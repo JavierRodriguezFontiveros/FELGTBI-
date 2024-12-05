@@ -1,10 +1,10 @@
 import psycopg2
 
 # Configura los parámetros de la conexión
-db_host="felgtbiplus.ctkyu2ec8xfz.eu-west-1.rds.amazonaws.com"  
-db_name="FELGTBIplus"  
-db_user="your_database_user"  
-db_password="d3sAf10_7riPulAc10n3s!"  
+db_host=""  
+db_name=""  
+db_user=""  
+db_password=""  
 db_port =5432
 
 
