@@ -16,19 +16,20 @@ def connect_to_db():
 
     # Establecer la conexión
     try:
-        connection = psycopg2.connect(
-            host=db_host,
-            database=db_database,
-            user=db_username,
-            password=db_password,
-            port=db_port,
-            sslmode="require"
-        )
+        connection = psycopg2.connect(host=db_host,
+                                      database=db_database,
+                                      user=db_username,
+                                      password=db_password,
+                                      port=db_port,
+                                      sslmode="require")
+        
         print("Conexión exitosa a la base de datos PostgreSQL con SSL")
-        return connection  # Retornar la conexión exitosa
+        return connection  
+    
     except psycopg2.OperationalError as e:
         print("Error de conexión:", e)
-        return None  # En caso de error, retornar None
+        return None  
+    
     except Exception as error:
         print("Error desconocido:", error)
-        return None  # En caso de error, retornar None
+        return None  
