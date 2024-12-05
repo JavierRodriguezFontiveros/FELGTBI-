@@ -1,19 +1,28 @@
 import psycopg2
-
+import os
+from dotenv import load_dotenv
+load_dotenv()
 # Configura los parámetros de la conexión
-db_host=""  
-db_name=""  
-db_user=""  
-db_password=""  
-db_port =5432
+
+db_host = os.getenv("HOST")
+db_username = os.getenv("AWS_USERNAME")
+db_password = os.getenv("PASSWORD")
+db_database = os.getenv("DATABASE")
+db_port = os.getenv("PORT")
+
+print(db_host)
+print(db_username)
+print(db_password)
+print(db_database)
+print(db_port)
 
 
 # Establecer la conexión
 try:
     connection = psycopg2.connect(
         host=db_host,
-        database=db_name,
-        user=db_user,
+        database=db_database,
+        user=db_username,
         password=db_password,
         port=db_port,
         sslmode='disable'
