@@ -8,8 +8,10 @@ from fastapi.responses import StreamingResponse
 import io
 import matplotlib.pyplot as plt
 
+from graficas import crear_grafico_pie, barras_apiladas_genero_orientacion, graficar_permiso_residencia, graficar_combinaciones
 from utils import connect_to_db
 
+from io import BytesIO
 
 
 
@@ -86,6 +88,131 @@ def generate_bar_chart():
 
 
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+@app.get("/grafico-pie/")
+def generar_grafico_pie(viven_espana: bool = True):
+    connection = connect_to_db()
+    try:
+        # Escribir la consulta SQL para obtener los datos
+        query = "SELECT * FROM user_data"  # Cambia esta consulta según sea necesario
+
+        # Usar pandas para ejecutar la consulta y convertirla en un DataFrame
+        df = pd.read_sql_query(query, connection)
+
+        # Cerrar la conexión después de obtener los datos
+        connection.close()
+        
+        # Crear el gráfico de pastel
+        fig = crear_grafico_pie(df, viven_espana)
+
+        # Guardar el gráfico como imagen en un buffer
+        img_bytes = fig.to_image(format="png")
+
+        # Crear un buffer de memoria
+        buf = BytesIO(img_bytes)
+        buf.seek(0)
+
+        # Devolver la imagen como respuesta
+        return StreamingResponse(buf, media_type="image/png")
+    
+    except Exception as e:
+        return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
+    
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+@app.get("/barras-apiladas/")
+def generar_barras_apiladas():
+    connection = connect_to_db()
+    try:
+        # Escribir la consulta SQL para obtener los datos
+        query = "SELECT * FROM user_data"  # Cambia esta consulta según sea necesario
+
+        # Usar pandas para ejecutar la consulta y convertirla en un DataFrame
+        df = pd.read_sql_query(query, connection)
+
+        # Cerrar la conexión después de obtener los datos
+        connection.close()
+
+        # Generar el gráfico de barras apiladas
+        fig = barras_apiladas_genero_orientacion(df)
+
+        # Guardar el gráfico como imagen en un buffer
+        img_bytes = fig.to_image(format="png")
+
+        # Crear un buffer de memoria
+        buf = BytesIO(img_bytes)
+        buf.seek(0)
+
+        # Devolver la imagen como respuesta
+        return StreamingResponse(buf, media_type="image/png")
+    
+    except Exception as e:
+        return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
+    
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+@app.get("/grafico-permiso-residencia/")
+def generar_grafico_permiso_residencia():
+    connection = connect_to_db()
+    try:
+        # Escribir la consulta SQL para obtener los datos
+        query = "SELECT * FROM user_data"  # Cambia esta consulta según sea necesario
+
+        # Usar pandas para ejecutar la consulta y convertirla en un DataFrame
+        df = pd.read_sql_query(query, connection)
+
+        # Cerrar la conexión después de obtener los datos
+        connection.close()
+
+        # Generar el gráfico de permisos de residencia
+        fig = graficar_permiso_residencia(df)
+
+        # Guardar el gráfico como imagen en un buffer
+        img_bytes = fig.to_image(format="png")
+
+        # Crear un buffer de memoria
+        buf = BytesIO(img_bytes)
+        buf.seek(0)
+
+        # Devolver la imagen como respuesta
+        return StreamingResponse(buf, media_type="image/png")
+    
+    except Exception as e:
+        return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
+    
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+@app.get("/grafico-combinaciones/")
+def generar_grafico_combinaciones():
+    connection = connect_to_db()
+    try:
+        # Escribir la consulta SQL para obtener los datos
+        query = "SELECT * FROM user_data"  # Cambia esta consulta según sea necesario
+
+        # Usar pandas para ejecutar la consulta y convertirla en un DataFrame
+        df = pd.read_sql_query(query, connection)
+
+        # Cerrar la conexión después de obtener los datos
+        connection.close()
+
+        # Generar el gráfico de combinaciones
+        fig = graficar_combinaciones(df)
+
+        # Guardar el gráfico como imagen en un buffer
+        img_bytes = fig.to_image(format="png")
+
+        # Crear un buffer de memoria
+        buf = BytesIO(img_bytes)
+        buf.seek(0)
+
+        # Devolver la imagen como respuesta
+        return StreamingResponse(buf, media_type="image/png")
+    
+    except Exception as e:
+        return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # Punto de entrada principal

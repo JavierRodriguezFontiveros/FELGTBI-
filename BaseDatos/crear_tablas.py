@@ -64,6 +64,18 @@ cur.execute("""CREATE TABLE IF NOT EXISTS user_data(
 conn.commit()
 print("tabla usuario creada")
 
+
+# Comando para crear tabla de sociosanitarios ¡¡¡¡¡¡¡Pendiente!!!!!!
+cur.execute("""CREATE TABLE IF NOT EXISTS sociosanitarios_data(
+            sociosanitario_id SERIAL PRIMARY KEY,
+            ciudad VARCHAR (50) NOT NULL,
+            ambito_laboral VARCHAR (50) NOT NULL,
+            especialidad VARCHAR (50) NOT NULL
+            );
+            """)
+conn.commit()
+print("tabla sociosanitarios creada")
+
 # Cerrar el cursor y la bbdd
 cur.close()
 conn.close()
