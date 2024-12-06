@@ -1,5 +1,5 @@
 # Bibliotecas:
-from fastapi import FastAPI #Api
+from fastapi import FastAPI, Query #Api
 import uvicorn #Despliegue en Local
 
 import pandas as pd
@@ -8,12 +8,12 @@ from fastapi.responses import StreamingResponse
 import io
 import matplotlib.pyplot as plt
 
-from graficas import crear_grafico_pie, barras_apiladas_genero_orientacion, graficar_permiso_residencia, graficar_combinaciones
+from graficas import crear_grafico_pie, barras_apiladas_genero_orientacion, graficar_permiso_residencia, graficar_combinaciones, buscar_ciudad, obtener_top_5_ciudades
 from utils import connect_to_db
 
 from io import BytesIO
 
-
+from fastapi.responses import JSONResponse
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 app = FastAPI()
@@ -213,6 +213,47 @@ def generar_grafico_combinaciones():
     
     except Exception as e:
         return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
+    
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+@app.get("/buscar-ciudad/")
+def endpoint_buscar_ciudad(ciudad: str = Query(..., description="Nombre de la ciudad a buscar en la tabla.")):
+    connection = connect_to_db()
+    try:
+        # Obtener datos de la base de datos
+        query = "SELECT * FROM sociosanitarios_data"  # Cambia la consulta según sea necesario
+        df = pd.read_sql_query(query, connection)
+        connection.close()
+
+        # Buscar información de la ciudad
+        info_ciudad = buscar_ciudad(df, ciudad)
+
+        # Devolver la respuesta
+        return JSONResponse(content=info_ciudad)
+    
+    except Exception as e:
+        return {"error": f"Ocurrió un error al procesar la solicitud: {e}"}
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+@app.get("/top-5-ciudades/")
+def endpoint_top_5_ciudades():
+    connection = connect_to_db()
+    try:
+        # Obtener datos de la base de datos
+        query = "SELECT * FROM sociosanitarios_data"  # Cambia la consulta según sea necesario
+        df = pd.read_sql_query(query, connection)
+        connection.close()
+
+        # Obtener el top 5 de ciudades
+        top_5_ciudades = obtener_top_5_ciudades(df)
+
+        # Devolver la respuesta
+        return JSONResponse(content={"Top_5_Ciudades": top_5_ciudades})
+    
+    except Exception as e:
+        return {"error": f"Ocurrió un error al procesar la solicitud: {e}"}
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # Punto de entrada principal
