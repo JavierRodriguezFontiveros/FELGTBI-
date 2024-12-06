@@ -3,3 +3,5 @@ uvicorn==0.32.1
 pandas==2.2.2
 matplotlib==3.8.4
 psycopg2==2.9.10
+python-dotenv==0.21.0
+plotly==5.22.0
