@@ -24,7 +24,6 @@ conn = psycopg2.connect(database = db_database,
 # Generamos un cursor para operar dentro de la bbdd
 cur = conn.cursor()
 
-<<<<<<< HEAD
 # cur.execute("INSERT INTO user_data(edad) VALUES(20)")
 # print("Valor añadido") 
 # cur.execute("INSERT INTO user_data(edad) VALUES(35)")
@@ -39,7 +38,7 @@ cur = conn.cursor()
 # print("Valor añadido")          
 # cur.execute("INSERT INTO user_data(edad) VALUES(31)") 
 # print("Valor añadido")
-=======
+
 # Listas de valores que pueden tomar las columnas en la tabla de users_data para rellenar aleatoriamente las filas    
 edad = np.arange(15,80)
 pronombres = ["el", "ella", "elle"]
@@ -53,7 +52,6 @@ discapacitade = [True, False]
 sin_hogar = [True, False]
 migrante = [True, False]
 intersexual = [True, False]
->>>>>>> 9be459185db51d6d394cac07cde52541b8571eb4
 
 # Generar 100 filas con datos aleatorios
 for _ in range(100):
