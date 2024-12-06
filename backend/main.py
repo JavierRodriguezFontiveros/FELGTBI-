@@ -8,8 +8,9 @@ from fastapi.responses import StreamingResponse
 import io
 import matplotlib.pyplot as plt
 
-from utils import connect_to_db
+from utils import connect_to_db, crear_grafico_pie
 
+from io import BytesIO
 
 
 
@@ -84,6 +85,37 @@ def generate_bar_chart():
     except Exception as e:
         return {"error": f"Ocurrió un error al procesar los datos: {e}"}
 
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+@app.get("/grafico-pie/")
+def generar_grafico_pie(viven_espana: bool = True):
+    connection = connect_to_db()
+    try:
+        # Escribir la consulta SQL para obtener los datos
+        query = "SELECT * FROM user_data"  # Cambia esta consulta según sea necesario
+
+        # Usar pandas para ejecutar la consulta y convertirla en un DataFrame
+        df = pd.read_sql_query(query, connection)
+
+        # Cerrar la conexión después de obtener los datos
+        connection.close()
+        
+        # Crear el gráfico de pastel
+        fig = crear_grafico_pie(df, viven_espana)
+
+        # Guardar el gráfico como imagen en un buffer
+        img_bytes = fig.to_image(format="png")
+
+        # Crear un buffer de memoria
+        buf = BytesIO(img_bytes)
+        buf.seek(0)
+
+        # Devolver la imagen como respuesta
+        return StreamingResponse(buf, media_type="image/png")
+    
+    except Exception as e:
+        return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
 
 
 
