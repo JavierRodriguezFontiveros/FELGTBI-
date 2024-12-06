@@ -1,0 +1,51 @@
+{
+    "camino_2.1": {
+      "profesional": "Personal Sanitario",
+      "necesidades": [
+        "Manejo clínico de pacientes con VIH",
+        "Protocolo PEP",
+        "Tratamientos (PREP, TAR)",
+        "Prevención de infecciones oportunistas",
+        "Consejería para adherencia al tratamiento"
+      ]
+    },
+    "camino_2.2": {
+      "profesional": "Trabajador Social",
+      "necesidades": [
+        "Acceso a medicamentos o servicios",
+        "Recursos legales y derechos",
+        "Apoyo a personas en situación de vulnerabilidad",
+        "Conexión con grupos de apoyo comunitario",
+        "Información sobre redes de Servicios Sociales"
+      ]
+    },
+    "camino_2.3": {
+      "profesional": "Psicólogo",
+      "necesidades": [
+        "Apoyo emocional para personas recién diagnosticadas",
+        "Intervenciones para adherencia al tratamiento",
+        "Manejo del estigma y problemas de salud mental",
+        "Recursos para pacientes con VIH y trastornos psicológicos",
+        "Consejería en prevención y autocuidado"
+      ]
+    },
+    "camino_2.4": {
+      "profesional": "Educador",
+      "necesidades": [
+        "Material educativo sobre VIH",
+        "Capacitación en prevención",
+        "Métodos para combatir el estigma",
+        "Recursos para sensibilización",
+        "Estadísticas y datos actualizados"
+      ]
+    },
+    "camino_2.5": {
+      "profesional": "Voluntarios y Cuidadores",
+      "necesidades": [
+        "Info básica sobre VIH",
+        "Consejos para apoyar emocionalmente",
+        "Recursos legales y sociales para pacientes",
+        "Conexión con redes de apoyo"
+      ]
+    }
+  }

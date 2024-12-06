@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+import json
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 import os
@@ -32,11 +33,8 @@ def get_response_from_gemini(prompt):
 async def serve_html():
     return templates.TemplateResponse("chatbot.html", {"request": {}})
 
-@app.post("/api/chat")
-async def process_chat(data: dict):
-    prompt = data.get("prompt", "")
-    if not prompt:
-        return JSONResponse(content={"response": "Prompt vacío"}, status_code=400)
-    
-    response = get_response_from_gemini(prompt)
-    return JSONResponse(content={"response": response})
+@app.post("/sociosanitario/")
+async def devolverJSON(data: dict):
+    with open('/JSONs/sociosanitario.json', 'r') as archivo:
+        datos = json.load(archivo)
+    return JSONResponse(datos)
