@@ -1,0 +1,17 @@
+id_categoria,titulo_categoria,texto_pregunta,texto_opcion
+1.1,Tengo VIH,¿Cuándo te diagnosticaron?,Hace menos de 6 meses
+1.1,Tengo VIH,¿Cuándo te diagnosticaron?,Entre 6 meses y un año
+1.1,Tengo VIH,¿Cuándo te diagnosticaron?,Hace más de un año
+1.1,Tengo VIH,¿Estás en tratamiento TAR?,Sí
+1.1,Tengo VIH,¿Estás en tratamiento TAR?,No
+1.1,Tengo VIH,¿Estás en tratamiento TAR?,No estoy seguro
+1.1,Tengo VIH,¿Tienes acceso a un médico?,Sí
+1.1,Tengo VIH,¿Tienes acceso a un médico?,No
+1.2,Creo que me he expuesto al virus,¿Cuándo ocurrió la posible infección?,Últimas 72h
+1.2,Creo que me he expuesto al virus,¿Cuándo ocurrió la posible infección?,Hace más de 72h
+2.1,Personal sanitario,¿que necesitas?,Manejo clínico de pacientes con VIH
+2.1,Personal sanitario,¿que necesitas?,Protocolo PEP
+2.2,unicornio,que necsitas juapi?,Protoco
+2.2,unicornio,que necsitas juapi?,unicornis mazo flama loco
+2.5,oyente,que necesitas,conocer mas del tema
+2.5,oyente,que necesitas,pag web

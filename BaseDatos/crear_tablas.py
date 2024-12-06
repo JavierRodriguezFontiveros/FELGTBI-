@@ -32,10 +32,24 @@ cur.execute("""CREATE TABLE IF NOT EXISTS admin_data(
 conn.commit()
 print("tabla admin creada")
 
+# # Comando para crear tabla de preguntas
+# cur.execute("""CREATE TABLE IF NOT EXISTS preguntas(
+#             pregunta_id SERIAL PRIMARY KEY,
+#             texto VARCHAR (200) NOT NULL);
+#             """)
+# # Grabar los cambios en la bbdd
+# conn.commit()
+# print("tabla preguntas creada")
+
 # Comando para crear tabla de preguntas
-cur.execute("""CREATE TABLE IF NOT EXISTS preguntas(
-            pregunta_id SERIAL PRIMARY KEY,
-            texto VARCHAR (200) NOT NULL);
+cur.execute("""
+            CREATE TABLE IF NOT EXISTS preguntas_front (
+            id_categoria VARCHAR(10),  -- categoría en formato "1.1", "1.2", etc.
+            titulo_categoria VARCHAR(255),
+            texto_pregunta TEXT,
+            texto_opcion TEXT,
+            -- opcionalmente podemos generar un ID de opción único basado en la categoría
+            CONSTRAINT unique_categoria_opcion UNIQUE (id_categoria, texto_pregunta, texto_opcion));
             """)
 # Grabar los cambios en la bbdd
 conn.commit()
