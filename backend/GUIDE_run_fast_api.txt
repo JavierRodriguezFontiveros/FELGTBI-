@@ -1,0 +1,55 @@
+Step-by-Step Guide to Use Gunicorn with Uvicorn Workers for FastAPI
+1. File Structure Example
+
+If your project is structured like this:
+
+my-project/
+├── backend/
+│   ├── main.py           # FastAPI app
+│   ├── requirements.txt  # Python dependencies
+└── README.md
+Your FastAPI application (app = FastAPI()) is inside backend/main.py.
+2. Gunicorn + Uvicorn Command
+
+You would need to run Gunicorn with Uvicorn workers. Here’s the command to launch the FastAPI app properly.
+
+Command to run your FastAPI app:
+
+gunicorn -w 4 -k uvicorn.workers.UvicornWorker backend.main:app --bind 0.0.0.0:8000
+Explanation:
+
+-w 4: Runs 4 worker processes for better concurrency. You can adjust this number based on your server resources.
+-k uvicorn.workers.UvicornWorker: Uses Uvicorn as the worker class, which is designed for running ASGI applications like FastAPI.
+backend.main:app: This refers to the FastAPI app instance. It's assuming that:
+The backend/ folder contains the main.py file.
+Inside main.py, your FastAPI app is defined with the variable name app (i.e., app = FastAPI()).
+--bind 0.0.0.0:8000: Binds the server to 0.0.0.0 (so it's accessible from anywhere) on port 8000.
+3. Running in Production with Gunicorn
+
+You can run this command on your production server (e.g., when deploying to Render or AWS). This will start the FastAPI app with 4 Gunicorn worker processes, each using Uvicorn as the worker for ASGI.
+
+Additional Notes on Deployment
+File Paths: When specifying backend.main:app, ensure that the path matches the file structure.
+Configuration for Render: If you're deploying this on Render or any other platform, you typically add this start command in your Render web service settings (in the "Start Command" field).
+For example:
+
+Start Command: gunicorn -w 4 -k uvicorn.workers.UvicornWorker backend.main:app --bind 0.0.0.0:8000
+
+Why Use Gunicorn with Uvicorn Workers?
+Uvicorn is an ASGI server and is best for FastAPI apps, allowing them to handle asynchronous operations efficiently.
+Gunicorn can manage multiple processes, which is crucial for handling multiple requests concurrently in a production environment.
+By using Uvicorn workers with Gunicorn, you get the benefits of both:
+Uvicorn handles asynchronous capabilities of FastAPI.
+Gunicorn manages multiple worker processes for concurrency and fault tolerance.
+
+Summary
+To run your FastAPI app located in backend/main.py with Gunicorn and Uvicorn workers, use this command:
+
+gunicorn -w 4 -k uvicorn.workers.UvicornWorker backend.main:app --bind 0.0.0.0:8000
+
+
+
+
+
+
+
