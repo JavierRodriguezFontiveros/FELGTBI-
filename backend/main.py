@@ -8,7 +8,7 @@ from fastapi.responses import StreamingResponse
 import io
 import matplotlib.pyplot as plt
 
-from graficas import crear_grafico_pie, barras_apiladas_genero_orientacion, graficar_permiso_residencia, graficar_combinaciones, buscar_ciudad, obtener_top_5_ciudades
+from graficas import crear_grafico_pie, barras_apiladas_genero_orientacion, graficar_permiso_residencia, graficar_combinaciones, buscar_ciudad, obtener_top_5_ciudades, graficar_especialidad
 from utils import connect_to_db
 
 from io import BytesIO
@@ -254,8 +254,55 @@ def endpoint_top_5_ciudades():
     
     except Exception as e:
         return {"error": f"Ocurrió un error al procesar la solicitud: {e}"}
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
+
+
+
+
+
+
+
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+
+@app.get("/grafico-especialidad/")
+def generar_grafico_especialidad():
+    connection = connect_to_db()
+    try:
+        # Consulta para obtener los datos
+        query = "SELECT * FROM sociosanitarios_data"  # Cambia la consulta según sea necesario
+
+        # Convertir los datos en un DataFrame
+        df = pd.read_sql_query(query, connection)
+
+        # Generar el gráfico de especialidades
+        fig = graficar_especialidad(df)
+
+        # Guardar el gráfico como imagen en un buffer
+        img_bytes = fig.to_image(format="png")
+
+        # Crear un buffer de memoria
+        buf = BytesIO(img_bytes)
+        buf.seek(0)
+
+        # Devolver la imagen como respuesta
+        return StreamingResponse(buf, media_type="image/png")
+    
+    except Exception as e:
+        return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
+    finally:
+        connection.close()
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # Punto de entrada principal
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
