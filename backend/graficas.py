@@ -97,3 +97,55 @@ def graficar_combinaciones(dataframe):
     fig.update_layout(xaxis_tickangle=45)
     
     return fig
+
+
+def buscar_ciudad(dataframe, ciudad_a_buscar):
+    ciudad_filtrada = dataframe[dataframe['ciudad'].str.lower() == ciudad_a_buscar.lower()]
+    info_ciudad = {
+        "Ciudad": ciudad_a_buscar,
+        "Cantidad": len(ciudad_filtrada)
+        } if not ciudad_filtrada.empty else {
+        "Ciudad": ciudad_a_buscar,
+        "Cantidad": 0
+    }
+    return info_ciudad
+
+
+def obtener_top_5_ciudades(dataframe):
+    ciudades_count = dataframe['ciudad'].value_counts().reset_index()
+    ciudades_count.columns = ['Ciudad', 'Cantidad']
+    top_5_ciudades = ciudades_count.head(5).to_dict(orient='records')
+    return top_5_ciudades
+
+
+def graficar_especialidad(dataframe):
+    # Contar las frecuencias de los valores en la columna 'especialidad'
+    especialidad_count = dataframe['especialidad'].value_counts().reset_index()
+    especialidad_count.columns = ['Especialidad', 'Cantidad']
+    
+    # Calcular los porcentajes
+    total = especialidad_count['Cantidad'].sum()
+    especialidad_count['Porcentaje'] = (especialidad_count['Cantidad'] / total) * 100
+    
+    # Calcular el índice de la sección con el valor más grande
+    max_value_index = especialidad_count['Cantidad'].idxmax()
+    
+    # Crear un vector donde la porción con el valor más grande será destacada
+    pull_values = [0 if i != max_value_index else 0.1 for i in range(len(especialidad_count))]
+    
+    # Crear gráfico de pastel (pie chart) con cantidades y porcentajes
+    fig = px.pie(
+        especialidad_count,
+        names='Especialidad',
+        values='Cantidad',
+        title='Distribución de Especialidades',
+        labels={'Especialidad': 'Especialidad'},
+        color='Especialidad',
+        color_discrete_sequence=px.colors.qualitative.Set1,
+        hole=0.3  # Tipo donut
+    )
+    
+    # Añadir texto de porcentajes y cantidades dentro del gráfico
+    fig.update_traces(pull=pull_values)
+    
+    return fig

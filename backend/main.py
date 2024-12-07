@@ -1,5 +1,5 @@
 # Bibliotecas:
-from fastapi import FastAPI #Api
+from fastapi import FastAPI, Query #Api
 import uvicorn #Despliegue en Local
 
 import pandas as pd
@@ -8,12 +8,17 @@ from fastapi.responses import StreamingResponse
 import io
 import matplotlib.pyplot as plt
 
-from graficas import crear_grafico_pie, barras_apiladas_genero_orientacion, graficar_permiso_residencia, graficar_combinaciones
+from graficas import crear_grafico_pie, barras_apiladas_genero_orientacion, graficar_permiso_residencia, graficar_combinaciones, buscar_ciudad, obtener_top_5_ciudades, graficar_especialidad
 from utils import connect_to_db
 
 from io import BytesIO
 
+from fastapi.responses import JSONResponse
 
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from typing import Dict, Any
+import google.generativeai as genai
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 app = FastAPI()
@@ -213,8 +218,177 @@ def generar_grafico_combinaciones():
     
     except Exception as e:
         return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
+    
+
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-# Punto de entrada principal
+@app.get("/buscar-ciudad/")
+def endpoint_buscar_ciudad(ciudad: str = Query(..., description="Nombre de la ciudad a buscar en la tabla.")):
+    connection = connect_to_db()
+    try:
+        # Obtener datos de la base de datos
+        query = "SELECT * FROM sociosanitarios_data"  # Cambia la consulta según sea necesario
+        df = pd.read_sql_query(query, connection)
+        connection.close()
+
+        # Buscar información de la ciudad
+        info_ciudad = buscar_ciudad(df, ciudad)
+
+        # Devolver la respuesta
+        return JSONResponse(content=info_ciudad)
+    
+    except Exception as e:
+        return {"error": f"Ocurrió un error al procesar la solicitud: {e}"}
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+@app.get("/top-5-ciudades/")
+def endpoint_top_5_ciudades():
+    connection = connect_to_db()
+    try:
+        # Obtener datos de la base de datos
+        query = "SELECT * FROM sociosanitarios_data"  # Cambia la consulta según sea necesario
+        df = pd.read_sql_query(query, connection)
+        connection.close()
+
+        # Obtener el top 5 de ciudades
+        top_5_ciudades = obtener_top_5_ciudades(df)
+
+        # Devolver la respuesta
+        return JSONResponse(content={"Top_5_Ciudades": top_5_ciudades})
+    
+    except Exception as e:
+        return {"error": f"Ocurrió un error al procesar la solicitud: {e}"}
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+
+
+
+
+
+
+
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+
+@app.get("/grafico-especialidad/")
+def generar_grafico_especialidad():
+    connection = connect_to_db()
+    try:
+        # Consulta para obtener los datos
+        query = "SELECT * FROM sociosanitarios_data"  # Cambia la consulta según sea necesario
+
+        # Convertir los datos en un DataFrame
+        df = pd.read_sql_query(query, connection)
+
+        # Generar el gráfico de especialidades
+        fig = graficar_especialidad(df)
+
+        # Guardar el gráfico como imagen en un buffer
+        img_bytes = fig.to_image(format="png")
+
+        # Crear un buffer de memoria
+        buf = BytesIO(img_bytes)
+        buf.seek(0)
+
+        # Devolver la imagen como respuesta
+        return StreamingResponse(buf, media_type="image/png")
+    
+    except Exception as e:
+        return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
+    finally:
+        connection.close()
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+#
+#
+#
+#
+# Definir el esquema para la solicitud entrante
+provincia = "Asturias"
+pronombres= "Elle"
+
+class UserData(BaseModel):
+    data: Dict[str, Any]
+
+def generar_respuesta(prompt):
+    try:
+        prompt_total = f"Eres un especialista sociosanitario en VIH, hablas con compasión y tacto.: {prompt}"
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        response = model.generate_content(prompt_total)
+        if not response or not hasattr(response, 'text'):
+            raise ValueError("Respuesta vacía o no válida del modelo.")
+        return response.text
+    except Exception as e:
+        return f"Error al generar respuesta para historia: {str(e)}"
+
+@app.post("/personalizar_prompt")
+async def personalizar_prompt(user_data: UserData):
+    try:
+        # Determinar el tipo de sección y construir el prompt dinámicamente
+        for key, seccion in user_data.data.items():
+            titulo = seccion.get("titulo", "No especificado")
+            preguntas = seccion.get("preguntas", {})
+
+            # Verificar el tipo de sección
+            if key.startswith("1.1"):
+                tiempo_diagnostico = preguntas.get("¿Cuándo te diagnosticaron?", ["No especificado"])[0]
+                en_tratamiento = preguntas.get("¿Estás en tratamiento TAR?", ["No especificado"])[0]
+                acceso_medico = preguntas.get("¿Tienes acceso a un médico?", ["No especificado"])[0]
+                informacion_necesaria = preguntas.get("¿Quieres información sobre algún tema?", ["Ninguna"])[0]
+
+                # Crear el prompt para la sección 1.1
+                prompt = ("Eres un especialista sociosanitario en VIH, hablas con compasión y tacto. Mis prnombres son:" + pronombres + "Vivo en" +provincia+ "Tengo VIH diagnosticado desde " + tiempo_diagnostico + "¿Qué si estoy en tratamiento?" + en_tratamiento + ". Y además " + acceso_medico + "tengo acceso médico. La información que solicito es:"+ informacion_necesaria + "."
+                )
+
+            elif key.startswith("1.2"):
+                tipo_exposicion = preguntas.get("¿Qué tipo de exposición fue?", ["No especificado"])[0]
+                tiempo_exposicion = preguntas.get("¿Cuándo ocurrió la posible infección?", ["No especificado"])[0]
+                acceso_medico = preguntas.get("¿Tienes acceso a un médico?", ["No especificado"])[0]
+                conocimiento_pep = preguntas.get("¿Sabes qué es la PEP?", ["No especificado"])[0]
+
+                # Crear el prompt para la sección 1.2
+                prompt = (
+                    "Título: " + titulo + ". \n"
+                    "Tipo de exposición: " + tipo_exposicion + ". \n"
+                    "Tiempo desde la exposición: " + tiempo_exposicion + ". \n"
+                    "Acceso a médico: " + acceso_medico + ". \n"
+                    "Conocimiento sobre PEP: " + conocimiento_pep + "."
+                )
+
+            elif key.startswith("1.3"):
+                tema_informacion = preguntas.get("¿Sobre qué tema quieres información?", ["No especificado"])[0]
+
+                # Crear el prompt para la sección 1.3
+                prompt = (
+                    "Título: " + titulo + ". \n"
+                    "Tema de interés: " + tema_informacion + "."
+                )
+
+            else:
+                prompt = "Título: " + titulo + ". No se encontró un formato específico para esta sección."
+
+            # Generar la respuesta del modelo
+            respuesta_chatbot = generar_respuesta(prompt)
+
+            # Devolver la respuesta del chatbot
+            return {"respuesta_chatbot": respuesta_chatbot}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    # Punto de entrada principal
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
