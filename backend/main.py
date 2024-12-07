@@ -310,6 +310,8 @@ def generar_grafico_especialidad():
 #
 #
 # Definir el esquema para la solicitud entrante
+# pronombres = seccion.get("pronombres", "No especificado")
+# provincia = seccion.get("provincia", "No especificado")
 provincia = "Asturias"
 pronombres= "Elle"
 
@@ -343,7 +345,12 @@ async def personalizar_prompt(user_data: UserData):
                 informacion_necesaria = preguntas.get("¿Quieres información sobre algún tema?", ["Ninguna"])[0]
 
                 # Crear el prompt para la sección 1.1
-                prompt = ("Eres un especialista sociosanitario en VIH, hablas con compasión y tacto. Mis prnombres son:" + pronombres + "Vivo en" +provincia+ "Tengo VIH diagnosticado desde " + tiempo_diagnostico + "¿Qué si estoy en tratamiento?" + en_tratamiento + ". Y además " + acceso_medico + "tengo acceso médico. La información que solicito es:"+ informacion_necesaria + "."
+                prompt = ("Mis prnombres son:" + pronombres + ". \n"
+                        "Vivo en" + provincia + ". \n"
+                        "Tengo VIH diagnosticado desde " + tiempo_diagnostico + ". \n"
+                        "¿Qué si estoy en tratamiento?" + en_tratamiento + ". \n"
+                        ". Y además " + acceso_medico + ". \n"
+                        "tengo acceso médico. La información que solicito es:"+ informacion_necesaria + "."
                 )
 
             elif key.startswith("1.2"):
