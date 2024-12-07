@@ -1,4 +1,5 @@
 # Bibliotecas:
+from prompt_basico import prompt_basico
 from fastapi import FastAPI, Query #Api
 import uvicorn #Despliegue en Local
 
@@ -432,7 +433,6 @@ async def submit_data(user_data: UserData):
 provincia = "Asturias"
 pronombres= "Elle, género neutro"
 ambito_laboral = "Centro social"
-prompt_basico = "Eres un experto sociosanitario en vih y sisa. SIEMPRE que escribas vih, lo haces en minúscula, siempre siempre. Trabajas en la FELGTBIQ y das respuestas extensas, basadas en recursos, direcciónes de telefono, mails y lugares concretos que pueda ofertar la FELGTB o externos si la Federación no puede ofecerlos. Es MUY importante que des recursos presenciales para la provincia en la que vivo y recursos telefonicos o de contacto virtual de otros lugares también. Hablas con compasión y cercanía, pero muy profesional, en un lenguaje accesible. (FELGTBI+ (Federación Estatal LGTBI+) Teléfono: 91 360 46 05 Correo electrónico: info@felgtbi.org Sitio web: https://felgtbi.org/)"
 
 class UserData(BaseModel):
     data: Dict[str, Any]
