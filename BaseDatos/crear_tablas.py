@@ -128,6 +128,34 @@ cur.execute(
 )
 conn.commit()
 print("tablas chatbot creadas")
+cur.execute(
+  """
+    CREATE TABLE IF NOT EXISTS categoria_pregunta_chat_intermed (
+        id_categoria INT NOT NULL,
+        id_pregunta INT NOT NULL,
+        PRIMARY KEY (id_categoria, id_pregunta),
+        FOREIGN KEY (id_categoria) REFERENCES categorias_chatbot(id_categoria),
+        FOREIGN KEY (id_pregunta) REFERENCES preguntas_chatbot(id_pregunta)
+    );
+  """
+)
+conn.commit()
+print("tablas categoria_pregunta_chat_intermed creada")
+
+cur.execute(
+  """
+      CREATE TABLE IF NOT EXISTS pregunta_opcion_chatbot (
+      id_pregunta INT NOT NULL,
+      id_opcion INT NOT NULL,
+      PRIMARY KEY (id_pregunta, id_opcion),
+      FOREIGN KEY (id_pregunta) REFERENCES preguntas_chatbot(id_pregunta),
+      FOREIGN KEY (id_opcion) REFERENCES opciones_chatbot(id_opcion)
+  );
+
+  """
+)
+conn.commit()
+print("tablas pregunta_opcion_chatbot creada")
 
 # Cerrar el cursor y la bbdd
 cur.close()

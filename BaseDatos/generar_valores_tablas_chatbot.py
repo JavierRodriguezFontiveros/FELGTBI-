@@ -41,33 +41,73 @@ categorias = [
 
 cur.executemany("INSERT INTO categorias_chatbot (titulo_categoria) VALUES (%s);", categorias)
 
-# Inserción en preguntas_chatbot
+
+# Recuperar los ids de las categorías
+cur.execute("SELECT id_categoria, titulo_categoria FROM categorias_chatbot;")
+categorias = cur.fetchall()
+
+# Crear un diccionario con los títulos de las categorías como claves y los IDs como valores
+categoria_dict = {categoria[1]: categoria[0] for categoria in categorias}
+
+# Crear una lista de preguntas con el id_categoria adecuado
 preguntas = [
-    # preguntas Chatbot (sociosanitario)
-    # PRIMARY id_pregunta, id_categoria, texto_pregunta
-    (1, '¿Qué necesitas?'),
+    (categoria_dict['Personal Sanitario'], '¿Qué necesitas?'),
+    
+    # Preguntas Chatbot (Usuario no sociosanitario)
+    (categoria_dict['Tengo vih'], '¿Cuándo te diagnosticaron?'),
+    (categoria_dict['Tengo vih'], '¿Estás en tratamiento TAR?'),
+    (categoria_dict['Tengo vih'], '¿Tienes acceso a un médico?'),
+    (categoria_dict['Tengo vih'], '¿Has compartido tu diagnostico con alguien?'),
+    (categoria_dict['Tengo vih'], '¿Quieres información sobre algun tema?'),
+    (categoria_dict['Creo que me he expuesto al virus'], '¿Cuándo ocurrió la posible infección?'),
+    (categoria_dict['Creo que me he expuesto al virus'], '¿Qué tipo de exposición fue?'),
+    (categoria_dict['Creo que me he expuesto al virus'], '¿Ha sido en un entorno de "chem-sex"?'),
+    (categoria_dict['Creo que me he expuesto al virus'], '¿Tienes acceso a un medico?'),
+    (categoria_dict['Creo que me he expuesto al virus'], '¿Has compartido tu preocupación con alguien?'),
+    (categoria_dict['Creo que me he expuesto al virus'], '¿Sabes qué es la PEP?'),
+    (categoria_dict['Quiero saber más sobre el vih/sida'], '¿Necesitas recursos de referencia?'),
+    (categoria_dict['Estoy apoyando a una persona seropositiva'], '¿Tienes acceso a recursos locales o grupos de apoyo?'),
+    (categoria_dict['Estoy apoyando a una persona seropositiva'], '¿Has compartido tu preocupación con alguien?'),
+    (categoria_dict['Estoy apoyando a una persona seropositiva'], '¿Qué apoyo necesitas?'),
+]
+
+# Insertar las preguntas en la base de datos
+cur.executemany("INSERT INTO preguntas_chatbot (id_categoria, texto_pregunta) VALUES (%s, %s);", preguntas)
+conn.commit()
+
+
+
+
+
+
+
+# # Inserción en preguntas_chatbot
+# preguntas = [
+#     # preguntas Chatbot (sociosanitario)
+#     # PRIMARY id_pregunta, id_categoria, texto_pregunta
+#     (1, '¿Qué necesitas?'),
    
  
-    # Preguntas Chatbot (Usuario no sociosanitario)
-    (2, '¿Cuándo te diagnosticaron?'),
-    (2, '¿Estás en tratamiento TAR?'),
-    (2, '¿Tienes acceso a un médico'),
-    (2, '¿Has compartido tu diagnostico con alguien?'),
-    (2, '¿Quieres información sobre algun tema?'),
-    (2, '¿Cuándo ocurrió la posible infección?'),
-    (2, '¿Qué tipo de exposición fue?'),
-    (2, '¿Ha sido en un entorno de "chem-sex"?'),
-    (2, '¿Has compartido tu preocupación con alguien"?'),
-    (2, '¿Sabes qué es la PEP?'),
-    (2, '¿Necesitas recursos de referencia?'),
-    (2, '¿Tienes acceso a recursos locales o grupos de apoyo?'),
-    (2, '¿Qué apoyo necesitas?'),
+#     # Preguntas Chatbot (Usuario no sociosanitario)
+#     (2, '¿Cuándo te diagnosticaron?'),
+#     (2, '¿Estás en tratamiento TAR?'),
+#     (2, '¿Tienes acceso a un médico'),
+#     (2, '¿Has compartido tu diagnostico con alguien?'),
+#     (2, '¿Quieres información sobre algun tema?'),
+#     (2, '¿Cuándo ocurrió la posible infección?'),
+#     (2, '¿Qué tipo de exposición fue?'),
+#     (2, '¿Ha sido en un entorno de "chem-sex"?'),
+#     (2, '¿Has compartido tu preocupación con alguien"?'),
+#     (2, '¿Sabes qué es la PEP?'),
+#     (2, '¿Necesitas recursos de referencia?'),
+#     (2, '¿Tienes acceso a recursos locales o grupos de apoyo?'),
+#     (2, '¿Qué apoyo necesitas?'),
     
 
 
-]
+# ]
 
-cur.executemany("INSERT INTO preguntas_chatbot (id_categoria, texto_pregunta) VALUES (%s, %s);", preguntas)
+# cur.executemany("INSERT INTO preguntas_chatbot (id_categoria, texto_pregunta) VALUES (%s, %s);", preguntas)
 
 # Inserción en opciones_chatbot
 opciones = [
