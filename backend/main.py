@@ -480,7 +480,7 @@ async def personalizar_prompt(user_data: UserData):
 
                 # Crear el prompt para la sección 1.1
                 prompt = ("Mis pronombres (dirígete a mi conjugando como corresponda, si es elle, en género neutro, si es él/ella, pues en masculino/femenino, si te digo varios, usa solo uno de los que te diga) son:" + pronombres + ". \n"
-                        "Vivo en" + provincia + ". \n"
+                        "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
                         "Tengo VIH diagnosticado desde " + tiempo_diagnostico + ". \n"
                         "¿Qué si estoy en tratamiento?" + en_tratamiento + ". \n"
                         ". Y además " + acceso_medico + ". \n"
@@ -497,7 +497,7 @@ async def personalizar_prompt(user_data: UserData):
 
                 # Crear el prompt para la sección 1.2
                 prompt = ("Mis pronombres (dirígete a mi conjugando como corresponda, si es elle, en género neutro, si es él/ella, pues en masculino/femenino, si te digo varios, usa solo uno de los que te diga) son:" + pronombres + ". \n"
-                        "Vivo en" + provincia + ". \n"
+                        "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
                         "Creo que me he expuesto al virus en " + tiempo_exposicion + ". \n"
                         "El tipo de exposición ha sido:" + tipo_exposicion + ". \n"
                         + chem_sex + "ha sido en entorno de chem-sex. \n"
@@ -509,7 +509,7 @@ async def personalizar_prompt(user_data: UserData):
 
                 # Crear el prompt para la sección 1.3
                 prompt = ("Mis pronombres (dirígete a mi conjugando como corresponda, si es elle, en género neutro, si es él/ella, pues en masculino/femenino, si te digo varios, usa solo uno de los que te diga) son:" + pronombres + ". \n"
-                        "Vivo en" + provincia + ". \n"
+                        "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
                         "Quiero información sobre:" + tema_informacion)
 
             elif key.startswith("1.4"):
@@ -519,7 +519,7 @@ async def personalizar_prompt(user_data: UserData):
 
                 # Crear el prompt para la sección 1.4
                 prompt = ("Mis pronombres (dirígete a mi conjugando como corresponda, si es elle, en género neutro, si es él/ella, pues en masculino/femenino, si te digo varios, usa solo uno de los que te diga) son:" + pronombres + ". \n"
-                        "Vivo en" + provincia + ". \n"
+                        "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
                         "Estoy acompañando a una persona seropositiva." + acceso_grupos + "tengo acceso a recursos locales o grupos de apoyo. /n"
                         "He compartido mi preocupación con" + preocupacion4 + ". /n"
                         "Me gustaría orientación para conseguir" + apoyo_necesario)
@@ -529,7 +529,7 @@ async def personalizar_prompt(user_data: UserData):
 
                 # Crear el prompt para la sección 2.1
                 prompt = ("Mis pronombres (dirígete a mi conjugando como corresponda, si es elle, en género neutro, si es él/ella, pues en masculino/femenino, si te digo varios, usa solo uno de los que te diga) son:" + pronombres + ". \n"
-                        "Vivo en" + provincia + ". \n"
+                        "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
                         "Soy personal sanitario y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
                         "Necesito información sobre" + eleccion + ".")
                 
@@ -538,7 +538,7 @@ async def personalizar_prompt(user_data: UserData):
 
                 # Crear el prompt para la sección 2.1
                 prompt = ("Mis pronombres (dirígete a mi conjugando como corresponda, si es elle, en género neutro, si es él/ella, pues en masculino/femenino, si te digo varios, usa solo uno de los que te diga) son:" + pronombres + ". \n"
-                        "Vivo en" + provincia + ". \n"
+                        "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
                         "Soy trabajador social y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
                         "Necesito información sobre" + eleccion2 + ".")
 
@@ -547,7 +547,7 @@ async def personalizar_prompt(user_data: UserData):
 
                 # Crear el prompt para la sección 2.1
                 prompt = ("Mis pronombres (dirígete a mi conjugando como corresponda, si es elle, en género neutro, si es él/ella, pues en masculino/femenino, si te digo varios, usa solo uno de los que te diga) son:" + pronombres + ". \n"
-                        "Vivo en" + provincia + ". \n"
+                        "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
                         "Soy psicólogo y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
                         "Necesito información sobre" + eleccion3 + ".")
                 
@@ -556,7 +556,7 @@ async def personalizar_prompt(user_data: UserData):
 
                 # Crear el prompt para la sección 2.1
                 prompt = ("Mis pronombres (dirígete a mi conjugando como corresponda, si es elle, en género neutro, si es él/ella, pues en masculino/femenino, si te digo varios, usa solo uno de los que te diga) son:" + pronombres + ". \n"
-                        "Vivo en" + provincia + ". \n"
+                        "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
                         "Soy educador y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
                         "Necesito información sobre" + eleccion4 + ".")
                 
@@ -565,7 +565,7 @@ async def personalizar_prompt(user_data: UserData):
 
                 # Crear el prompt para la sección 2.1
                 prompt = ("Mis pronombres (dirígete a mi conjugando como corresponda, si es elle, en género neutro, si es él/ella, pues en masculino/femenino, si te digo varios, usa solo uno de los que te diga) son:" + pronombres + ". \n"
-                        "Vivo en" + provincia + ". \n"
+                        "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
                         "Soy voluntario/cuidador y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
                         "Necesito información sobre" + eleccion5 + ".")
 
