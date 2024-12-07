@@ -339,7 +339,7 @@ def generar_respuesta(prompt):
     try:
         print(f"Llamando al modelo con prompt: {prompt}")
         model = genai.GenerativeModel("gemini-1.5-flash")
-        response = model.generate_content(prompt)
+        response = model.generate_content(prompt, timeout=30)
         print("Respuesta generada con éxito.")
         if not response or not hasattr(response, 'text'):
             raise ValueError("Respuesta vacía o no válida del modelo.")
