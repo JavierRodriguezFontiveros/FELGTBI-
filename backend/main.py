@@ -26,18 +26,19 @@ import os
 #CREAR API Y CONFIGURAR MODELO
 app = FastAPI()
 load_dotenv()
-try:
-    gemini_api_key = load_dotenv()
-    
-    if not gemini_api_key:
-        raise ValueError("La variable GEMINI_API_KEY no está definida. Verifica tu archivo .env o las variables de entorno.")
-    
-    genai.configure(api_key=gemini_api_key)
-    print("API configurada correctamente con la clave proporcionada.")
+gemini_api_key = load_dotenv()
+import google.generativeai as genai
 
+genai.configure(api_key=gemini_api_key)
+
+try:
+    model = genai.GenerativeModel("gemini-1.5-flash")
+    print("Llamando al modelo con un prompt simple...")
+    # response = model.generate_content("Prueba simple del modelo.")
+    # print(f"Respuesta: {response.text}")
 except Exception as e:
-    print(f"Error al configurar la API: {e}")
-    raise
+    print(f"Error al llamar al modelo: {e}")
+
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -437,18 +438,30 @@ ambito_laboral = "Centro social2"
 class UserData(BaseModel):
     data: Dict[str, Any]
 
+import concurrent.futures
+
 def generar_respuesta(prompt):
     try:
-        print(f"Llamando al modelo con prompt: {prompt}")
-        model = genai.GenerativeModel("gemini-1.5-flash")
-        response = model.generate_content(prompt, timeout=30)
-        print("Respuesta generada con éxito.")
+        def call_model():
+            model = genai.GenerativeModel("gemini-1.5-flash")
+            return model.generate_content(prompt)
+
+        # Usar un executor para manejar el tiempo límite
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(call_model)
+            response = future.result(timeout=30)  # Tiempo límite de 30 segundos
+
+        # Verificar si la respuesta es válida
         if not response or not hasattr(response, 'text'):
             raise ValueError("Respuesta vacía o no válida del modelo.")
         return response.text
+    except concurrent.futures.TimeoutError:
+        print("El modelo tomó demasiado tiempo en responder.")
+        return "Error: El modelo tardó demasiado en responder."
     except Exception as e:
         print(f"Error en generar_respuesta: {e}")
         return f"Error al generar respuesta para historia: {str(e)}"
+
 
 @app.post("/personalizar_prompt")
 async def personalizar_prompt(user_data: UserData):
