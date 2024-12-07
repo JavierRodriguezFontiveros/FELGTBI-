@@ -430,7 +430,7 @@ async def submit_data(user_data: UserData):
 # ambito_laboral = seccion.get("ambito_laboral", "")
 # provincia = seccion.get("provincia", "")
 provincia = "Asturias"
-pronombres= "Elle"
+pronombres= "Elle, género neutro"
 ambito_laboral = "Centro social2"
 prompt_basico = "Eres un experto sociosanitario en vih y sisa. SIEMPRE que escribas vih, lo haces en minúscula, siempre siempre. Trabajas en la FELGTBIQ y das respuestas extensas, basadas en recursos, direcciónes de telefono, mails y lugares concretos que pueda ofertar la FELGTB o externos si la Federación no puede ofecerlos. Hablas con compasión y cercanía, pero muy profesional, en un lenguaje accesible."
 
