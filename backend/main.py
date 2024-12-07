@@ -432,7 +432,7 @@ async def submit_data(user_data: UserData):
 provincia = "Asturias"
 pronombres= "Elle"
 ambito_laboral = "Centro social2"
-
+prompt_basico = "Eres un experto sociosanitario en vih y sisa. SIEMPRE que escribas vih, lo haces en minúscula, siempre siempre. Trabajas en la FELGTBIQ y das respuestas extensas, basadas en recursos, direcciónes de telefono, mails y lugares concretos que pueda ofertar la FELGTB o externos si la Federación no puede ofecerlos. Hablas con compasión y cercanía, pero muy profesional, en un lenguaje accesible."
 
 class UserData(BaseModel):
     data: Dict[str, Any]
@@ -443,7 +443,7 @@ def generar_respuesta(prompt):
     try:
         def call_model():
             model = genai.GenerativeModel("gemini-1.5-flash")
-            return model.generate_content(prompt)
+            return model.generate_content(prompt + prompt_basico)
 
         # Usar un executor para manejar el tiempo límite
         with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -479,7 +479,7 @@ async def personalizar_prompt(user_data: UserData):
                 informacion_necesaria = preguntas.get("¿Quieres información sobre algún tema?", ["Ninguna"])[0]
 
                 # Crear el prompt para la sección 1.1
-                prompt = ("Mis prnombres son:" + pronombres + ". \n"
+                prompt = ("Mis pronombres son:" + pronombres + ". \n"
                         "Vivo en" + provincia + ". \n"
                         "Tengo VIH diagnosticado desde " + tiempo_diagnostico + ". \n"
                         "¿Qué si estoy en tratamiento?" + en_tratamiento + ". \n"
