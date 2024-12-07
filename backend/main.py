@@ -1,4 +1,5 @@
 # Bibliotecas:
+from prompt_basico import prompt_basico
 from fastapi import FastAPI, Query #Api
 import uvicorn #Despliegue en Local
 
@@ -339,6 +340,54 @@ class AffectiveSituation(str, Enum):
     viudo = "Viudo"
     otro = "Otro"
 
+class Province(str, Enum):
+    alava = "Álava"
+    albacete = "Albacete"
+    alicante = "Alicante"
+    almeria = "Almería"
+    avila = "Ávila"
+    badajoz = "Badajoz"
+    barcelona = "Barcelona"
+    burgos = "Burgos"
+    caceres = "Cáceres"
+    cadiz = "Cádiz"
+    cantabria = "Cantabria"
+    castellon = "Castellón"
+    ceuta = "Ceuta"
+    cordoba = "Córdoba"
+    cuenca = "Cuenca"
+    girona = "Girona"
+    granada = "Granada"
+    guadalajara = "Guadalajara"
+    girona = "Girona"
+    huelva = "Huelva"
+    huesca = "Huesca"
+    jaen = "Jaén"
+    la_rioja = "La Rioja"
+    las_palmas = "Las Palmas"
+    leon = "León"
+    lugo = "Lugo"
+    madrid = "Madrid"
+    malaga = "Málaga"
+    melilla = "Melilla"
+    murcia = "Murcia"
+    navarra = "Navarra"
+    ourense = "Ourense"
+    palencia = "Palencia"
+    pontevedra = "Pontevedra"
+    salamanca = "Salamanca"
+    segovia = "Segovia"
+    sevilla = "Sevilla"
+    soria = "Soria"
+    tarragona = "Tarragona"
+    teruel = "Teruel"
+    toledo = "Toledo"
+    valencia = "Valencia"
+    valladolid = "Valladolid"
+    vizcaya = "Vizcaya"
+    zamora = "Zamora"
+    zaragoza = "Zaragoza"
+    fuera_espana = "Fuera de España"
 
 #Clase Completa
 class UserData(BaseModel):
@@ -364,7 +413,7 @@ class UserData(BaseModel):
 
     nivel_estudios: EducationLevel  
     situacion_afectiva: AffectiveSituation 
-
+    provincia: Province
 
 @app.post("/submit-data")
 async def submit_data(user_data: UserData):
@@ -376,18 +425,19 @@ async def submit_data(user_data: UserData):
 
     # Aquí ajustamos la consulta y los datos
     query = """
-           INSERT INTO no_sociosanit_formulario (edad,pronombre_el,pronombre_ella,pronombre_elle,identidad_genero,
-                                                orientacion_sexual,vives_en_espana,pais,permiso_residencia,
-                                                persona_racializada,persona_discapacitada,persona_sin_hogar,
-                                                persona_migrante,persona_intersexual,nivel_estudios,situacion_afectiva)
-
-           VALUES (%(edad)s,%(pronombre_el)s,%(pronombre_ella)s,%(pronombre_elle)s,%(identidad_genero)s,
-                   %(orientacion_sexual)s,%(vives_en_espana)s,%(pais)s,%(permiso_residencia)s,
-                   %(persona_racializada)s,%(persona_discapacitada)s,%(persona_sin_hogar)s,%(persona_migrante)s,
-                   %(persona_intersexual)s,%(nivel_estudios)s,%(situacion_afectiva)s)
-            """
+           INSERT INTO no_sociosanit_formulario (edad, pronombre_el, pronombre_ella, pronombre_elle, identidad_genero,
+                                                orientacion_sexual, vives_en_espana, pais, permiso_residencia,
+                                                persona_racializada, persona_discapacitada, persona_sin_hogar,
+                                                persona_migrante, persona_intersexual, nivel_estudios, situacion_afectiva,
+                                                provincia)
+           VALUES (%(edad)s, %(pronombre_el)s, %(pronombre_ella)s, %(pronombre_elle)s, %(identidad_genero)s,
+                   %(orientacion_sexual)s, %(vives_en_espana)s, %(pais)s, %(permiso_residencia)s,
+                   %(persona_racializada)s, %(persona_discapacitada)s, %(persona_sin_hogar)s, %(persona_migrante)s,
+                   %(persona_intersexual)s, %(nivel_estudios)s, %(situacion_afectiva)s, %(provincia)s)
+    """
     
-    data = {"edad": user_data.edad,
+    data = {
+            "edad": user_data.edad,
             "pronombre_el": user_data.pronombre_el,
             "pronombre_ella": user_data.pronombre_ella,
             "pronombre_elle": user_data.pronombre_elle,
@@ -402,7 +452,9 @@ async def submit_data(user_data: UserData):
             "persona_migrante": user_data.persona_migrante,
             "persona_intersexual": user_data.persona_intersexual,
             "nivel_estudios": user_data.nivel_estudios,
-            "situacion_afectiva": user_data.situacion_afectiva,}
+            "situacion_afectiva": user_data.situacion_afectiva,
+            "provincia": user_data.provincia,
+            }
 
     try:
         cursor.execute(query, data)
@@ -430,9 +482,8 @@ async def submit_data(user_data: UserData):
 # ambito_laboral = seccion.get("ambito_laboral", "")
 # provincia = seccion.get("provincia", "")
 provincia = "Asturias"
-pronombres= "Elle"
-ambito_laboral = "Centro social2"
-
+pronombres= "Elle, género neutro"
+ambito_laboral = "Centro social"
 
 class UserData(BaseModel):
     data: Dict[str, Any]
@@ -443,7 +494,7 @@ def generar_respuesta(prompt):
     try:
         def call_model():
             model = genai.GenerativeModel("gemini-1.5-flash")
-            return model.generate_content(prompt)
+            return model.generate_content(prompt + prompt_basico)
 
         # Usar un executor para manejar el tiempo límite
         with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -479,8 +530,8 @@ async def personalizar_prompt(user_data: UserData):
                 informacion_necesaria = preguntas.get("¿Quieres información sobre algún tema?", ["Ninguna"])[0]
 
                 # Crear el prompt para la sección 1.1
-                prompt = ("Mis prnombres son:" + pronombres + ". \n"
-                        "Vivo en" + provincia + ". \n"
+                prompt = ("Mis pronombres (dirígete a mi conjugando como corresponda, si es elle, en género neutro, si es él/ella, pues en masculino/femenino, si te digo varios, usa solo uno de los que te diga) son:" + pronombres + ". \n"
+                        "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
                         "Tengo VIH diagnosticado desde " + tiempo_diagnostico + ". \n"
                         "¿Qué si estoy en tratamiento?" + en_tratamiento + ". \n"
                         ". Y además " + acceso_medico + ". \n"
@@ -496,8 +547,8 @@ async def personalizar_prompt(user_data: UserData):
                 conocimiento_pep = preguntas.get("¿Sabes qué es la PEP?", [" "])[0]
 
                 # Crear el prompt para la sección 1.2
-                prompt = ("Mis prnombres son:" + pronombres + ". \n"
-                        "Vivo en" + provincia + ". \n"
+                prompt = ("Mis pronombres (dirígete a mi conjugando como corresponda, si es elle, en género neutro, si es él/ella, pues en masculino/femenino, si te digo varios, usa solo uno de los que te diga) son:" + pronombres + ". \n"
+                        "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
                         "Creo que me he expuesto al virus en " + tiempo_exposicion + ". \n"
                         "El tipo de exposición ha sido:" + tipo_exposicion + ". \n"
                         + chem_sex + "ha sido en entorno de chem-sex. \n"
@@ -508,7 +559,9 @@ async def personalizar_prompt(user_data: UserData):
                 tema_informacion = preguntas.get("¿Sobre qué tema quieres información?", [" "])[0]
 
                 # Crear el prompt para la sección 1.3
-                prompt = ("Quiero información sobre:" + tema_informacion)
+                prompt = ("Mis pronombres (dirígete a mi conjugando como corresponda, si es elle, en género neutro, si es él/ella, pues en masculino/femenino, si te digo varios, usa solo uno de los que te diga) son:" + pronombres + ". \n"
+                        "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
+                        "Quiero información sobre:" + tema_informacion)
 
             elif key.startswith("1.4"):
                 acceso_grupos = preguntas.get("¿Tienes acceso a recursos locales o grupos de apoyo?", [" "])[0]
@@ -516,7 +569,9 @@ async def personalizar_prompt(user_data: UserData):
                 apoyo_necesario = preguntas.get("¿Qué apoyo necesitas?", [" "])[0]
 
                 # Crear el prompt para la sección 1.4
-                prompt = ("Estoy acompañando a una persona seropositiva." + acceso_grupos + "tengo acceso a recursos locales o grupos de apoyo. /n"
+                prompt = ("Mis pronombres (dirígete a mi conjugando como corresponda, si es elle, en género neutro, si es él/ella, pues en masculino/femenino, si te digo varios, usa solo uno de los que te diga) son:" + pronombres + ". \n"
+                        "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
+                        "Estoy acompañando a una persona seropositiva." + acceso_grupos + "tengo acceso a recursos locales o grupos de apoyo. /n"
                         "He compartido mi preocupación con" + preocupacion4 + ". /n"
                         "Me gustaría orientación para conseguir" + apoyo_necesario)
                 
@@ -524,35 +579,45 @@ async def personalizar_prompt(user_data: UserData):
                 eleccion = preguntas.get("¿Qué necesitas?", [" "])[0]
 
                 # Crear el prompt para la sección 2.1
-                prompt = ("Soy personal sanitario y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
+                prompt = ("Mis pronombres (dirígete a mi conjugando como corresponda, si es elle, en género neutro, si es él/ella, pues en masculino/femenino, si te digo varios, usa solo uno de los que te diga) son:" + pronombres + ". \n"
+                        "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
+                        "Soy personal sanitario y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
                         "Necesito información sobre" + eleccion + ".")
                 
             elif key.startswith("2.2"):
                 eleccion2 = preguntas.get("¿Qué necesitas?", [" "])[0]
 
                 # Crear el prompt para la sección 2.1
-                prompt = ("Soy trabajador social y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
+                prompt = ("Mis pronombres (dirígete a mi conjugando como corresponda, si es elle, en género neutro, si es él/ella, pues en masculino/femenino, si te digo varios, usa solo uno de los que te diga) son:" + pronombres + ". \n"
+                        "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
+                        "Soy trabajador social y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
                         "Necesito información sobre" + eleccion2 + ".")
 
             elif key.startswith("2.3"):
                 eleccion3 = preguntas.get("¿Qué necesitas?", [" "])[0]
 
                 # Crear el prompt para la sección 2.1
-                prompt = ("Soy psicólogo y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
+                prompt = ("Mis pronombres (dirígete a mi conjugando como corresponda, si es elle, en género neutro, si es él/ella, pues en masculino/femenino, si te digo varios, usa solo uno de los que te diga) son:" + pronombres + ". \n"
+                        "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
+                        "Soy psicólogo y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
                         "Necesito información sobre" + eleccion3 + ".")
                 
             elif key.startswith("2.4"):
                 eleccion4 = preguntas.get("¿Qué necesitas?", [" "])[0]
 
                 # Crear el prompt para la sección 2.1
-                prompt = ("Soy educador y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
+                prompt = ("Mis pronombres (dirígete a mi conjugando como corresponda, si es elle, en género neutro, si es él/ella, pues en masculino/femenino, si te digo varios, usa solo uno de los que te diga) son:" + pronombres + ". \n"
+                        "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
+                        "Soy educador y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
                         "Necesito información sobre" + eleccion4 + ".")
                 
             elif key.startswith("2.5"):
                 eleccion5 = preguntas.get("¿Qué necesitas?", [" "])[0]
 
                 # Crear el prompt para la sección 2.1
-                prompt = ("Soy voluntario/cuidador y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
+                prompt = ("Mis pronombres (dirígete a mi conjugando como corresponda, si es elle, en género neutro, si es él/ella, pues en masculino/femenino, si te digo varios, usa solo uno de los que te diga) son:" + pronombres + ". \n"
+                        "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
+                        "Soy voluntario/cuidador y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
                         "Necesito información sobre" + eleccion5 + ".")
 
             else:
