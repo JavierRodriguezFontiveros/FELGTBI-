@@ -58,7 +58,7 @@ cur = conn.cursor()
 
 # Agregamos nuevas variables a la tabla users y eliminamos pertenencia a colectivos
 cur.execute("""ALTER TABLE no_sociosanit_formulario 
-            ADD COLUMN intersexual BOOLEAN;
+            ADD COLUMN provincia VARCHAR(50);
       """)
 conn.commit()
 
