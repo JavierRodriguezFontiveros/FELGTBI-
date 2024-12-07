@@ -25,9 +25,9 @@ import os
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 #CREAR API Y CONFIGURAR MODELO
 app = FastAPI()
-load_dotenv(".env")
+load_dotenv()
 try:
-    gemini_api_key = os.getenv("GEMINI_API_KEY")
+    gemini_api_key = load_dotenv()
     
     if not gemini_api_key:
         raise ValueError("La variable GEMINI_API_KEY no está definida. Verifica tu archivo .env o las variables de entorno.")
@@ -337,13 +337,15 @@ class UserData(BaseModel):
 
 def generar_respuesta(prompt):
     try:
-        prompt_total = f"Eres un especialista sociosanitario en VIH, háblame con compasión y tacto, y profesionalidad. {prompt}"
+        print(f"Llamando al modelo con prompt: {prompt}")
         model = genai.GenerativeModel("gemini-1.5-flash")
-        response = model.generate_content(prompt_total)
+        response = model.generate_content(prompt)
+        print("Respuesta generada con éxito.")
         if not response or not hasattr(response, 'text'):
             raise ValueError("Respuesta vacía o no válida del modelo.")
         return response.text
     except Exception as e:
+        print(f"Error en generar_respuesta: {e}")
         return f"Error al generar respuesta para historia: {str(e)}"
 
 @app.post("/personalizar_prompt")
