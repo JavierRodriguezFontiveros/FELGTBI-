@@ -24,7 +24,7 @@ conn = psycopg2.connect(database = db_database,
 cur = conn.cursor()
 
 # Agregamos nuevas variables a la tabla users
-# cur.execute("""ALTER TABLE user_data 
+# cur.execute("""ALTER TABLE no_sociosanit_formulario 
 #             ADD COLUMN pronombres VARCHAR(50),
 #             ADD COLUMN genero VARCHAR(50),
 #             ADD COLUMN orientacion VARCHAR(50),
@@ -40,12 +40,12 @@ cur = conn.cursor()
 
 # Modificar tipo variable permiso_residencia. SOLO USAR SI NO HAY DATOS
 
-# cur.execute("""ALTER TABLE user_data 
+# cur.execute("""ALTER TABLE no_sociosanit_formulario 
 # ALTER COLUMN permiso_residencia TYPE BOOLEAN 
 # USING permiso_residencia::BOOLEAN; """)
 
 # Agregamos nuevas variables a la tabla users y eliminamos pertenencia a colectivos
-# cur.execute("""ALTER TABLE user_data 
+# cur.execute("""ALTER TABLE no_sociosanit_formulario 
 #             DROP COLUMN pertenencia_colectivos,
 #             DROP COLUMN permiso_residencia,
 #             ADD COLUMN permiso_residencia VARCHAR(50),
@@ -57,7 +57,7 @@ cur = conn.cursor()
 # conn.commit()
 
 # Agregamos nuevas variables a la tabla users y eliminamos pertenencia a colectivos
-cur.execute("""ALTER TABLE user_data 
+cur.execute("""ALTER TABLE no_sociosanit_formulario 
             ADD COLUMN intersexual BOOLEAN;
       """)
 conn.commit()
