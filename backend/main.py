@@ -26,8 +26,7 @@ import os
 #CREAR API Y CONFIGURAR MODELO
 app = FastAPI()
 load_dotenv()
-gemini_api_key = load_dotenv()
-import google.generativeai as genai
+gemini_api_key = os.getenv("GEMINI_API_KEY")
 
 genai.configure(api_key=gemini_api_key)
 
