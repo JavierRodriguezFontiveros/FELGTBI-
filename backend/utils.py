@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 def connect_to_db():
     # Cargar las variables de entorno desde el archivo .env
-    load_dotenv(dotenv_path="../credendiciales.env")
+    load_dotenv(dotenv_path="../credenciales.env")
     
     # Configura los parámetros de la conexión
     db_host = os.getenv("DB_HOST_AWS")
