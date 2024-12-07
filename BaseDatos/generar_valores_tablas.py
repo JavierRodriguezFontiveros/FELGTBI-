@@ -83,7 +83,7 @@ conn.commit()
 # Listas de valores que pueden tomar las columnas en la tabla de sociosanitarios_data para rellenar aleatoriamente las filas
 ciudades = ["Salamanca", "Madrid", "Barcelona", "Cádiz", "Toledo", "Valencia", "Zaragoza", "A Coruña", "Sevilla"]
 ambito_laboral = ["Hospitalario", "Centro de salud", "Asociación", "Centro comunitario"]
-especialidad = ["Psicólogo", "Trabajador social", "Especialista en ETS", "Voluntario"]
+especialidad = ["Trabajador social", "Especialista en ETS", "Voluntarios y cuidadores", "Personal sanitario", "Educador"]
 
 # Generar 100 filas con datos aleatorios
 for _ in range(100):
