@@ -273,19 +273,6 @@ def endpoint_top_5_ciudades():
     except Exception as e:
         return {"error": f"Ocurrió un error al procesar la solicitud: {e}"}
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-
-
-
-
-
-
-
-
-
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-
 @app.get("/grafico-especialidad/")
 def generar_grafico_especialidad():
     connection = connect_to_db()
@@ -316,8 +303,123 @@ def generar_grafico_especialidad():
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+from enum import Enum
+
+
+class GenderIdentity(str, Enum):
+    hombre_cis = "Hombre Cis"
+    hombre_trans = "Hombre Trans"
+    mujer_cis = "Mujer Cis"
+    mujer_trans = "Mujer Trans"
+    no_binario = "No binario"
+    otro = "Otro"
+
+class SexualOrientation(str, Enum):
+    gay = "Gay"
+    lesbiana = "Lesbiana"
+    bisexual = "Bisexual"
+    pansexual = "Pansexual"
+    asexual = "Asexual"
+    otro = "Otro"
+
+
+class EducationLevel(str, Enum):
+    primarios = "Primarios"
+    secundarios = "Secundarios"
+    tecnicos = "Técnicos"
+    universitarios = "Universitarios"
+    postgrado = "Postgrado"
+    otro = "Otro"
+
+class AffectiveSituation(str, Enum):
+    soltero = "Soltero"
+    en_pareja = "En pareja"
+    casado = "Casado"
+    divorciado = "Divorciado"
+    viudo = "Viudo"
+    otro = "Otro"
+
+
+#Clase Completa
+class UserData(BaseModel):
+    edad: int
+
+    pronombre_el: bool  
+    pronombre_ella: bool  
+    pronombre_elle: bool  
+
+    identidad_genero: GenderIdentity
+    orientacion_sexual: SexualOrientation
+    vives_en_espana: bool
+    pais: str  #Pais como Texto Libre
+    permiso_residencia: bool
+
+
+    persona_racializada: bool  
+    persona_discapacitada: bool  
+    persona_sin_hogar: bool  
+    persona_migrante: bool  
+    persona_intersexual: bool
+    
+
+    nivel_estudios: EducationLevel  
+    situacion_afectiva: AffectiveSituation 
+
+
+@app.post("/submit-data")
+async def submit_data(user_data: UserData):
+    connection = connect_to_db()
+    if connection is None:
+        raise HTTPException(status_code=500, detail="No se pudo conectar a la base de datos")
+    
+    cursor = connection.cursor()
+
+    # Aquí ajustamos la consulta y los datos
+    query = """
+           INSERT INTO no_sociosanit_formulario (edad,pronombre_el,pronombre_ella,pronombre_elle,identidad_genero,
+                                                orientacion_sexual,vives_en_espana,pais,permiso_residencia,
+                                                persona_racializada,persona_discapacitada,persona_sin_hogar,
+                                                persona_migrante,persona_intersexual,nivel_estudios,situacion_afectiva)
+
+           VALUES (%(edad)s,%(pronombre_el)s,%(pronombre_ella)s,%(pronombre_elle)s,%(identidad_genero)s,
+                   %(orientacion_sexual)s,%(vives_en_espana)s,%(pais)s,%(permiso_residencia)s,
+                   %(persona_racializada)s,%(persona_discapacitada)s,%(persona_sin_hogar)s,%(persona_migrante)s,
+                   %(persona_intersexual)s,%(nivel_estudios)s,%(situacion_afectiva)s)
+            """
+    
+    data = {"edad": user_data.edad,
+            "pronombre_el": user_data.pronombre_el,
+            "pronombre_ella": user_data.pronombre_ella,
+            "pronombre_elle": user_data.pronombre_elle,
+            "identidad_genero": user_data.identidad_genero,
+            "orientacion_sexual": user_data.orientacion_sexual,
+            "vives_en_espana": user_data.vives_en_espana,
+            "pais": user_data.pais,
+            "permiso_residencia": user_data.permiso_residencia,
+            "persona_racializada": user_data.persona_racializada,
+            "persona_discapacitada": user_data.persona_discapacitada,
+            "persona_sin_hogar": user_data.persona_sin_hogar,
+            "persona_migrante": user_data.persona_migrante,
+            "persona_intersexual": user_data.persona_intersexual,
+            "nivel_estudios": user_data.nivel_estudios,
+            "situacion_afectiva": user_data.situacion_afectiva,}
+
+    try:
+        cursor.execute(query, data)
+        connection.commit()
+        return {"message": "Datos enviados y almacenados correctamente"}
+    except Exception as e:
+        print(f"Error al ejecutar la consulta: {e}")
+        connection.rollback()
+        raise HTTPException(status_code=500, detail="Error al guardar los datos")
+    finally:
+        cursor.close()
+        connection.close()
+
+
+
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 #
 #
 #

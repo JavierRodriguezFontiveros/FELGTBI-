@@ -14,6 +14,9 @@ def connect_to_db():
     db_database = os.getenv("DB_DATABASE_AWS")
     db_port = int(os.getenv("DB_PORT_AWS", 5432))
 
+
+    print
+
     # Establecer la conexión
     try:
         connection = psycopg2.connect(host=db_host,
