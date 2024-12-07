@@ -80,16 +80,19 @@ cur = conn.cursor()
 
 cur.execute("""DROP TABLE IF EXISTS user_data""")
 print("tabla user_data eliminada")
+
+cur.execute("""DROP TABLE IF EXISTS sociosanitarios_data""")
+print("tabla user_data eliminada")
+
 # Comando para crear tabla de sociosanitarios ¡¡¡¡¡¡¡Pendiente!!!!!!
-# cur.execute("""CREATE TABLE IF NOT EXISTS sociosanitarios_formulario(
-#             sociosanitario_id SERIAL PRIMARY KEY,
-#             ciudad VARCHAR (50) NOT NULL,
-#             ambito_laboral VARCHAR (50) NOT NULL,
-#             especialidad VARCHAR (50) NOT NULL
-#             );
-#             """)
-# conn.commit()
-# print("tabla sociosanitarios creada")
+cur.execute("""CREATE TABLE IF NOT EXISTS sociosanitarios_formulario(
+            sociosanitario_id SERIAL PRIMARY KEY,
+            ciudad VARCHAR (50) NOT NULL,
+            ambito_laboral VARCHAR (50) NOT NULL
+            );
+            """)
+conn.commit()
+print("tabla sociosanitarios creada")
 
 
 # Crear tablas del arbol de decisión (alias: chatbot)
