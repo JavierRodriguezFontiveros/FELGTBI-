@@ -72,7 +72,7 @@ for _ in range(100):
 
     # Insertar los datos en la tabla
     cur.execute("""
-        INSERT INTO user_data (edad, pronombres, genero, orientacion, vives_espana, pais, permiso_residencia, persona_racializada, discapacitade, sin_hogar, migrante, intersexual)
+        INSERT INTO no_sociosanit_formulario (edad, pronombres, genero, orientacion, vives_espana, pais, permiso_residencia, persona_racializada, discapacitade, sin_hogar, migrante, intersexual)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """, (edad_random, pronombres_random, genero_random, orientacion_random, vives_espana_random, pais_random, permiso_residencia_random, persona_racializada_random, discapacitade_random, sin_hogar_random, migrante_random, intersexual_random))
 
