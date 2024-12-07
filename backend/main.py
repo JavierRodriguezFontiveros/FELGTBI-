@@ -310,17 +310,21 @@ def generar_grafico_especialidad():
 #
 #
 # Definir el esquema para la solicitud entrante
-# pronombres = seccion.get("pronombres", "No especificado")
-# provincia = seccion.get("provincia", "No especificado")
+# pronombres = seccion.get("pronombres", "")
+# provincia = seccion.get("provincia", "")
+# ambito_laboral = seccion.get("ambito_laboral", "")
+# provincia = seccion.get("provincia", "")
 provincia = "Asturias"
 pronombres= "Elle"
+ambito_laboral = "Centro social2"
+
 
 class UserData(BaseModel):
     data: Dict[str, Any]
 
 def generar_respuesta(prompt):
     try:
-        prompt_total = f"Eres un especialista sociosanitario en VIH, hablas con compasión y tacto.: {prompt}"
+        prompt_total = f"Eres un especialista sociosanitario en VIH, háblame con compasión y tacto, y profesionalidad. {prompt}"
         model = genai.GenerativeModel("gemini-1.5-flash")
         response = model.generate_content(prompt_total)
         if not response or not hasattr(response, 'text'):
@@ -334,14 +338,14 @@ async def personalizar_prompt(user_data: UserData):
     try:
         # Determinar el tipo de sección y construir el prompt dinámicamente
         for key, seccion in user_data.data.items():
-            titulo = seccion.get("titulo", "No especificado")
+            titulo = seccion.get("titulo", " ")
             preguntas = seccion.get("preguntas", {})
 
             # Verificar el tipo de sección
             if key.startswith("1.1"):
-                tiempo_diagnostico = preguntas.get("¿Cuándo te diagnosticaron?", ["No especificado"])[0]
-                en_tratamiento = preguntas.get("¿Estás en tratamiento TAR?", ["No especificado"])[0]
-                acceso_medico = preguntas.get("¿Tienes acceso a un médico?", ["No especificado"])[0]
+                tiempo_diagnostico = preguntas.get("¿Cuándo te diagnosticaron?", [""])[0]
+                en_tratamiento = preguntas.get("¿Estás en tratamiento TAR?", [""])[0]
+                acceso_medico = preguntas.get("¿Tienes acceso a un médico?", [""])[0]
                 informacion_necesaria = preguntas.get("¿Quieres información sobre algún tema?", ["Ninguna"])[0]
 
                 # Crear el prompt para la sección 1.1
@@ -354,31 +358,75 @@ async def personalizar_prompt(user_data: UserData):
                 )
 
             elif key.startswith("1.2"):
-                tipo_exposicion = preguntas.get("¿Qué tipo de exposición fue?", ["No especificado"])[0]
-                tiempo_exposicion = preguntas.get("¿Cuándo ocurrió la posible infección?", ["No especificado"])[0]
-                acceso_medico = preguntas.get("¿Tienes acceso a un médico?", ["No especificado"])[0]
-                conocimiento_pep = preguntas.get("¿Sabes qué es la PEP?", ["No especificado"])[0]
+                tipo_exposicion = preguntas.get("¿Qué tipo de exposición fue?", [" "])[0]
+                tiempo_exposicion = preguntas.get("¿Cuándo ocurrió la posible infección?", [" "])[0]
+                acceso_medico = preguntas.get("¿Tienes acceso a un médico?", [" "])[0]
+                chem_sex = preguntas.get("¿Ha sido en un entorno de 'chem-sex'?", [" "])[0]
+                preocupacion = preguntas.get("¿Has compartido tu preocupación con alguien?", [" "])[0]
+                conocimiento_pep = preguntas.get("¿Sabes qué es la PEP?", [" "])[0]
 
                 # Crear el prompt para la sección 1.2
-                prompt = (
-                    "Título: " + titulo + ". \n"
-                    "Tipo de exposición: " + tipo_exposicion + ". \n"
-                    "Tiempo desde la exposición: " + tiempo_exposicion + ". \n"
-                    "Acceso a médico: " + acceso_medico + ". \n"
-                    "Conocimiento sobre PEP: " + conocimiento_pep + "."
+                prompt = ("Mis prnombres son:" + pronombres + ". \n"
+                        "Vivo en" + provincia + ". \n"
+                        "Creo que me he expuesto al virus en " + tiempo_exposicion + ". \n"
+                        "El tipo de exposición ha sido:" + tipo_exposicion + ". \n"
+                        + chem_sex + "ha sido en entorno de chem-sex. \n"
+                        "He compartido mi preocupación con"+ preocupacion + "Y quiero más información sobre la PEP."
                 )
 
             elif key.startswith("1.3"):
-                tema_informacion = preguntas.get("¿Sobre qué tema quieres información?", ["No especificado"])[0]
+                tema_informacion = preguntas.get("¿Sobre qué tema quieres información?", [" "])[0]
 
                 # Crear el prompt para la sección 1.3
-                prompt = (
-                    "Título: " + titulo + ". \n"
-                    "Tema de interés: " + tema_informacion + "."
-                )
+                prompt = ("Quiero información sobre:" + tema_informacion)
+
+            elif key.startswith("1.4"):
+                acceso_grupos = preguntas.get("¿Tienes acceso a recursos locales o grupos de apoyo?", [" "])[0]
+                preocupacion4 = preguntas.get("¿Has compartido tu preocupación con alguien?", [" "])[0]
+                apoyo_necesario = preguntas.get("¿Qué apoyo necesitas?", [" "])[0]
+
+                # Crear el prompt para la sección 1.4
+                prompt = ("Estoy acompañando a una persona seropositiva." + acceso_grupos + "tengo acceso a recursos locales o grupos de apoyo. /n"
+                        "He compartido mi preocupación con" + preocupacion4 + ". /n"
+                        "Me gustaría orientación para conseguir" + apoyo_necesario)
+                
+            elif key.startswith("2.1"):
+                eleccion = preguntas.get("¿Qué necesitas?", [" "])[0]
+
+                # Crear el prompt para la sección 2.1
+                prompt = ("Soy personal sanitario y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
+                        "Necesito información sobre" + eleccion + ".")
+                
+            elif key.startswith("2.2"):
+                eleccion2 = preguntas.get("¿Qué necesitas?", [" "])[0]
+
+                # Crear el prompt para la sección 2.1
+                prompt = ("Soy trabajador social y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
+                        "Necesito información sobre" + eleccion2 + ".")
+
+            elif key.startswith("2.3"):
+                eleccion3 = preguntas.get("¿Qué necesitas?", [" "])[0]
+
+                # Crear el prompt para la sección 2.1
+                prompt = ("Soy psicólogo y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
+                        "Necesito información sobre" + eleccion3 + ".")
+                
+            elif key.startswith("2.4"):
+                eleccion4 = preguntas.get("¿Qué necesitas?", [" "])[0]
+
+                # Crear el prompt para la sección 2.1
+                prompt = ("Soy educador y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
+                        "Necesito información sobre" + eleccion4 + ".")
+                
+            elif key.startswith("2.5"):
+                eleccion5 = preguntas.get("¿Qué necesitas?", [" "])[0]
+
+                # Crear el prompt para la sección 2.1
+                prompt = ("Soy voluntario/cuidador y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
+                        "Necesito información sobre" + eleccion5 + ".")
 
             else:
-                prompt = "Título: " + titulo + ". No se encontró un formato específico para esta sección."
+                prompt = "Título: "
 
             # Generar la respuesta del modelo
             respuesta_chatbot = generar_respuesta(prompt)
