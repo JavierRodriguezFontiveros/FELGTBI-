@@ -78,11 +78,8 @@ cur = conn.cursor()
 # conn.commit()
 # print("tabla no sociosanitario creada")
 
-cur.execute("""DROP TABLE IF EXISTS user_data""")
-print("tabla user_data eliminada")
 
-cur.execute("""DROP TABLE IF EXISTS sociosanitarios_data""")
-print("tabla user_data eliminada")
+
 
 # Comando para crear tabla de sociosanitarios ¡¡¡¡¡¡¡Pendiente!!!!!!
 cur.execute("""CREATE TABLE IF NOT EXISTS sociosanitarios_formulario(
@@ -105,6 +102,8 @@ cur.execute(
   """
 )
 conn.commit()
+
+
 cur.execute(
   """
   CREATE TABLE IF NOT EXISTS preguntas_chatbot (
@@ -116,6 +115,8 @@ cur.execute(
   """
 )
 conn.commit()
+
+
 cur.execute(
   """
   CREATE TABLE IF NOT EXISTS opciones_chatbot (
@@ -128,6 +129,8 @@ cur.execute(
 )
 conn.commit()
 print("tablas chatbot creadas")
+
+
 cur.execute(
   """
     CREATE TABLE IF NOT EXISTS categoria_pregunta_chat_intermed (
@@ -142,21 +145,7 @@ cur.execute(
 conn.commit()
 print("tablas categoria_pregunta_chat_intermed creada")
 
-cur.execute(
-  """
-      CREATE TABLE IF NOT EXISTS pregunta_opcion_chatbot (
-      id_pregunta INT NOT NULL,
-      id_opcion INT NOT NULL,
-      PRIMARY KEY (id_pregunta, id_opcion),
-      FOREIGN KEY (id_pregunta) REFERENCES preguntas_chatbot(id_pregunta),
-      FOREIGN KEY (id_opcion) REFERENCES opciones_chatbot(id_opcion)
-  );
-
-  """
-)
-conn.commit()
-print("tablas pregunta_opcion_chatbot creada")
 
 # Cerrar el cursor y la bbdd
 cur.close()
-conn.close()
+conn.close() 
