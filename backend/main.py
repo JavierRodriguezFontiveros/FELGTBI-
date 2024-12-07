@@ -19,12 +19,25 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Dict, Any
 import google.generativeai as genai
+from dotenv import load_dotenv
+import os
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+#CREAR API Y CONFIGURAR MODELO
 app = FastAPI()
-
-
+load_dotenv(".env")
+try:
+    gemini_api_key = os.getenv("GEMINI_API_KEY")
     
+    if not gemini_api_key:
+        raise ValueError("La variable GEMINI_API_KEY no está definida. Verifica tu archivo .env o las variables de entorno.")
+    
+    genai.configure(api_key=gemini_api_key)
+    print("API configurada correctamente con la clave proporcionada.")
+
+except Exception as e:
+    print(f"Error al configurar la API: {e}")
+    raise
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -335,6 +348,7 @@ def generar_respuesta(prompt):
 
 @app.post("/personalizar_prompt")
 async def personalizar_prompt(user_data: UserData):
+    print(f"API Key en uso: {gemini_api_key}")  # Verifica si la clave está accesible aquí
     try:
         # Determinar el tipo de sección y construir el prompt dinámicamente
         for key, seccion in user_data.data.items():
