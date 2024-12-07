@@ -305,12 +305,6 @@ def generar_grafico_especialidad():
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-# Punto de entrada principal
-if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8000)
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 #
 #
 #
@@ -324,7 +318,7 @@ class UserData(BaseModel):
 
 def generar_respuesta(prompt):
     try:
-        prompt_total = f"En contexto histórico LGTBI, responde: {prompt}"
+        prompt_total = f"Eres un especialista sociosanitario en VIH, hablas con compasión y tacto.: {prompt}"
         model = genai.GenerativeModel("gemini-1.5-flash")
         response = model.generate_content(prompt_total)
         if not response or not hasattr(response, 'text'):
@@ -332,6 +326,7 @@ def generar_respuesta(prompt):
         return response.text
     except Exception as e:
         return f"Error al generar respuesta para historia: {str(e)}"
+
 @app.post("/personalizar_prompt")
 async def personalizar_prompt(user_data: UserData):
     try:
@@ -386,3 +381,14 @@ async def personalizar_prompt(user_data: UserData):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    # Punto de entrada principal
+if __name__ == "__main__":
+    uvicorn.run(app, host="127.0.0.1", port=8000)
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
