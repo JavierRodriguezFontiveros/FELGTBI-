@@ -340,6 +340,54 @@ class AffectiveSituation(str, Enum):
     viudo = "Viudo"
     otro = "Otro"
 
+class Province(str, Enum):
+    alava = "Álava"
+    albacete = "Albacete"
+    alicante = "Alicante"
+    almeria = "Almería"
+    avila = "Ávila"
+    badajoz = "Badajoz"
+    barcelona = "Barcelona"
+    burgos = "Burgos"
+    caceres = "Cáceres"
+    cadiz = "Cádiz"
+    cantabria = "Cantabria"
+    castellon = "Castellón"
+    ceuta = "Ceuta"
+    cordoba = "Córdoba"
+    cuenca = "Cuenca"
+    girona = "Girona"
+    granada = "Granada"
+    guadalajara = "Guadalajara"
+    girona = "Girona"
+    huelva = "Huelva"
+    huesca = "Huesca"
+    jaen = "Jaén"
+    la_rioja = "La Rioja"
+    las_palmas = "Las Palmas"
+    leon = "León"
+    lugo = "Lugo"
+    madrid = "Madrid"
+    malaga = "Málaga"
+    melilla = "Melilla"
+    murcia = "Murcia"
+    navarra = "Navarra"
+    ourense = "Ourense"
+    palencia = "Palencia"
+    pontevedra = "Pontevedra"
+    salamanca = "Salamanca"
+    segovia = "Segovia"
+    sevilla = "Sevilla"
+    soria = "Soria"
+    tarragona = "Tarragona"
+    teruel = "Teruel"
+    toledo = "Toledo"
+    valencia = "Valencia"
+    valladolid = "Valladolid"
+    vizcaya = "Vizcaya"
+    zamora = "Zamora"
+    zaragoza = "Zaragoza"
+    fuera_espana = "Fuera de España"
 
 #Clase Completa
 class UserData(BaseModel):
@@ -365,7 +413,7 @@ class UserData(BaseModel):
 
     nivel_estudios: EducationLevel  
     situacion_afectiva: AffectiveSituation 
-
+    provincia: Province
 
 @app.post("/submit-data")
 async def submit_data(user_data: UserData):
@@ -377,18 +425,19 @@ async def submit_data(user_data: UserData):
 
     # Aquí ajustamos la consulta y los datos
     query = """
-           INSERT INTO no_sociosanit_formulario (edad,pronombre_el,pronombre_ella,pronombre_elle,identidad_genero,
-                                                orientacion_sexual,vives_en_espana,pais,permiso_residencia,
-                                                persona_racializada,persona_discapacitada,persona_sin_hogar,
-                                                persona_migrante,persona_intersexual,nivel_estudios,situacion_afectiva)
-
-           VALUES (%(edad)s,%(pronombre_el)s,%(pronombre_ella)s,%(pronombre_elle)s,%(identidad_genero)s,
-                   %(orientacion_sexual)s,%(vives_en_espana)s,%(pais)s,%(permiso_residencia)s,
-                   %(persona_racializada)s,%(persona_discapacitada)s,%(persona_sin_hogar)s,%(persona_migrante)s,
-                   %(persona_intersexual)s,%(nivel_estudios)s,%(situacion_afectiva)s)
-            """
+           INSERT INTO no_sociosanit_formulario (edad, pronombre_el, pronombre_ella, pronombre_elle, identidad_genero,
+                                                orientacion_sexual, vives_en_espana, pais, permiso_residencia,
+                                                persona_racializada, persona_discapacitada, persona_sin_hogar,
+                                                persona_migrante, persona_intersexual, nivel_estudios, situacion_afectiva,
+                                                provincia)
+           VALUES (%(edad)s, %(pronombre_el)s, %(pronombre_ella)s, %(pronombre_elle)s, %(identidad_genero)s,
+                   %(orientacion_sexual)s, %(vives_en_espana)s, %(pais)s, %(permiso_residencia)s,
+                   %(persona_racializada)s, %(persona_discapacitada)s, %(persona_sin_hogar)s, %(persona_migrante)s,
+                   %(persona_intersexual)s, %(nivel_estudios)s, %(situacion_afectiva)s, %(provincia)s)
+    """
     
-    data = {"edad": user_data.edad,
+    data = {
+            "edad": user_data.edad,
             "pronombre_el": user_data.pronombre_el,
             "pronombre_ella": user_data.pronombre_ella,
             "pronombre_elle": user_data.pronombre_elle,
@@ -403,7 +452,9 @@ async def submit_data(user_data: UserData):
             "persona_migrante": user_data.persona_migrante,
             "persona_intersexual": user_data.persona_intersexual,
             "nivel_estudios": user_data.nivel_estudios,
-            "situacion_afectiva": user_data.situacion_afectiva,}
+            "situacion_afectiva": user_data.situacion_afectiva,
+            "provincia": user_data.provincia,
+            }
 
     try:
         cursor.execute(query, data)
