@@ -6,7 +6,6 @@ import psycopg2
 import json
 import pandas as pd
 
-
 load_dotenv()
     
 #Leer Las Variables:
@@ -45,7 +44,7 @@ async def preguntas_user():
 
             # Usa pandas para ejecutar la consulta y convertirla en un DataFrame
             df = pd.read_sql_query(query, connection)
-            print(df.head(50))  # Imprime las primeras filas para depuración
+            # print(df.head(50))  # Imprime las primeras filas para depuración
 
     except psycopg2.OperationalError as e:
         raise HTTPException(status_code=400, detail="Error de conexión: " + str(e))
@@ -54,35 +53,38 @@ async def preguntas_user():
     
     
     
-    # Agrupar opciones por pregunta y categoría
-    grouped = (
-        df.groupby(["id_categoria", "titulo_categoria", "texto_pregunta"])["texto_opcion"]
-        .apply(list)
-        .reset_index()
-    )
+    query_usuarios = """
+    SELECT 
+        c.id_categoria,
+        p.id_pregunta,
+        o.id_opcion,
+        c.titulo_categoria,
+        p.texto_pregunta,
+        o.texto_opcion
+    FROM 
+        categorias_chatbot c
+    JOIN 
+        categoria_pregunta_chat_intermed cp ON c.id_categoria = cp.id_categoria
+    JOIN 
+        preguntas_chatbot p ON cp.id_pregunta = p.id_pregunta
+    JOIN 
+        preguntas_opciones_chatbot po ON p.id_pregunta = po.id_pregunta
+    JOIN 
+        opciones_chatbot o ON po.id_opcion = o.id_opcion
+    WHERE 
+        c.seccion = 'usuario'
+    ORDER BY 
+        c.id_categoria, p.id_pregunta, o.id_opcion;
+"""
 
-    # Crear el JSON dinámico
-    json_data = {}
-    for _, row in grouped.iterrows():
-        id_categoria = row["id_categoria"]
-        titulo = row["titulo_categoria"]
-        pregunta = row["texto_pregunta"]
-        opciones = row["texto_opcion"]
+    df = pd.read_sql_query(query_usuarios, connection)
 
-        # Crear la estructura del JSON
-        if id_categoria not in json_data:
-            json_data[id_categoria] = {"titulo": titulo, "preguntas": {}}
-
-        json_data[id_categoria]["preguntas"][pregunta] = opciones
-
-    # Convertir a JSON
-    json_resultado = json.dumps(json_data, indent=4, ensure_ascii=False)
-
-    # Imprimir el JSON resultante
-    print(json_resultado)
+    json_data = df.to_dict(orient="records")
+    
+    connection.close()
 
 
-    return json_resultado
+    return json_data
 
 # # 0.Ruta para obtener todos los libros
 # @app.get("/books")

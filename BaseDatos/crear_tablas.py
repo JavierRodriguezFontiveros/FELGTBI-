@@ -97,8 +97,9 @@ cur.execute(
   """
   CREATE TABLE IF NOT EXISTS categorias_chatbot (
     id_categoria SERIAL PRIMARY KEY,
-    titulo_categoria VARCHAR(500)
-  );
+    titulo_categoria VARCHAR(500),
+    seccion VARCHAR(50)  -- Columna que puedes utilizar para indicar si pertenece a 'sociosanitario' o 'usuario'
+);
   """
 )
 conn.commit()
@@ -108,10 +109,8 @@ cur.execute(
   """
   CREATE TABLE IF NOT EXISTS preguntas_chatbot (
     id_pregunta SERIAL PRIMARY KEY,
-    id_categoria INTEGER,
-    texto_pregunta VARCHAR(500),
-    CONSTRAINT fk_categoria FOREIGN KEY (id_categoria) REFERENCES categorias_chatbot (id_categoria)
-  );
+    texto_pregunta TEXT NOT NULL UNIQUE
+);
   """
 )
 conn.commit()
@@ -120,11 +119,9 @@ conn.commit()
 cur.execute(
   """
   CREATE TABLE IF NOT EXISTS opciones_chatbot (
-    id_opcion SERIAL PRIMARY KEY,
-    id_pregunta INTEGER,
-    texto_opcion VARCHAR(500),
-    CONSTRAINT fk_pregunta FOREIGN KEY (id_pregunta) REFERENCES preguntas_chatbot (id_pregunta)
-  );
+    id_opcion INTEGER PRIMARY KEY AUTOINCREMENT,
+    texto_opcion TEXT NOT NULL
+);
   """
 )
 conn.commit()
@@ -132,18 +129,28 @@ print("tablas chatbot creadas")
 
 
 cur.execute(
-  """
-    CREATE TABLE IF NOT EXISTS categoria_pregunta_chat_intermed (
-        id_categoria INT NOT NULL,
-        id_pregunta INT NOT NULL,
-        PRIMARY KEY (id_categoria, id_pregunta),
-        FOREIGN KEY (id_categoria) REFERENCES categorias_chatbot(id_categoria),
-        FOREIGN KEY (id_pregunta) REFERENCES preguntas_chatbot(id_pregunta)
-    );
-  """
+  """CREATE TABLE IF NOT EXISTS categoria_pregunta_chat_intermed (
+    id_categoria INT,
+    id_pregunta INT,
+    FOREIGN KEY (id_categoria) REFERENCES categorias_chatbot(id_categoria),
+    FOREIGN KEY (id_pregunta) REFERENCES preguntas_chatbot(id_pregunta)
+);"""
 )
 conn.commit()
 print("tablas categoria_pregunta_chat_intermed creada")
+
+cur.execute(
+  """CREATE TABLE IF NOT EXISTS preguntas_opciones_chatbot (
+    id_pregunta INT,
+    id_opcion INT,
+    PRIMARY KEY (id_pregunta, id_opcion),
+    FOREIGN KEY (id_pregunta) REFERENCES preguntas_chatbot(id_pregunta) ON DELETE CASCADE,
+    FOREIGN KEY (id_opcion) REFERENCES opciones_chatbot(id_opcion) ON DELETE CASCADE
+);
+"""
+)
+conn.commit()
+print("tablas preguntas_opciones_chatbot creada")
 
 
 # Cerrar el cursor y la bbdd

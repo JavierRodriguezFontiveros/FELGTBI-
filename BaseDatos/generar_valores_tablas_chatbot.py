@@ -24,22 +24,345 @@ conn = psycopg2.connect(database = db_database,
 # Generamos un cursor para operar dentro de la bbdd
 cur = conn.cursor()
 
-# Inserción en categorias_chatbot
+# Inserción en categorias_chatbot, añadiendo la columna 'seccion'
 categorias = [
-    ('Personal Sanitario',),
-    ('Trabajador Social',),
-    ('Psicologo',),
-    ('Educador',),
-    ('Voluntarios y Cuidadores',),
-    ('Tengo vih',),
-    ('Creo que me he expuesto al virus',),
-    ('Quiero saber mas sobre el vih/sida',),
-    ('Estoy apoyando a una persona seropositiva',),
+    ('Personal Sanitario', 'sociosanitario'),
+    ('Trabajador Social', 'sociosanitario'),
+    ('Psicologo', 'sociosanitario'),
+    ('Educador', 'sociosanitario'),
+    ('Voluntarios y Cuidadores', 'sociosanitario'),
+    ('Tengo vih', 'usuario'),
+    ('Creo que me he expuesto al virus', 'usuario'),
+    ('Quiero saber mas sobre el vih/sida', 'usuario'),
+    ('Estoy apoyando a una persona seropositiva', 'usuario'),
 ]
+
+cur = conn.cursor()
+
+# Query para insertar datos incluyendo la columna 'seccion'
+query = "INSERT INTO categorias_chatbot (titulo_categoria, seccion) VALUES (%s, %s)"
+
+# Ejecutar las inserciones
+cur.executemany(query, categorias)
+conn.commit()
+
+preguntas = [
+    '¿Qué necesitas como Personal Sanitario?',
+    '¿Qué necesitas como Trabajador Social?',
+    '¿Qué necesitas como Psicologo?',
+    '¿Qué necesitas como Educador?',
+    '¿Qué necesitas como Voluntario/Cuidador?',
+    '¿Cuándo te diagnosticaron?',
+    '¿Estás en tratamiento TAR?',
+    '¿Tienes acceso a un médico?',
+    '¿Has compartido tu diagnostico con alguien?',
+    '¿Quieres información sobre algun tema?',
+    '¿Cuándo ocurrió la posible infección?',
+    '¿Qué tipo de exposición fue?',
+    '¿Ha sido en un entorno de "chem-sex"?',
+    '¿Tienes acceso a un médico?',  # Este se repite, se eliminará
+    '¿Has compartido tu preocupación con alguien?',
+    '¿Sabes qué es la PEP?',
+    '¿Necesitas recursos de referencia?',
+    '¿Tiene acceso a recursos locales o grupos de apoyo?',
+    '¿Has compartido su preocupación sobre esta persona con alguien?',
+    '¿Qué apoyo necesitas?'
+]
+
+# Eliminar duplicados
+preguntas_unicas = list(set(preguntas))
+
+# Conexión y ejecución
+cur = conn.cursor()
+
+# Query para insertar preguntas sin relación con categorías
+query_insert = "INSERT INTO preguntas_chatbot (texto_pregunta) VALUES (%s)"
+
+# Insertar cada pregunta
+for pregunta in preguntas_unicas:
+    cur.execute(query_insert, (pregunta,))
+
+conn.commit()
+
+
+# Relación entre categorías y preguntas
+relaciones_categoria_pregunta = [
+    (1, 16),  # "Personal Sanitario" - "¿Qué necesitas como Personal Sanitario?"
+    (2, 2),   # "Trabajador Social" - "¿Qué necesitas como Trabajador Social?"
+    (3, 7),   # "Psicologo" - "¿Qué necesitas como Psicologo?"
+    (4, 18),  # "Educador" - "¿Qué necesitas como Educador?"
+    (5, 12),  # "Voluntarios y Cuidadores" - "¿Qué necesitas como Voluntario/Cuidador?"
+    (6, 13),  # "Tengo vih" - "¿Cuándo te diagnosticaron?"
+    (6, 9),   # "Tengo vih" - "¿Estás en tratamiento TAR?"
+    (6, 5),   # "Tengo vih" - "¿Tienes acceso a un médico?"
+    (6, 10),  # "Tengo vih" - "¿Has compartido tu diagnóstico con alguien?"
+    (6, 11),  # "Tengo vih" - "¿Quieres información sobre algún tema?"
+    (7, 3),   # "Creo que me he expuesto al virus" - "¿Cuándo ocurrió la posible infección?"
+    (7, 17),  # "Creo que me he expuesto al virus" - "¿Qué tipo de exposición fue?"
+    (7, 8),   # "Creo que me he expuesto al virus" - "¿Ha sido en un entorno de 'chem-sex'?"
+    (7, 5),   # "Creo que me he expuesto al virus" - "¿Tienes acceso a un médico?"
+    (7, 6),   # "Creo que me he expuesto al virus" - "¿Has compartido tu preocupación con alguien?"
+    (7, 15),  # "Creo que me he expuesto al virus" - "¿Sabes qué es la PEP?"
+    (8, 4),   # "Quiero saber más sobre el vih/sida" - "¿Necesitas recursos de referencia?"
+    (9, 11),  # "Estoy apoyando a una persona seropositiva" - "¿Tiene acceso a recursos locales o grupos de apoyo?"
+    (9, 14),  # "Estoy apoyando a una persona seropositiva" - "¿Has compartido su preocupación sobre esta persona con alguien?"
+    (9, 19),  # "Estoy apoyando a una persona seropositiva" - "¿Qué apoyo necesitas?"
+    # Añadimos las relaciones que faltaban para la pregunta "¿Qué apoyo necesitas?"
+    (1, 19),  # "Personal Sanitario" - "¿Qué apoyo necesitas?"
+    (2, 19),  # "Trabajador Social" - "¿Qué apoyo necesitas?"
+    (3, 19),  # "Psicologo" - "¿Qué apoyo necesitas?"
+    (4, 19),  # "Educador" - "¿Qué apoyo necesitas?"
+    (5, 19),  # "Voluntarios y Cuidadores" - "¿Qué apoyo necesitas?"
+]
+
+# Inserción de las relaciones en la tabla intermedia
+query_insert_relaciones = "INSERT INTO categoria_pregunta_chat_intermed (id_categoria, id_pregunta) VALUES (%s, %s)"
+
+# Ejecutar las inserciones
+cur.executemany(query_insert_relaciones, relaciones_categoria_pregunta)
+conn.commit()
+
+
+
+
+query_insert_opciones = """INSERT INTO opciones_chatbot (texto_opcion) VALUES
+    ('Manejo clínico de pacientes con vih'),
+    ('Protocolo PEP'),
+    ('Tratamientos (PREP, TAR)'),
+    ('Prevención de infecciones oportunistas'),
+    ('Consejería para adherencia al tratamiento'),
+    ('Acceso a medicamentos o servicios'),
+    ('Recursos legales y derechos'),
+    ('Apoyo a personas en situación de vulnerabilidad'),
+    ('Conexión con grupos de apoyo comunitario'),
+    ('Información sobre redes de Servicios Sociales'),
+    ('Apoyo emocional para personas recién diagnosticadas'),
+    ('Intervenciones para adherencia al tratamiento'),
+    ('Manejo del estigma y problemas de salud mental'),
+    ('Recursos para pacientes con vih y trastornos psicológicos'),
+    ('Consejería en prevención y autocuidado'),
+    ('Material educativo sobre vih'),
+    ('Capacitación en prevención'),
+    ('Métodos para combatir el estigma'),
+    ('Recursos para sensibilización'),
+    ('Estadísticas y datos actualizados'),
+    ('Info básica sobre vih'),
+    ('Consejos para apoyar emocionalmente'),
+    ('Recursos legales y sociales para pacientes'),
+    ('Métodos de autocuidado para cuidadores'),
+    ('Hace menos de 6 meses'),
+    ('Entre 6 meses y un año'),
+    ('Hace más de un año'),
+    ('Sí'),
+    ('No'),
+    ('No estoy seguro'),
+    ('Un amigo'),
+    ('Algún familiar'),
+    ('Mi pareja en ese momento'),
+    ('Compañero/a de trabajo'),
+    ('Con mi jefe/a'),
+    ('Personal de ONG'),
+    ('Expareja'),
+    ('Nadie'),
+    ('Opciones de tratamiento'),
+    ('Apoyo psicológico'),
+    ('Derechos laborales y legales'),
+    ('Grupos de apoyo'),
+    ('Prevención de transmisión'),
+    ('Últimas 72h'),
+    ('Hace más de 72h'),
+    ('Relación sexual'),
+    ('Aguja compartida'),
+    ('Contacto con fluidos corporales (sangre, fluido sexual..)'),
+    ('La persona que me preocupa'),
+    ('Si, quiero más información'),
+    ('No ¿Qué es?'),
+    ('¿Qué es el vih/sida?'),
+    ('Formas de transmisión'),
+    ('Métodos de prevención'),
+    ('Impacto del tratamiento'),
+    ('Historia del vih'),
+    ('Ayuda emocional'),
+    ('Información sobre tratamientos'),
+    ('Recursos para cuidadores'),
+    ('Información sobre derechos y apoyo social');
+"""
+cur.execute(query_insert_opciones)
+conn.commit()
+
+
+# Recuperar los id_pregunta de la tabla preguntas_chatbot
+cur.execute("SELECT id_pregunta, texto_pregunta FROM preguntas_chatbot")
+preguntas_dict = cur.fetchall()  # Esto es una lista de tuplas con (id_pregunta, pregunta)
+
+# Recuperar los id_opcion de la tabla opciones_chatbot
+cur.execute("SELECT id_opcion, texto_opcion FROM opciones_chatbot")
+opciones_dict = cur.fetchall()  # Esto es una lista de tuplas con (id_opcion, opcion)
+
+# Crear mapeo de preguntas a ids
+preguntas_dict = {pregunta[1]: pregunta[0] for pregunta in preguntas_dict}
+
+# Crear mapeo de opciones a ids
+opciones_dict = {opcion[1]: opcion[0] for opcion in opciones_dict}
+
+print(preguntas_dict)
+print(opciones_dict)
+
+
+# Lista de relaciones entre preguntas y opciones (basado en los valores que tienes)
+# Lista de relaciones entre preguntas y opciones con los IDs correctos
+preguntas_opciones = [
+    (preguntas_dict['¿Qué necesitas como Personal Sanitario?'], opciones_dict['Manejo clínico de pacientes con vih']),
+    (preguntas_dict['¿Qué necesitas como Personal Sanitario?'], opciones_dict['Protocolo PEP']),
+    (preguntas_dict['¿Qué necesitas como Personal Sanitario?'], opciones_dict['Tratamientos (PREP, TAR)']),
+    (preguntas_dict['¿Qué necesitas como Personal Sanitario?'], opciones_dict['Prevención de infecciones oportunistas']),
+    (preguntas_dict['¿Qué necesitas como Personal Sanitario?'], opciones_dict['Consejería para adherencia al tratamiento']),
+
+    (preguntas_dict['¿Qué necesitas como Trabajador Social?'], opciones_dict['Acceso a medicamentos o servicios']),
+    (preguntas_dict['¿Qué necesitas como Trabajador Social?'], opciones_dict['Recursos legales y derechos']),
+    (preguntas_dict['¿Qué necesitas como Trabajador Social?'], opciones_dict['Apoyo a personas en situación de vulnerabilidad']),
+    (preguntas_dict['¿Qué necesitas como Trabajador Social?'], opciones_dict['Conexión con grupos de apoyo comunitario']),
+    (preguntas_dict['¿Qué necesitas como Trabajador Social?'], opciones_dict['Información sobre redes de Servicios Sociales']),
+
+    (preguntas_dict['¿Qué necesitas como Psicologo?'], opciones_dict['Apoyo emocional para personas recién diagnosticadas']),
+    (preguntas_dict['¿Qué necesitas como Psicologo?'], opciones_dict['Intervenciones para adherencia al tratamiento']),
+    (preguntas_dict['¿Qué necesitas como Psicologo?'], opciones_dict['Manejo del estigma y problemas de salud mental']),
+    (preguntas_dict['¿Qué necesitas como Psicologo?'], opciones_dict['Recursos para pacientes con vih y trastornos psicológicos']),
+    (preguntas_dict['¿Qué necesitas como Psicologo?'], opciones_dict['Consejería en prevención y autocuidado']),
+
+    (preguntas_dict['¿Qué necesitas como Educador?'], opciones_dict['Material educativo sobre vih']),
+    (preguntas_dict['¿Qué necesitas como Educador?'], opciones_dict['Capacitación en prevención']),
+    (preguntas_dict['¿Qué necesitas como Educador?'], opciones_dict['Métodos para combatir el estigma']),
+    (preguntas_dict['¿Qué necesitas como Educador?'], opciones_dict['Recursos para sensibilización']),
+    (preguntas_dict['¿Qué necesitas como Educador?'], opciones_dict['Estadísticas y datos actualizados']),
+
+    (preguntas_dict['¿Qué necesitas como Voluntario/Cuidador?'], opciones_dict['Info básica sobre vih']),
+    (preguntas_dict['¿Qué necesitas como Voluntario/Cuidador?'], opciones_dict['Consejos para apoyar emocionalmente']),
+    (preguntas_dict['¿Qué necesitas como Voluntario/Cuidador?'], opciones_dict['Recursos legales y sociales para pacientes']),
+    (preguntas_dict['¿Qué necesitas como Voluntario/Cuidador?'], opciones_dict['Conexión con grupos de apoyo comunitario']),
+    (preguntas_dict['¿Qué necesitas como Voluntario/Cuidador?'], opciones_dict['Métodos de autocuidado para cuidadores']),
+    
+    (preguntas_dict['¿Cuándo te diagnosticaron?'], opciones_dict['Hace menos de 6 meses']),
+    (preguntas_dict['¿Cuándo te diagnosticaron?'], opciones_dict['Entre 6 meses y un año']),
+    (preguntas_dict['¿Cuándo te diagnosticaron?'], opciones_dict['Hace más de un año']),
+    
+    (preguntas_dict['¿Estás en tratamiento TAR?'], opciones_dict['Sí']),
+    (preguntas_dict['¿Estás en tratamiento TAR?'], opciones_dict['No']),
+    (preguntas_dict['¿Estás en tratamiento TAR?'], opciones_dict['No estoy seguro']),
+
+    (preguntas_dict['¿Tienes acceso a un médico?'], opciones_dict['Sí']),
+    (preguntas_dict['¿Tienes acceso a un médico?'], opciones_dict['No']),
+
+    (preguntas_dict['¿Has compartido tu diagnostico con alguien?'], opciones_dict['Un amigo']),
+    (preguntas_dict['¿Has compartido tu diagnostico con alguien?'], opciones_dict['Algún familiar']),
+    (preguntas_dict['¿Has compartido tu diagnostico con alguien?'], opciones_dict['Mi pareja en ese momento']),
+    (preguntas_dict['¿Has compartido tu diagnostico con alguien?'], opciones_dict['Compañero/a de trabajo']),
+    (preguntas_dict['¿Has compartido tu diagnostico con alguien?'], opciones_dict['Con mi jefe/a']),
+    (preguntas_dict['¿Has compartido tu diagnostico con alguien?'], opciones_dict['Personal de ONG']),
+    (preguntas_dict['¿Has compartido tu diagnostico con alguien?'], opciones_dict['Expareja']),
+    (preguntas_dict['¿Has compartido tu diagnostico con alguien?'], opciones_dict['Nadie']),
+
+    (preguntas_dict['¿Quieres información sobre algun tema?'], opciones_dict['Opciones de tratamiento']),
+    (preguntas_dict['¿Quieres información sobre algun tema?'], opciones_dict['Apoyo psicológico']),
+    (preguntas_dict['¿Quieres información sobre algun tema?'], opciones_dict['Derechos laborales y legales']),
+    (preguntas_dict['¿Quieres información sobre algun tema?'], opciones_dict['Grupos de apoyo']),
+    (preguntas_dict['¿Quieres información sobre algun tema?'], opciones_dict['Prevención de transmisión']),
+
+    (preguntas_dict['¿Cuándo ocurrió la posible infección?'], opciones_dict['Últimas 72h']),
+    (preguntas_dict['¿Cuándo ocurrió la posible infección?'], opciones_dict['Hace más de 72h']),
+
+    (preguntas_dict['¿Qué tipo de exposición fue?'], opciones_dict['Relación sexual']),
+    (preguntas_dict['¿Qué tipo de exposición fue?'], opciones_dict['Aguja compartida']),
+    (preguntas_dict['¿Qué tipo de exposición fue?'], opciones_dict['Contacto con fluidos corporales (sangre, fluido sexual..)']),
+    (preguntas_dict['¿Qué tipo de exposición fue?'], opciones_dict['No estoy seguro']),
+
+    (preguntas_dict['¿Ha sido en un entorno de "chem-sex"?'], opciones_dict['Sí']),
+    (preguntas_dict['¿Ha sido en un entorno de "chem-sex"?'], opciones_dict['No']),
+
+    (preguntas_dict['¿Tienes acceso a un médico?'], opciones_dict['Sí']),
+    (preguntas_dict['¿Tienes acceso a un médico?'], opciones_dict['No']),
+
+    (preguntas_dict['¿Has compartido tu preocupación con alguien?'], opciones_dict['La persona que me preocupa']),
+    (preguntas_dict['¿Has compartido tu preocupación con alguien?'], opciones_dict['Un amigo']),
+    (preguntas_dict['¿Has compartido tu preocupación con alguien?'], opciones_dict['Algún familiar']),
+    (preguntas_dict['¿Has compartido tu preocupación con alguien?'], opciones_dict['Mi pareja en ese momento']),
+    (preguntas_dict['¿Has compartido tu preocupación con alguien?'], opciones_dict['Compañero/a de trabajo']),
+    (preguntas_dict['¿Has compartido tu preocupación con alguien?'], opciones_dict['Con mi jefe/a']),
+    (preguntas_dict['¿Has compartido tu preocupación con alguien?'], opciones_dict['Personal de ONG']),
+    (preguntas_dict['¿Has compartido tu preocupación con alguien?'], opciones_dict['Expareja']),
+    (preguntas_dict['¿Has compartido tu preocupación con alguien?'], opciones_dict['Nadie']),
+
+    (preguntas_dict['¿Sabes qué es la PEP?'], opciones_dict['Si, quiero más información']),
+    (preguntas_dict['¿Sabes qué es la PEP?'], opciones_dict['No ¿Qué es?']),
+
+    (preguntas_dict['¿Necesitas recursos de referencia?'], opciones_dict['¿Qué es el vih/sida?']),
+    (preguntas_dict['¿Necesitas recursos de referencia?'], opciones_dict['Formas de transmisión']),
+    (preguntas_dict['¿Necesitas recursos de referencia?'], opciones_dict['Métodos de prevención']),
+    (preguntas_dict['¿Necesitas recursos de referencia?'], opciones_dict['Impacto del tratamiento']),
+    (preguntas_dict['¿Necesitas recursos de referencia?'], opciones_dict['Historia del vih']),
+
+    (preguntas_dict['¿Tiene acceso a recursos locales o grupos de apoyo?'], opciones_dict['Sí']),
+    (preguntas_dict['¿Tiene acceso a recursos locales o grupos de apoyo?'], opciones_dict['No']),
+
+    (preguntas_dict['¿Has compartido su preocupación sobre esta persona con alguien?'], opciones_dict['La persona que me preocupa']),
+    (preguntas_dict['¿Has compartido su preocupación sobre esta persona con alguien?'], opciones_dict['Un amigo']),
+    (preguntas_dict['¿Has compartido su preocupación sobre esta persona con alguien?'], opciones_dict['Algún familiar']),
+    (preguntas_dict['¿Has compartido su preocupación sobre esta persona con alguien?'], opciones_dict['Mi pareja en ese momento']),
+    (preguntas_dict['¿Has compartido su preocupación sobre esta persona con alguien?'], opciones_dict['Compañero/a de trabajo']),
+    (preguntas_dict['¿Has compartido su preocupación sobre esta persona con alguien?'], opciones_dict['Con mi jefe/a']),
+    (preguntas_dict['¿Has compartido su preocupación sobre esta persona con alguien?'], opciones_dict['Personal de ONG']),
+    (preguntas_dict['¿Has compartido su preocupación sobre esta persona con alguien?'], opciones_dict['Expareja']),
+    (preguntas_dict['¿Has compartido su preocupación sobre esta persona con alguien?'], opciones_dict['Nadie']),
+
+]
+
+
+for pregunta_id, opcion_id in preguntas_opciones:
+    cur.execute("""
+        SELECT 1 FROM preguntas_opciones_chatbot
+        WHERE id_pregunta = %s AND id_opcion = %s;
+    """, (pregunta_id, opcion_id))
+    
+    # Si no existe la combinación, insertar
+    if not cur.fetchone():
+        cur.execute("""
+            INSERT INTO preguntas_opciones_chatbot (id_pregunta, id_opcion)
+            VALUES (%s, %s);
+        """, (pregunta_id, opcion_id))
+
+# Confirmar los cambios en la base de datos
+conn.commit()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #Inserción en preguntas_chatbot
 cur.execute("SELECT id_categoria, titulo_categoria FROM categorias_chatbot;")
 categorias = cur.fetchall()
+
+
 categoria_dict = {categoria[1]: categoria[0] for categoria in categorias}
 preguntas = [
     (categoria_dict['Personal Sanitario'], '¿Qué necesitas como Personal Sanitario?'),
@@ -136,8 +459,8 @@ opciones = [
     (preguntas_dict['¿Ha sido en un entorno de "chem-sex"?'], 'Sí'),
     (preguntas_dict['¿Ha sido en un entorno de "chem-sex"?'], 'No'),
 
-    (preguntas_dict['¿Tiene acceso a un médico?'], 'Sí'),
-    (preguntas_dict['¿Tiene acceso a un médico?'], 'No'),
+    (preguntas_dict['¿Tienes acceso a un médico?'], 'Sí'),
+    (preguntas_dict['¿Tienes acceso a un médico?'], 'No'),
 
     (preguntas_dict['¿Has compartido tu preocupación con alguien?'], 'La persona que me preocupa'),
     (preguntas_dict['¿Has compartido tu preocupación con alguien?'], 'Un amigo'),
@@ -174,7 +497,7 @@ opciones = [
     (preguntas_dict['¿Qué apoyo necesitas?'], 'Ayuda emocional'),
     (preguntas_dict['¿Qué apoyo necesitas?'], 'Información sobre tratamientos'),
     (preguntas_dict['¿Qué apoyo necesitas?'], 'Recursos para cuidadores'),
-    (preguntas_dict['¿Qué apoyo necesitas?'], 'Información sobre derechos y apoyo social'),
+    (preguntas_dict['¿Qué apoyo necesitas?'], 'Información sobre derechos y apoyo social')
 
 
 ]
