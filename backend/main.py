@@ -22,8 +22,13 @@ from typing import Dict, Any
 import google.generativeai as genai
 from dotenv import load_dotenv
 import os
+
 import plotly.io as pio
-pio.renderers.default = "svg"  # Usa un renderer sin navegador
+from fastapi.responses import HTMLResponse
+
+
+# Configurar renderer
+pio.renderers.default = "browser"
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 #CREAR API Y CONFIGURAR MODELO
 app = FastAPI()
@@ -847,7 +852,7 @@ async def personalizar_prompt(user_data: UserData):
     
 
 
-@app.get("/prueba/")
+@app.get("/prueba/", response_class=HTMLResponse)
 def generar_grafico_pie(viven_espana: bool = True):
     try:
         # Conexión a la base de datos
@@ -865,25 +870,11 @@ def generar_grafico_pie(viven_espana: bool = True):
         # Crear el gráfico de pastel
         fig = prueba(df, viven_espana)
 
-        # # Guardar el gráfico como imagen usando kaleido
-        # img_bytes = fig.to_image(format="png", engine="kaleido")
+        # Exportar el gráfico como HTML
+        html_content = fig.to_html(full_html=False)  # Genera solo el cuerpo del HTML
 
-        # # Crear un buffer de memoria para la imagen
-        # buf = BytesIO(img_bytes)
-        # buf.seek(0)
-
-        # # Devolver la imagen como respuesta
-        # return StreamingResponse(buf, media_type="image/png")
-
-         # Guardar el gráfico como SVG
-        img_bytes = fig.to_image(format="svg")
-
-        # Crear un buffer de memoria para la imagen
-        buf = BytesIO(img_bytes)
-        buf.seek(0)
-
-        # Devolver la imagen como respuesta
-        return StreamingResponse(buf, media_type="image/svg+xml")
+        # Devolver el HTML como respuesta
+        return HTMLResponse(content=html_content, media_type="text/html")
     
     except Exception as e:
         return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
