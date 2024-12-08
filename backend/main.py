@@ -985,7 +985,7 @@ async def preguntas_user():
             .apply(lambda x: x[['id_opcion', 'texto_opcion']].to_dict(orient='records'))
             .reset_index()
             .rename(columns={0: 'opciones'})
-        )
+            )
         
         # Convertir las preguntas a una lista estructurada por categorías
         result = (
