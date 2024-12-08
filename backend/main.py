@@ -62,7 +62,7 @@ def generate_bar_chart():
     
     try:
         # Escribir la consulta SQL para obtener los datos
-        query = "SELECT * FROM user_data"  # Cambia esta consulta según sea necesario
+        query = "SELECT * FROM no_sociosanit_formulario"  # Cambia esta consulta según sea necesario
 
         # Usar pandas para ejecutar la consulta y convertirla en un DataFrame
         df = pd.read_sql_query(query, connection)
@@ -113,7 +113,7 @@ def generar_grafico_pie(viven_espana: bool = True):
     connection = connect_to_db()
     try:
         # Escribir la consulta SQL para obtener los datos
-        query = "SELECT * FROM user_data"  # Cambia esta consulta según sea necesario
+        query = "SELECT * FROM no_sociosanit_formulario"  # Cambia esta consulta según sea necesario
 
         # Usar pandas para ejecutar la consulta y convertirla en un DataFrame
         df = pd.read_sql_query(query, connection)
@@ -145,7 +145,7 @@ def generar_barras_apiladas():
     connection = connect_to_db()
     try:
         # Escribir la consulta SQL para obtener los datos
-        query = "SELECT * FROM user_data"  # Cambia esta consulta según sea necesario
+        query = "SELECT * FROM no_sociosanit_formulario"  # Cambia esta consulta según sea necesario
 
         # Usar pandas para ejecutar la consulta y convertirla en un DataFrame
         df = pd.read_sql_query(query, connection)
@@ -177,7 +177,7 @@ def generar_grafico_permiso_residencia():
     connection = connect_to_db()
     try:
         # Escribir la consulta SQL para obtener los datos
-        query = "SELECT * FROM user_data"  # Cambia esta consulta según sea necesario
+        query = "SELECT * FROM no_sociosanit_formulario"  # Cambia esta consulta según sea necesario
 
         # Usar pandas para ejecutar la consulta y convertirla en un DataFrame
         df = pd.read_sql_query(query, connection)
@@ -209,7 +209,7 @@ def generar_grafico_combinaciones():
     connection = connect_to_db()
     try:
         # Escribir la consulta SQL para obtener los datos
-        query = "SELECT * FROM user_data"  # Cambia esta consulta según sea necesario
+        query = "SELECT * FROM no_sociosanit_formulario"  # Cambia esta consulta según sea necesario
 
         # Usar pandas para ejecutar la consulta y convertirla en un DataFrame
         df = pd.read_sql_query(query, connection)
@@ -467,7 +467,7 @@ async def submit_data(user_data: UserData):
         cursor.close()
         connection.close()
 
-        
+
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 class WorkEnvironment(str, Enum):
     centro_salud = "Centro de Salud"

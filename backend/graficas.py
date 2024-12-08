@@ -3,11 +3,11 @@ import plotly.express as px
 
 def crear_grafico_pie(dataframe, viven_espana=True):
     # Filtro para el DataFrame
-    filtro = dataframe['vives_espana'] == viven_espana
+    filtro = dataframe['vives_en_espana'] == viven_espana
     df_filtrado = dataframe[filtro]
     
     # Conteo de orientaciones
-    colectivos_count = df_filtrado['orientacion'].value_counts().reset_index()
+    colectivos_count = df_filtrado['orientacion_sexual'].value_counts().reset_index()
     colectivos_count.columns = ['Orientacion', 'Cantidad']
     
     # Tener en cuenta ambas posibilidades
@@ -30,7 +30,7 @@ def crear_grafico_pie(dataframe, viven_espana=True):
 
 def barras_apiladas_genero_orientacion(dataframe):
     # Agrupar y contar las combinaciones de género y orientación
-    datos_agrupados = dataframe.groupby(['genero', 'orientacion']).size().reset_index(name='Cantidad')
+    datos_agrupados = dataframe.groupby(['identidad_genero	', 'orientacion_sexual']).size().reset_index(name='Cantidad')
 
     # Configurar el gráfico de barras apiladas
     fig = px.bar(datos_agrupados,
