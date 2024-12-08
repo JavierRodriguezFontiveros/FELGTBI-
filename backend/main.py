@@ -934,12 +934,12 @@ async def preguntas_user():
             .to_dict(orient='records')
         )
         
-        # json_data = df.to_dict(orient="records")
-        json_data = json.dumps(result, indent=4, ensure_ascii=False)
+        # # json_data = df.to_dict(orient="records")
+        # json_data = json.dumps(result, indent=3, ensure_ascii=False)
         
         connection.close()
 
-        return json_data
+        return result
     
     except Exception as e:
         return {"error": f"Ha ocurrido algún problema obteniendo las preguntas: {e}"}
@@ -997,14 +997,14 @@ async def preguntas_user():
             .to_dict(orient='records')
         )
         
-        # json_data = df.to_dict(orient="records")
-        json_data = json.dumps(result, indent=3, ensure_ascii=False)
+        # # json_data = df.to_dict(orient="records")
+        # json_data = json.dumps(result, indent=3, ensure_ascii=False)
         
-        print(json_data)
+        # print(json_data)
         
         connection.close()
 
-        return json_data
+        return result
     
     except Exception as e:
         return {"error": f"Ha ocurrido algún problema obteniendo las preguntas: {e}"}
