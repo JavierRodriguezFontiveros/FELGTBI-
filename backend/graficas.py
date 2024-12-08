@@ -34,15 +34,15 @@ def crear_grafico_pie(dataframe, viven_espana=True):
 
 def barras_apiladas_genero_orientacion(dataframe):
     # Agrupar y contar las combinaciones de género y orientación
-    datos_agrupados = dataframe.groupby(['identidad_genero	', 'orientacion_sexual']).size().reset_index(name='Cantidad')
+    datos_agrupados = dataframe.groupby(['identidad_genero', 'orientacion_sexual']).size().reset_index(name='Cantidad')
 
     # Configurar el gráfico de barras apiladas
     fig = px.bar(datos_agrupados,
-                 x='genero',
+                 x='identidad_genero',
                  y='Cantidad',
-                 color='orientacion',
+                 color='orientacion_sexual',
                  title='Distribución de Género y Orientación Sexual',
-                 labels={'genero': 'Género', 'orientacion': 'Orientación Sexual'},
+                 labels={'identidad_genero': 'Género', 'orientacion_sexual': 'Orientación Sexual'},
                  barmode='stack',  
                  color_discrete_sequence=px.colors.qualitative.Pastel)
 
@@ -81,12 +81,12 @@ def graficar_permiso_residencia(dataframe):
 
 def graficar_combinaciones(dataframe):
     # Agrupación y conteo
-    combinaciones = dataframe.groupby(['persona_racializada', 'discapacitade', 'sin_hogar', 'migrante']).size().reset_index(name='Cantidad')
+    combinaciones = dataframe.groupby(['persona_racializada', 'persona_discapacitada', 'persona_sin_hogar', 'persona_migrante']).size().reset_index(name='Cantidad')
     
     # Crear una nueva columna que combine las condiciones
     combinaciones['Combinación'] = combinaciones.apply(
-        lambda row: f"Racializada: {row['persona_racializada']}, Discapacidad: {row['discapacitade']}, "
-                    f"Hogar: {row['sin_hogar']}, Migrante: {row['migrante']}", axis=1)
+        lambda row: f"persona_racializada: {row['persona_racializada']}, persona_discapacitada: {row['persona_discapacitada']}, "
+                    f"persona_sin_hogar: {row['persona_sin_hogar']}, persona_migrante: {row['persona_migrante']}", axis=1)
     
     # Configuración gráfico de barras
     fig = px.bar(combinaciones, 
@@ -104,20 +104,20 @@ def graficar_combinaciones(dataframe):
 
 
 def buscar_ciudad(dataframe, ciudad_a_buscar):
-    ciudad_filtrada = dataframe[dataframe['ciudad'].str.lower() == ciudad_a_buscar.lower()]
+    ciudad_filtrada = dataframe[dataframe['provincia'].str.lower() == ciudad_a_buscar.lower()]
     info_ciudad = {
-        "Ciudad": ciudad_a_buscar,
+        "Provincia": ciudad_a_buscar,
         "Cantidad": len(ciudad_filtrada)
         } if not ciudad_filtrada.empty else {
-        "Ciudad": ciudad_a_buscar,
+        "Provincia": ciudad_a_buscar,
         "Cantidad": 0
     }
     return info_ciudad
 
 
 def obtener_top_5_ciudades(dataframe):
-    ciudades_count = dataframe['ciudad'].value_counts().reset_index()
-    ciudades_count.columns = ['Ciudad', 'Cantidad']
+    ciudades_count = dataframe['provincia'].value_counts().reset_index()
+    ciudades_count.columns = ['Provincia', 'Cantidad']
     top_5_ciudades = ciudades_count.head(5).to_dict(orient='records')
     return top_5_ciudades
 

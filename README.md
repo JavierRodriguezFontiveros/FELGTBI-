@@ -1,4 +1,5 @@
 # FELGTBI-
 
-altair o bokeh
-dash
+Proyecto que predice cosas!
+
+Cuidadin Cuidadin Cuidadin
