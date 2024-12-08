@@ -568,7 +568,7 @@ class UserData(BaseModel):
     identidad_genero: GenderIdentity
     orientacion_sexual: SexualOrientation
     vives_en_espana: bool
-    pais: Nacionalidad  
+    nacionalidad: Nacionalidad  
     permiso_residencia: bool
 
 
@@ -594,12 +594,12 @@ async def submit_data(user_data: UserData):
     # Aquí ajustamos la consulta y los datos
     query = """
            INSERT INTO no_sociosanit_formulario (edad, pronombre_el, pronombre_ella, pronombre_elle, identidad_genero,
-                                                orientacion_sexual, vives_en_espana, pais, permiso_residencia,
+                                                orientacion_sexual, vives_en_espana, nacionalidad, permiso_residencia,
                                                 persona_racializada, persona_discapacitada, persona_sin_hogar,
                                                 persona_migrante, persona_intersexual, nivel_estudios, situacion_afectiva,
                                                 provincia)
            VALUES (%(edad)s, %(pronombre_el)s, %(pronombre_ella)s, %(pronombre_elle)s, %(identidad_genero)s,
-                   %(orientacion_sexual)s, %(vives_en_espana)s, %(pais)s, %(permiso_residencia)s,
+                   %(orientacion_sexual)s, %(vives_en_espana)s, %(nacionalidad)s, %(permiso_residencia)s,
                    %(persona_racializada)s, %(persona_discapacitada)s, %(persona_sin_hogar)s, %(persona_migrante)s,
                    %(persona_intersexual)s, %(nivel_estudios)s, %(situacion_afectiva)s, %(provincia)s)
     """
@@ -612,7 +612,7 @@ async def submit_data(user_data: UserData):
             "identidad_genero": user_data.identidad_genero,
             "orientacion_sexual": user_data.orientacion_sexual,
             "vives_en_espana": user_data.vives_en_espana,
-            "pais": user_data.pais,
+            "nacionalidad": user_data.nacionalidad,
             "permiso_residencia": user_data.permiso_residencia,
             "persona_racializada": user_data.persona_racializada,
             "persona_discapacitada": user_data.persona_discapacitada,
