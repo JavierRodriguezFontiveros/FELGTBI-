@@ -26,6 +26,7 @@ import os
 import plotly.io as pio
 from fastapi.responses import HTMLResponse
 
+import json
 
 # Configurar renderer
 pio.renderers.default = "browser"
@@ -890,46 +891,127 @@ async def preguntas_user():
         
         # Escribir la consulta SQL para obtener los datos
         query_usuarios = """
-                        SELECT 
-                            c.id_categoria,
-                            p.id_pregunta,
-                            o.id_opcion,
-                            c.titulo_categoria,
-                            p.texto_pregunta,
-                            o.texto_opcion
-                        FROM 
-                            categorias_chatbot c
-                        JOIN 
-                            categoria_pregunta_chat_intermed cp ON c.id_categoria = cp.id_categoria
-                        JOIN 
-                            preguntas_chatbot p ON cp.id_pregunta = p.id_pregunta
-                        JOIN 
-                            preguntas_opciones_chatbot po ON p.id_pregunta = po.id_pregunta
-                        JOIN 
-                            opciones_chatbot o ON po.id_opcion = o.id_opcion
-                        WHERE 
-                            c.seccion = 'usuario'
-                        ORDER BY 
-                            c.id_categoria, p.id_pregunta, o.id_opcion;
+                    SELECT 
+                        c.id_categoria,
+                        p.id_pregunta,
+                        o.id_opcion,
+                        c.titulo_categoria,
+                        p.texto_pregunta,
+                        o.texto_opcion
+                    FROM 
+                        categorias_chatbot c
+                    JOIN 
+                        categoria_pregunta_chat_intermed cp ON c.id_categoria = cp.id_categoria
+                    JOIN 
+                        preguntas_chatbot p ON cp.id_pregunta = p.id_pregunta
+                    JOIN 
+                        preguntas_opciones_chatbot po ON p.id_pregunta = po.id_pregunta
+                    JOIN 
+                        opciones_chatbot o ON po.id_opcion = o.id_opcion
+                    WHERE 
+                        c.seccion = 'usuario'
+                    ORDER BY 
+                        c.id_categoria, p.id_pregunta, o.id_opcion;
                     """
 
         # Usar pandas para ejecutar la consulta y convertirla en un DataFrame
         df = pd.read_sql_query(query_usuarios, connection)
         
-        # Cerrar la conexión después de obtener los datos
-        # connection.close()
+        grouped_questions = (
+            df.groupby(['id_categoria', 'titulo_categoria', 'id_pregunta', 'texto_pregunta'])
+            .apply(lambda x: x[['id_opcion', 'texto_opcion']].to_dict(orient='records'))
+            .reset_index()
+            .rename(columns={0: 'opciones'})
+        )
         
-        # df = pd.read_sql_query(query_usuarios, connection)
-
-        json_data = df.to_dict(orient="records")
+        # Convertir las preguntas a una lista estructurada por categorías
+        result = (
+            grouped_questions.groupby(['id_categoria', 'titulo_categoria'])
+            .apply(lambda x: x[['id_pregunta', 'texto_pregunta', 'opciones']].to_dict(orient='records'))
+            .reset_index()
+            .rename(columns={0: 'preguntas'})
+            .to_dict(orient='records')
+        )
+        
+        # json_data = df.to_dict(orient="records")
+        json_data = json.dumps(result, indent=4, ensure_ascii=False)
         
         connection.close()
 
         return json_data
     
     except Exception as e:
-        return {"error": f"Ha ocurrido algún problema: {e}"}
+        return {"error": f"Ha ocurrido algún problema obteniendo las preguntas: {e}"}
     
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+@app.get("/preguntas_sociosanitarios/")
+async def preguntas_user(): 
+    try:
+        # Conexión a la base de datos
+        connection = connect_to_db()
+        
+        # Escribir la consulta SQL para obtener los datos
+        query_sociosanitarios = """
+                            SELECT 
+                                c.id_categoria,
+                                p.id_pregunta,
+                                o.id_opcion,
+                                c.titulo_categoria,
+                                p.texto_pregunta,
+                                o.texto_opcion
+                            FROM 
+                                categorias_chatbot c
+                            JOIN 
+                                categoria_pregunta_chat_intermed cp ON c.id_categoria = cp.id_categoria
+                            JOIN 
+                                preguntas_chatbot p ON cp.id_pregunta = p.id_pregunta
+                            JOIN 
+                                preguntas_opciones_chatbot po ON p.id_pregunta = po.id_pregunta
+                            JOIN 
+                                opciones_chatbot o ON po.id_opcion = o.id_opcion
+                            WHERE 
+                                c.seccion = 'sociosanitario'
+                            ORDER BY 
+                                c.id_categoria, p.id_pregunta, o.id_opcion;
+                        """
+
+        # Usar pandas para ejecutar la consulta y convertirla en un DataFrame
+        df = pd.read_sql_query(query_sociosanitarios, connection)
+        
+        grouped_questions = (
+            df.groupby(['id_categoria', 'titulo_categoria', 'id_pregunta', 'texto_pregunta'])
+            .apply(lambda x: x[['id_opcion', 'texto_opcion']].to_dict(orient='records'))
+            .reset_index()
+            .rename(columns={0: 'opciones'})
+        )
+        
+        # Convertir las preguntas a una lista estructurada por categorías
+        result = (
+            grouped_questions.groupby(['id_categoria', 'titulo_categoria'])
+            .apply(lambda x: x[['id_pregunta', 'texto_pregunta', 'opciones']].to_dict(orient='records'))
+            .reset_index()
+            .rename(columns={0: 'preguntas'})
+            .to_dict(orient='records')
+        )
+        
+        # json_data = df.to_dict(orient="records")
+        json_data = json.dumps(result, indent=4, ensure_ascii=False)
+        
+        connection.close()
+
+        return json_data
+    
+    except Exception as e:
+        return {"error": f"Ha ocurrido algún problema obteniendo las preguntas: {e}"}
+
+
+
+
+
+
+
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
