@@ -1,0 +1,43 @@
+[
+    {
+      "id_pregunta": 9,
+      "texto_pregunta": "¿Estás en tratamiento TAR?",
+      "opciones": [
+        {
+          "id_opcion": 30,
+          "texto_opcion": "Sí"
+        }
+      ]
+    },
+    {
+      "id_pregunta": 10,
+      "texto_pregunta": "¿Has compartido tu diagnóstico con alguien?",
+      "opciones": [
+        {
+          "id_opcion": 32,
+          "texto_opcion": "Sí"
+        }
+      ]
+    },
+    {
+      "id_pregunta": 11,
+      "texto_pregunta": "¿Tiene acceso a recursos locales o grupos de apoyo?",
+      "opciones": [
+        {
+          "id_opcion": 29,
+          "texto_opcion": "Sí"
+        }
+      ]
+    },
+    {
+      "id_pregunta": 13,
+      "texto_pregunta": "¿Cuándo te diagnosticaron?",
+      "opciones": [
+        {
+          "id_opcion": 26,
+          "texto_opcion": "Sí"
+        }
+      ]
+    }
+  ]
+  
