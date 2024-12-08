@@ -1,5 +1,8 @@
-
+import plotly.io as pio
 import plotly.express as px
+
+# Configurar renderer
+pio.renderers.default = "browser"
 
 def crear_grafico_pie(dataframe, viven_espana=True):
     # Filtro para el DataFrame
@@ -184,5 +187,8 @@ def prueba(dataframe, viven_espana=True):
         title=titulo,
         color_discrete_sequence=px.colors.qualitative.Pastel
     )
+    
+    # Mostrar el gráfico en el navegador al ejecutar localmente
+    fig.show()  # Esto abrirá el gráfico en tu navegador
     
     return fig
