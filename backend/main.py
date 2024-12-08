@@ -248,7 +248,7 @@ def endpoint_buscar_ciudad(ciudad: str = Query(..., description="Nombre de la ci
     connection = connect_to_db()
     try:
         # Obtener datos de la base de datos
-        query = "SELECT * FROM sociosanitarios_data"  # Cambia la consulta según sea necesario
+        query = "SELECT * FROM sociosanitarios_formulario"  # Cambia la consulta según sea necesario
         df = pd.read_sql_query(query, connection)
         connection.close()
 
@@ -280,6 +280,7 @@ def endpoint_top_5_ciudades():
     
     except Exception as e:
         return {"error": f"Ocurrió un error al procesar la solicitud: {e}"}
+    
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 @app.get("/grafico-especialidad/")
 def generar_grafico_especialidad():

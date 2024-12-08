@@ -104,20 +104,20 @@ def graficar_combinaciones(dataframe):
 
 
 def buscar_ciudad(dataframe, ciudad_a_buscar):
-    ciudad_filtrada = dataframe[dataframe['ciudad'].str.lower() == ciudad_a_buscar.lower()]
+    ciudad_filtrada = dataframe[dataframe['provincia'].str.lower() == ciudad_a_buscar.lower()]
     info_ciudad = {
-        "Ciudad": ciudad_a_buscar,
+        "Provincia": ciudad_a_buscar,
         "Cantidad": len(ciudad_filtrada)
         } if not ciudad_filtrada.empty else {
-        "Ciudad": ciudad_a_buscar,
+        "Provincia": ciudad_a_buscar,
         "Cantidad": 0
     }
     return info_ciudad
 
 
 def obtener_top_5_ciudades(dataframe):
-    ciudades_count = dataframe['ciudad'].value_counts().reset_index()
-    ciudades_count.columns = ['Ciudad', 'Cantidad']
+    ciudades_count = dataframe['provincia'].value_counts().reset_index()
+    ciudades_count.columns = ['Provincia', 'Cantidad']
     top_5_ciudades = ciudades_count.head(5).to_dict(orient='records')
     return top_5_ciudades
 
