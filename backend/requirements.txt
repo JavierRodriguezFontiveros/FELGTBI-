@@ -5,3 +5,10 @@ matplotlib==3.8.4
 psycopg2==2.9.10
 python-dotenv==0.21.0
 plotly==5.22.0
+google-ai-generativelanguage==0.6.10
+google-api-core==2.23.0
+google-api-python-client==2.154.0
+google-auth==2.36.0
+google-auth-httplib2==0.2.0
+google-generativeai==0.8.3
+googleapis-common-protos==1.66.0
