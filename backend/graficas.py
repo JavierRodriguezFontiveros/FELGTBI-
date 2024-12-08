@@ -2,7 +2,7 @@ import plotly.io as pio
 import plotly.express as px
 
 # Configurar renderer
-pio.renderers.default = "browser"
+pio.renderers.default = "svg"
 
 def crear_grafico_pie(dataframe, viven_espana=True):
     # Filtro para el DataFrame
@@ -191,4 +191,5 @@ def prueba(dataframe, viven_espana=True):
     # Mostrar el gráfico en el navegador al ejecutar localmente
     fig.show()  # Esto abrirá el gráfico en tu navegador
     
+
     return fig

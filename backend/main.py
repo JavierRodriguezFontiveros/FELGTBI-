@@ -22,7 +22,8 @@ from typing import Dict, Any
 import google.generativeai as genai
 from dotenv import load_dotenv
 import os
-
+import plotly.io as pio
+pio.renderers.default = "svg"  # Usa un renderer sin navegador
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 #CREAR API Y CONFIGURAR MODELO
 app = FastAPI()
@@ -864,15 +865,25 @@ def generar_grafico_pie(viven_espana: bool = True):
         # Crear el gráfico de pastel
         fig = prueba(df, viven_espana)
 
-        # Guardar el gráfico como imagen usando kaleido
-        img_bytes = fig.to_image(format="png", engine="kaleido")
+        # # Guardar el gráfico como imagen usando kaleido
+        # img_bytes = fig.to_image(format="png", engine="kaleido")
+
+        # # Crear un buffer de memoria para la imagen
+        # buf = BytesIO(img_bytes)
+        # buf.seek(0)
+
+        # # Devolver la imagen como respuesta
+        # return StreamingResponse(buf, media_type="image/png")
+
+         # Guardar el gráfico como SVG
+        img_bytes = fig.to_image(format="svg")
 
         # Crear un buffer de memoria para la imagen
         buf = BytesIO(img_bytes)
         buf.seek(0)
 
         # Devolver la imagen como respuesta
-        return StreamingResponse(buf, media_type="image/png")
+        return StreamingResponse(buf, media_type="image/svg+xml")
     
     except Exception as e:
         return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
