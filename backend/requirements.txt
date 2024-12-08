@@ -8,3 +8,4 @@ plotly==5.22.0
 google-generativeai==0.8.3
 kaleido==0.2.1
 ipython==8.12.3
+nbformat>=4.2.0
