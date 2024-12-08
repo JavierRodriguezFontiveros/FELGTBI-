@@ -123,9 +123,9 @@ def obtener_top_5_ciudades(dataframe):
 
 
 def graficar_especialidad(dataframe):
-    # Contar las frecuencias de los valores en la columna 'especialidad'
-    especialidad_count = dataframe['especialidad'].value_counts().reset_index()
-    especialidad_count.columns = ['Especialidad', 'Cantidad']
+    # Contar las frecuencias de los valores en la columna 'ambito laboral'
+    especialidad_count = dataframe['ambito_laboral'].value_counts().reset_index()
+    especialidad_count.columns = ['Ambito Laboral', 'Cantidad']
     
     # Calcular los porcentajes
     total = especialidad_count['Cantidad'].sum()
@@ -140,11 +140,11 @@ def graficar_especialidad(dataframe):
     # Crear gráfico de pastel (pie chart) con cantidades y porcentajes
     fig = px.pie(
         especialidad_count,
-        names='Especialidad',
+        names='Ambito Laboral',
         values='Cantidad',
         title='Distribución de Especialidades',
-        labels={'Especialidad': 'Especialidad'},
-        color='Especialidad',
+        labels={'Ambito Laboral': 'Ambito Laboral'},
+        color='Ambito Laboral',
         color_discrete_sequence=px.colors.qualitative.Set1,
         hole=0.3  # Tipo donut
     )
