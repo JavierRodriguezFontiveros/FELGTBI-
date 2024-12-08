@@ -879,11 +879,58 @@ def generar_grafico_pie(viven_espana: bool = True):
     except Exception as e:
         return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+@app.get("/preguntas_user/")
+async def preguntas_user(): 
+    try:
+        # Conexión a la base de datos
+        connection = connect_to_db()
+        
+        # Escribir la consulta SQL para obtener los datos
+        query_usuarios = """
+                        SELECT 
+                            c.id_categoria,
+                            p.id_pregunta,
+                            o.id_opcion,
+                            c.titulo_categoria,
+                            p.texto_pregunta,
+                            o.texto_opcion
+                        FROM 
+                            categorias_chatbot c
+                        JOIN 
+                            categoria_pregunta_chat_intermed cp ON c.id_categoria = cp.id_categoria
+                        JOIN 
+                            preguntas_chatbot p ON cp.id_pregunta = p.id_pregunta
+                        JOIN 
+                            preguntas_opciones_chatbot po ON p.id_pregunta = po.id_pregunta
+                        JOIN 
+                            opciones_chatbot o ON po.id_opcion = o.id_opcion
+                        WHERE 
+                            c.seccion = 'usuario'
+                        ORDER BY 
+                            c.id_categoria, p.id_pregunta, o.id_opcion;
+                    """
 
+        # Usar pandas para ejecutar la consulta y convertirla en un DataFrame
+        df = pd.read_sql_query(query_usuarios, connection)
+        
+        # Cerrar la conexión después de obtener los datos
+        connection.close()
+        
+        df = pd.read_sql_query(query_usuarios, connection)
 
+        json_data = df.to_dict(orient="records")
+        
+        connection.close()
 
-
-
+        
+        return json_data
+    
+    except Exception as e:
+        return {"error": f"Ha ocurrido algún problema: {e}"}
+    
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
