@@ -917,15 +917,14 @@ async def preguntas_user():
         df = pd.read_sql_query(query_usuarios, connection)
         
         # Cerrar la conexión después de obtener los datos
-        connection.close()
+        # connection.close()
         
-        df = pd.read_sql_query(query_usuarios, connection)
+        # df = pd.read_sql_query(query_usuarios, connection)
 
         json_data = df.to_dict(orient="records")
         
         connection.close()
 
-        
         return json_data
     
     except Exception as e:
