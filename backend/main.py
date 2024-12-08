@@ -934,7 +934,7 @@ async def preguntas_user():
         )
         
         # json_data = df.to_dict(orient="records")
-        json_data = json.dumps(result, indent=4, ensure_ascii=False)
+        json_data = json.dumps(result, indent=3, ensure_ascii=False)
         
         connection.close()
 
