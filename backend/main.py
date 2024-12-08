@@ -268,7 +268,7 @@ def endpoint_top_5_ciudades():
     connection = connect_to_db()
     try:
         # Obtener datos de la base de datos
-        query = "SELECT * FROM sociosanitarios_data"  # Cambia la consulta según sea necesario
+        query = "SELECT * FROM sociosanitarios_formulario"  # Cambia la consulta según sea necesario
         df = pd.read_sql_query(query, connection)
         connection.close()
 
@@ -286,7 +286,7 @@ def generar_grafico_especialidad():
     connection = connect_to_db()
     try:
         # Consulta para obtener los datos
-        query = "SELECT * FROM sociosanitarios_data"  # Cambia la consulta según sea necesario
+        query = "SELECT * FROM sociosanitarios_formulario"  # Cambia la consulta según sea necesario
 
         # Convertir los datos en un DataFrame
         df = pd.read_sql_query(query, connection)
