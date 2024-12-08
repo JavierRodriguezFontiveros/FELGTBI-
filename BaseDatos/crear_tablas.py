@@ -65,7 +65,7 @@ cur = conn.cursor()
 #             identidad_genero VARCHAR(50) NOT NULL,
 #             orientacion_sexual VARCHAR(50) NOT NULL,
 #             vives_en_espana BOOLEAN NOT NULL,
-#             pais VARCHAR(50) NOT NULL,
+#             nacionalidad VARCHAR(50) NOT NULL,
 #             permiso_residencia BOOLEAN NOT NULL,
 #             persona_racializada BOOLEAN NOT NULL,
 #             persona_discapacitada BOOLEAN NOT NULL,

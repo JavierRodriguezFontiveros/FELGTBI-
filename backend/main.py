@@ -9,7 +9,7 @@ from fastapi.responses import StreamingResponse
 import io
 import matplotlib.pyplot as plt
 
-from graficas import crear_grafico_pie, barras_apiladas_genero_orientacion, graficar_permiso_residencia, graficar_combinaciones, buscar_ciudad, obtener_top_5_ciudades, graficar_especialidad
+from graficas import crear_grafico_pie, barras_apiladas_genero_orientacion, graficar_permiso_residencia, graficar_combinaciones, buscar_ciudad, obtener_top_5_ciudades, graficar_especialidad, prueba
 from utils import connect_to_db
 
 from io import BytesIO
@@ -23,6 +23,12 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 import os
 
+import plotly.io as pio
+from fastapi.responses import HTMLResponse
+
+
+# Configurar renderer
+pio.renderers.default = "browser"
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 #CREAR API Y CONFIGURAR MODELO
 app = FastAPI()
@@ -340,6 +346,174 @@ class AffectiveSituation(str, Enum):
     viudo = "Viudo"
     otro = "Otro"
 
+class Nacionalidad(str,Enum):
+    afganistan = "Afganistán"
+    albania = "Albania"
+    alemania = "Alemania"
+    andorra = "Andorra"
+    angola = "Angola"
+    antigua_y_barbuda = "Antigua y Barbuda"
+    argentina = "Argentina"
+    armenia = "Armenia"
+    australia = "Australia"
+    austria = "Austria"
+    azerbaiyan = "Azerbaiyán"
+    bahamas = "Bahamas"
+    banglades = "Bangladés"
+    barbados = "Barbados"
+    bielorrusia = "Bielorrusia"
+    belgica = "Bélgica"
+    belice = "Belice"
+    benin = "Benín"
+    bolivia = "Bolivia"
+    bosnia_y_herzegovina = "Bosnia y Herzegovina"
+    botsuana = "Botsuana"
+    brasil = "Brasil"
+    brunei = "Brunéi"
+    bulgaria = "Bulgaria"
+    burundi = "Burundi"
+    butan = "Bután"
+    cabo_verde = "Cabo Verde"
+    camboya = "Camboya"
+    camerun = "Camerún"
+    canada = "Canadá"
+    chad = "Chad"
+    chile = "Chile"
+    china = "China"
+    chipre = "Chipre"
+    colombia = "Colombia"
+    comoras = "Comoras"
+    republica_del_congo = "República del Congo"
+    costa_rica = "Costa Rica"
+    croacia = "Croacia"
+    cuba = "Cuba"
+    dinamarca = "Dinamarca"
+    republica_dominicana = "República Dominicana"
+    ecuador = "Ecuador"
+    egipto = "Egipto"
+    emiratos_arabes_unidos = "Emiratos Árabes Unidos"
+    guinea_ecuatorial = "Guinea Ecuatorial"
+    eslovaquia = "Eslovaquia"
+    eslovenia = "Eslovenia"
+    españa = "España"
+    estados_unidos = "Estados Unidos"
+    estonia = "Estonia"
+    etiopia = "Etiopía"
+    fiyi = "Fiyi"
+    filipinas = "Filipinas"
+    finlandia = "Finlandia"
+    francia = "Francia"
+    gabon = "Gabón"
+    gambia = "Gambia"
+    georgia = "Georgia"
+    ghana = "Ghana"
+    granada = "Granada"
+    guatemala = "Guatemala"
+    guinea = "Guinea"
+    guyana = "Guyana"
+    haiti = "Haití"
+    honduras = "Honduras"
+    hong_kong = "Hong Kong"
+    hungria = "Hungría"
+    islandia = "Islandia"
+    india = "India"
+    indonesia = "Indonesia"
+    irak = "Irak"
+    iran = "Irán"
+    israel = "Israel"
+    italia = "Italia"
+    jamaica = "Jamaica"
+    japon = "Japón"
+    jordania = "Jordania"
+    kenia = "Kenia"
+    kirguistan = "Kirguistán"
+    kosovo = "Kosovo"
+    kuwait = "Kuwait"
+    laos = "Laos"
+    letonia = "Letonia"
+    lesoto = "Lesoto"
+    liberia = "Liberia"
+    libia = "Libia"
+    liechtenstein = "Liechtenstein"
+    lituania = "Lituania"
+    luxemburgo = "Luxemburgo"
+    macedonia_del_norte = "Macedonia del Norte"
+    madagascar = "Madagascar"
+    malaui = "Malaui"
+    malasia = "Malasia"
+    maldivas = "Maldivas"
+    mali = "Malí"
+    costa_de_marfil = "Costa de Marfil"
+    mauricio = "Mauricio"
+    mauritania = "Mauritania"
+    mexico = "México"
+    myanmar = "Myanmar"
+    moldavia = "Moldavia"
+    monaco = "Mónaco"
+    mongolia = "Mongolia"
+    mozambique = "Mozambique"
+    namibia = "Namibia"
+    nauru = "Nauru"
+    nepal = "Nepal"
+    nicaragua = "Nicaragua"
+    nigeria = "Nigeria"
+    noruega = "Noruega"
+    nueva_zelanda = "Nueva Zelanda"
+    niger = "Níger"
+    palestina = "Palestina"
+    panama = "Panamá"
+    papua_nueva_guinea = "Papúa Nueva Guinea"
+    paraguay = "Paraguay"
+    peru = "Perú"
+    polonia = "Polonia"
+    portugal = "Portugal"
+    catar = "Catar"
+    reino_unido = "Reino Unido"
+    republica_checa = "República Checa"
+    ruanda = "Ruanda"
+    rumania = "Rumanía"
+    rusia = "Rusia"
+    el_salvador = "El Salvador"
+    samoa = "Samoa"
+    san_cristobal_y_nieves = "San Cristóbal y Nieves"
+    san_marino = "San Marino"
+    santo_tome_y_principe = "Santo Tomé y Príncipe"
+    senegal = "Senegal"
+    serbia = "Serbia"
+    seychelles = "Seychelles"
+    sierra_leona = "Sierra Leona"
+    singapur = "Singapur"
+    siria = "Siria"
+    somalia = "Somalia"
+    sri_lanka = "Sri Lanka"
+    sudafrica = "Sudáfrica"
+    sudan = "Sudán"
+    surinam = "Surinam"
+    suecia = "Suecia"
+    suiza = "Suiza"
+    sudan_del_sur = "Sudán del Sur"
+    esuatini = "Esuatini"
+    tailandia = "Tailandia"
+    tanzania = "Tanzania"
+    togo = "Togo"
+    tonga = "Tonga"
+    trinidad_y_tobago = "Trinidad y Tobago"
+    tunez = "Túnez"
+    turquia = "Turquía"
+    turkmenistan = "Turkmenistán"
+    tuvalu = "Tuvalu"
+    ucrania = "Ucrania"
+    uganda = "Uganda"
+    uruguay = "Uruguay"
+    uzbekistan = "Uzbekistán"
+    vanuatu = "Vanuatu"
+    venezuela = "Venezuela"
+    vietnam = "Vietnam"
+    yemen = "Yemen"
+    yugoslavia = "Yugoslavia"
+    zambia = "Zambia"
+    zimbabue = "Zimbabue"
+
 class Province(str, Enum):
     alava = "Álava"
     albacete = "Albacete"
@@ -399,7 +573,7 @@ class UserData(BaseModel):
     identidad_genero: GenderIdentity
     orientacion_sexual: SexualOrientation
     vives_en_espana: bool
-    pais: str  #Pais como Texto Libre
+    nacionalidad: Nacionalidad  
     permiso_residencia: bool
 
 
@@ -425,12 +599,12 @@ async def submit_data(user_data: UserData):
     # Aquí ajustamos la consulta y los datos
     query = """
            INSERT INTO no_sociosanit_formulario (edad, pronombre_el, pronombre_ella, pronombre_elle, identidad_genero,
-                                                orientacion_sexual, vives_en_espana, pais, permiso_residencia,
+                                                orientacion_sexual, vives_en_espana, nacionalidad, permiso_residencia,
                                                 persona_racializada, persona_discapacitada, persona_sin_hogar,
                                                 persona_migrante, persona_intersexual, nivel_estudios, situacion_afectiva,
                                                 provincia)
            VALUES (%(edad)s, %(pronombre_el)s, %(pronombre_ella)s, %(pronombre_elle)s, %(identidad_genero)s,
-                   %(orientacion_sexual)s, %(vives_en_espana)s, %(pais)s, %(permiso_residencia)s,
+                   %(orientacion_sexual)s, %(vives_en_espana)s, %(nacionalidad)s, %(permiso_residencia)s,
                    %(persona_racializada)s, %(persona_discapacitada)s, %(persona_sin_hogar)s, %(persona_migrante)s,
                    %(persona_intersexual)s, %(nivel_estudios)s, %(situacion_afectiva)s, %(provincia)s)
     """
@@ -443,7 +617,7 @@ async def submit_data(user_data: UserData):
             "identidad_genero": user_data.identidad_genero,
             "orientacion_sexual": user_data.orientacion_sexual,
             "vives_en_espana": user_data.vives_en_espana,
-            "pais": user_data.pais,
+            "nacionalidad": user_data.nacionalidad,
             "permiso_residencia": user_data.permiso_residencia,
             "persona_racializada": user_data.persona_racializada,
             "persona_discapacitada": user_data.persona_discapacitada,
@@ -677,6 +851,40 @@ async def personalizar_prompt(user_data: UserData):
         raise HTTPException(status_code=500, detail=str(e))
     
 
+
+@app.get("/prueba/", response_class=HTMLResponse)
+def generar_grafico_pie(viven_espana: bool = True):
+    try:
+        # Conexión a la base de datos
+        connection = connect_to_db()
+        
+        # Escribir la consulta SQL para obtener los datos
+        query = "SELECT * FROM no_sociosanit_formulario"  # Cambia esta consulta según sea necesario
+
+        # Usar pandas para ejecutar la consulta y convertirla en un DataFrame
+        df = pd.read_sql_query(query, connection)
+        
+        # Cerrar la conexión después de obtener los datos
+        connection.close()
+
+        # Crear el gráfico de pastel
+        fig = prueba(df, viven_espana)
+
+        # Exportar el gráfico como HTML
+        html_content = fig.to_html(full_html=False)  # Genera solo el cuerpo del HTML
+
+        # Devolver el HTML como respuesta
+        return HTMLResponse(content=html_content, media_type="text/html")
+    
+    except Exception as e:
+        return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
+
+
+
+
+
+
+
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -701,3 +909,19 @@ if __name__ == "__main__":
 #     }
 #   }
 # }
+
+
+
+
+
+
+
+
+
+# {
+#   "error": "Ocurrió un error al procesar el gráfico: \nImage export using the "kaleido" engine requires the kaleido package,\nwhich can be installed using pip:\n    $ pip install -U kaleido\n"
+# }
+
+
+
+

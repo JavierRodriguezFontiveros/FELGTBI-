@@ -1,13 +1,17 @@
-
+import plotly.io as pio
 import plotly.express as px
+
+
+# Configurar renderer
+pio.renderers.default = "svg"
 
 def crear_grafico_pie(dataframe, viven_espana=True):
     # Filtro para el DataFrame
-    filtro = dataframe['vives_espana'] == viven_espana
+    filtro = dataframe['vives_en_espana'] == viven_espana
     df_filtrado = dataframe[filtro]
     
     # Conteo de orientaciones
-    colectivos_count = df_filtrado['orientacion'].value_counts().reset_index()
+    colectivos_count = df_filtrado['orientacion_sexual'].value_counts().reset_index()
     colectivos_count.columns = ['Orientacion', 'Cantidad']
     
     # Tener en cuenta ambas posibilidades
@@ -30,7 +34,7 @@ def crear_grafico_pie(dataframe, viven_espana=True):
 
 def barras_apiladas_genero_orientacion(dataframe):
     # Agrupar y contar las combinaciones de género y orientación
-    datos_agrupados = dataframe.groupby(['genero', 'orientacion']).size().reset_index(name='Cantidad')
+    datos_agrupados = dataframe.groupby(['identidad_genero	', 'orientacion_sexual']).size().reset_index(name='Cantidad')
 
     # Configurar el gráfico de barras apiladas
     fig = px.bar(datos_agrupados,
@@ -147,5 +151,42 @@ def graficar_especialidad(dataframe):
     
     # Añadir texto de porcentajes y cantidades dentro del gráfico
     fig.update_traces(pull=pull_values)
+    
+    return fig
+
+
+
+
+#####Prueba
+def prueba(dataframe, viven_espana=True):
+    # Verificar que las columnas necesarias existen en el DataFrame
+    columnas_requeridas = ['vives_en_espana', 'orientacion_sexual']
+    for columna in columnas_requeridas:
+        if columna not in dataframe.columns:
+            raise ValueError(f"Falta la columna requerida: {columna}")
+
+    # Filtrar el DataFrame según el parámetro
+    filtro = dataframe['vives_en_espana'] == viven_espana
+    df_filtrado = dataframe[filtro]
+    
+    # Conteo de orientaciones
+    colectivos_count = df_filtrado['orientacion_sexual'].value_counts().reset_index()
+    colectivos_count.columns = ['Orientacion', 'Cantidad']
+    
+    # Configurar título según el filtro
+    titulo = "Distribución de Orientación Sexual"
+    if viven_espana:
+        titulo += " (Personas que Viven en España)"
+    else:
+        titulo += " (Personas que No Viven en España)"
+    
+    # Crear gráfico de pastel
+    fig = px.pie(
+        colectivos_count, 
+        values='Cantidad', 
+        names='Orientacion', 
+        title=titulo,
+        color_discrete_sequence=px.colors.qualitative.Pastel
+    )
     
     return fig
