@@ -149,3 +149,40 @@ def graficar_especialidad(dataframe):
     fig.update_traces(pull=pull_values)
     
     return fig
+
+
+
+
+#####Prueba
+def prueba(dataframe, viven_espana=True):
+    # Verificar que las columnas necesarias existen en el DataFrame
+    columnas_requeridas = ['vives_en_espana', 'orientacion_sexual']
+    for columna in columnas_requeridas:
+        if columna not in dataframe.columns:
+            raise ValueError(f"Falta la columna requerida: {columna}")
+
+    # Filtrar el DataFrame según el parámetro
+    filtro = dataframe['vives_en_espana'] == viven_espana
+    df_filtrado = dataframe[filtro]
+    
+    # Conteo de orientaciones
+    colectivos_count = df_filtrado['orientacion_sexual'].value_counts().reset_index()
+    colectivos_count.columns = ['Orientacion', 'Cantidad']
+    
+    # Configurar título según el filtro
+    titulo = "Distribución de Orientación Sexual"
+    if viven_espana:
+        titulo += " (Personas que Viven en España)"
+    else:
+        titulo += " (Personas que No Viven en España)"
+    
+    # Crear gráfico de pastel
+    fig = px.pie(
+        colectivos_count, 
+        values='Cantidad', 
+        names='Orientacion', 
+        title=titulo,
+        color_discrete_sequence=px.colors.qualitative.Pastel
+    )
+    
+    return fig

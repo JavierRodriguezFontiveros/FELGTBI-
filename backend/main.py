@@ -9,7 +9,7 @@ from fastapi.responses import StreamingResponse
 import io
 import matplotlib.pyplot as plt
 
-from graficas import crear_grafico_pie, barras_apiladas_genero_orientacion, graficar_permiso_residencia, graficar_combinaciones, buscar_ciudad, obtener_top_5_ciudades, graficar_especialidad
+from graficas import crear_grafico_pie, barras_apiladas_genero_orientacion, graficar_permiso_residencia, graficar_combinaciones, buscar_ciudad, obtener_top_5_ciudades, graficar_especialidad, prueba
 from utils import connect_to_db
 
 from io import BytesIO
@@ -849,6 +849,44 @@ async def personalizar_prompt(user_data: UserData):
         raise HTTPException(status_code=500, detail=str(e))
     
 
+
+@app.get("/prueba/")
+def generar_grafico_pie(viven_espana: bool = True):
+    try:
+        # Conexión a la base de datos
+        connection = connect_to_db()
+        
+        # Escribir la consulta SQL para obtener los datos
+        query = "SELECT * FROM no_sociosanit_formulario"  # Cambia esta consulta según sea necesario
+
+        # Usar pandas para ejecutar la consulta y convertirla en un DataFrame
+        df = pd.read_sql_query(query, connection)
+        
+        # Cerrar la conexión después de obtener los datos
+        connection.close()
+
+        # Crear el gráfico de pastel
+        fig = prueba(df, viven_espana)
+
+        # Guardar el gráfico como imagen usando kaleido
+        img_bytes = fig.to_image(format="png", engine="kaleido")
+
+        # Crear un buffer de memoria para la imagen
+        buf = BytesIO(img_bytes)
+        buf.seek(0)
+
+        # Devolver la imagen como respuesta
+        return StreamingResponse(buf, media_type="image/png")
+    
+    except Exception as e:
+        return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
+
+
+
+
+
+
+
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -873,3 +911,19 @@ if __name__ == "__main__":
 #     }
 #   }
 # }
+
+
+
+
+
+
+
+
+
+# {
+#   "error": "Ocurrió un error al procesar el gráfico: \nImage export using the "kaleido" engine requires the kaleido package,\nwhich can be installed using pip:\n    $ pip install -U kaleido\n"
+# }
+
+
+
+
