@@ -30,9 +30,14 @@ from fastapi.responses import HTMLResponse
 
 import json
 
+from fastapi.middleware.cors import CORSMiddleware
+
 # Configurar renderer
 pio.renderers.default = "browser"
+
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+
 #CREAR API Y CONFIGURAR MODELO
 app = FastAPI()
 load_dotenv()
@@ -48,6 +53,25 @@ try:
 except Exception as e:
     print(f"Error al llamar al modelo: {e}")
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+# Configurar CORS
+
+
+# Configurar orígenes permitidos
+origins = [
+    "http://localhost:5173/",  # React u otras apps locales
+    "https://felgtbiqplus.netlify.app/",      # Dominio de producción
+    "*"                       # Permitir todos los orígenes (útil para pruebas, no recomendado en producción)
+]
+
+# Añadir middleware de CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,             # Orígenes permitidos
+    allow_credentials=True,            # Permitir credenciales como cookies o headers de autenticación
+    allow_methods=["*"],               # Métodos HTTP permitidos (GET, POST, PUT, DELETE, etc.)
+    allow_headers=["*"],               # Headers HTTP permitidos
+)
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
