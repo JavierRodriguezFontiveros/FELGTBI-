@@ -737,8 +737,18 @@ def generar_respuesta(prompt):
 
 @app.post("/personalizar_prompt")
 async def personalizar_prompt(user_data: UserData):
-    print(f"API Key en uso: {gemini_api_key}")  
-    # Conectar a la base de datos
+    print(f"API Key en uso: {gemini_api_key}")
+
+#EXTRAER ID_USUARIO
+    id_usuario = None
+
+    # Extraer el id_usuario del JSON
+    for key, seccion in user_data.data.items():
+        id_usuario = seccion.get("id_usuario")
+        if not id_usuario:
+            return {"error": "No se encontró id_usuario"}
+        
+# Conectar a la base de datos
     connection = connect_to_db()
 
     if connection is None:
