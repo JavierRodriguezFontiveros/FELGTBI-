@@ -79,89 +79,56 @@ Hola buenas bienvenido a este proyecto de tripulaciones
 
 
 
-
+from utils import create_bar_chart_plotly_html,barras_apiladas_genero_orientacion_html,graficar_permiso_residencia_html,graficar_especialidad_html, grafico_pie
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-@app.get("/bar-chart/")
+###FUNCIONA###
+@app.get("/bar-chart/", response_class=HTMLResponse)
 def generate_bar_chart():
-    # Conectar a la base de datos
-    connection = connect_to_db()
-
-    if connection is None:
-        return {"error": "No se pudo conectar a la base de datos."}
-    
     try:
-        # Escribir la consulta SQL para obtener los datos
-        query = "SELECT * FROM no_sociosanit_formulario"  # Cambia esta consulta según sea necesario
-
-        # Usar pandas para ejecutar la consulta y convertirla en un DataFrame
-        df = pd.read_sql_query(query, connection)
-
-        # Cerrar la conexión después de obtener los datos
-        connection.close()
-
-        # Definir los rangos de edades y las etiquetas correspondientes
-        bins = [0, 15, 19, 24, 29, 39, 49, 59, 100]
-        labels = ['Menores de 16', 'Adolescentes (15-19)', 'Jóvenes adultos (20-24)', 
-                'Adultos jóvenes (25-29)', 'Adultos en plena madurez (30-39)', 
-                'Adultos maduros (40-49)', 'Adultos mayores (50-59)', 'Mayores de 60']
-
-        # Asegurarse de que la columna 'edad' está en formato numérico
-        df['edad'] = pd.to_numeric(df['edad'], errors='coerce')
-
-        # Crear una nueva columna 'grupo_edad' con las categorías de edad
-        df['grupo_edad'] = pd.cut(df['edad'], bins=bins, labels=labels, right=False)
-
-        # Contar la cantidad de personas en cada grupo de edad
-        edad_grupo = df.groupby('grupo_edad').size().reset_index(name='cantidad')
-
-        # Crear el gráfico de barras
-        plt.figure(figsize=(10, 6))
-        plt.bar(edad_grupo['grupo_edad'], edad_grupo['cantidad'], color="blue", alpha=0.7)
-        plt.title("Distribución de Edad por Grupo")
-        plt.xlabel("Grupo de Edad")
-        plt.ylabel("Cantidad de Personas")
-        plt.xticks(rotation=45, ha='right')  # Rotar las etiquetas del eje X
-
-        # Guardar el gráfico en un buffer
-        buf = io.BytesIO()
-        plt.savefig(buf, format="png")
-        buf.seek(0)
-        plt.close()
-
-        # Devolver el gráfico como una respuesta de imagen
-        return StreamingResponse(buf, media_type="image/png")
-
-    except Exception as e:
-        return {"error": f"Ocurrió un error al procesar los datos: {e}"}
-
-
-
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-@app.get("/grafico-pie/")
-def generar_grafico_pie(viven_espana: bool = True):
-    connection = connect_to_db()
-    try:
-        # Escribir la consulta SQL para obtener los datos
-        query = "SELECT * FROM no_sociosanit_formulario"  # Cambia esta consulta según sea necesario
-
-        # Usar pandas para ejecutar la consulta y convertirla en un DataFrame
-        df = pd.read_sql_query(query, connection)
-
-        # Cerrar la conexión después de obtener los datos
-        connection.close()
         
+        connection = connect_to_db()
+        if connection is None:
+            return {"error": "No se pudo conectar a la base de datos."}
+
+        query = "SELECT * FROM no_sociosanit_formulario"
+
+        df = pd.read_sql_query(query, connection)
+
+        connection.close()
+
+        html_content = create_bar_chart_plotly_html(df)
+
+        return HTMLResponse(content=html_content, media_type="text/html")
+    except Exception as e:
+        return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
+
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+###FUNCIONA###
+@app.get("/pie-chart/", response_class=HTMLResponse)
+def generar_grafico_pie(viven_espana: bool = True):
+    try:
+        # Conexión a la base de datos
+        connection = connect_to_db()
+        
+        # Escribir la consulta SQL para obtener los datos
+        query = "SELECT * FROM no_sociosanit_formulario"  # Cambia esta consulta según sea necesario
+
+        # Usar pandas para ejecutar la consulta y convertirla en un DataFrame
+        df = pd.read_sql_query(query, connection)
+        
+        # Cerrar la conexión después de obtener los datos
+        connection.close()
+
         # Crear el gráfico de pastel
-        fig = crear_grafico_pie(df, viven_espana)
+        fig = grafico_pie(df, viven_espana)
 
-        # Guardar el gráfico como imagen en un buffer
-        img_bytes = fig.to_image(format="png")
+        # Exportar el gráfico como HTML
+        html_content = fig.to_html(full_html=False)  # Genera solo el cuerpo del HTML
 
-        # Crear un buffer de memoria
-        buf = BytesIO(img_bytes)
-        buf.seek(0)
-
-        # Devolver la imagen como respuesta
-        return StreamingResponse(buf, media_type="image/png")
+        # Devolver el HTML como respuesta
+        return HTMLResponse(content=html_content, media_type="text/html")
     
     except Exception as e:
         return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
@@ -169,42 +136,42 @@ def generar_grafico_pie(viven_espana: bool = True):
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-@app.get("/barras-apiladas/")
+@app.get("/barras-apiladas/", response_class=HTMLResponse)
 def generar_barras_apiladas():
-    connection = connect_to_db()
-    try:
-        # Escribir la consulta SQL para obtener los datos
-        query = "SELECT * FROM no_sociosanit_formulario"  # Cambia esta consulta según sea necesario
 
-        # Usar pandas para ejecutar la consulta y convertirla en un DataFrame
+    try:
+
+        connection = connect_to_db()
+        if connection is None:
+            return {"error": "No se pudo conectar a la base de datos."}
+
+
+        query = "SELECT * FROM no_sociosanit_formulario"  
+
         df = pd.read_sql_query(query, connection)
 
-        # Cerrar la conexión después de obtener los datos
         connection.close()
 
-        # Generar el gráfico de barras apiladas
-        fig = barras_apiladas_genero_orientacion(df)
+        html_content = barras_apiladas_genero_orientacion_html(df)
 
-        # Guardar el gráfico como imagen en un buffer
-        img_bytes = fig.to_image(format="png")
-
-        # Crear un buffer de memoria
-        buf = BytesIO(img_bytes)
-        buf.seek(0)
-
-        # Devolver la imagen como respuesta
-        return StreamingResponse(buf, media_type="image/png")
-    
+        return HTMLResponse(content=html_content, media_type="text/html")
     except Exception as e:
         return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
     
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-@app.get("/grafico-permiso-residencia/")
+@app.get("/grafico-permiso-residencia/", response_class=HTMLResponse)
 def generar_grafico_permiso_residencia():
-    connection = connect_to_db()
+    """
+    Endpoint para generar y mostrar un gráfico de permisos de residencia en HTML.
+    """
     try:
+        # Conectar a la base de datos
+        connection = connect_to_db()
+        if connection is None:
+            return {"error": "No se pudo conectar a la base de datos."}
+
         # Escribir la consulta SQL para obtener los datos
         query = "SELECT * FROM no_sociosanit_formulario"  # Cambia esta consulta según sea necesario
 
@@ -214,19 +181,11 @@ def generar_grafico_permiso_residencia():
         # Cerrar la conexión después de obtener los datos
         connection.close()
 
-        # Generar el gráfico de permisos de residencia
-        fig = graficar_permiso_residencia(df)
+        # Generar el gráfico de permisos de residencia como HTML
+        html_content = graficar_permiso_residencia_html(df)
 
-        # Guardar el gráfico como imagen en un buffer
-        img_bytes = fig.to_image(format="png")
-
-        # Crear un buffer de memoria
-        buf = BytesIO(img_bytes)
-        buf.seek(0)
-
-        # Devolver la imagen como respuesta
-        return StreamingResponse(buf, media_type="image/png")
-    
+        # Devolver el HTML como respuesta
+        return HTMLResponse(content=html_content, media_type="text/html")
     except Exception as e:
         return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
     
@@ -304,29 +263,28 @@ def endpoint_top_5_ciudades():
         return {"error": f"Ocurrió un error al procesar la solicitud: {e}"}
     
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-@app.get("/grafico-especialidad/")
+@app.get("/grafico-especialidad/", response_class=HTMLResponse)
 def generar_grafico_especialidad():
-    connection = connect_to_db()
+    """
+    Endpoint para generar y mostrar un gráfico de especialidades en HTML.
+    """
     try:
+        # Conectar a la base de datos
+        connection = connect_to_db()
+        if connection is None:
+            return {"error": "No se pudo conectar a la base de datos."}
+
         # Consulta para obtener los datos
-        query = "SELECT * FROM sociosanitarios_formulario"  # Cambia la consulta según sea necesario
+        query = "SELECT * FROM sociosanitarios_formulario"  # Cambia esta consulta según sea necesario
 
         # Convertir los datos en un DataFrame
         df = pd.read_sql_query(query, connection)
 
-        # Generar el gráfico de especialidades
-        fig = graficar_especialidad(df)
+        # Generar el gráfico de especialidades como HTML
+        html_content = graficar_especialidad_html(df)
 
-        # Guardar el gráfico como imagen en un buffer
-        img_bytes = fig.to_image(format="png")
-
-        # Crear un buffer de memoria
-        buf = BytesIO(img_bytes)
-        buf.seek(0)
-
-        # Devolver la imagen como respuesta
-        return StreamingResponse(buf, media_type="image/png")
-    
+        # Devolver el HTML como respuesta
+        return HTMLResponse(content=html_content, media_type="text/html")
     except Exception as e:
         return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
     finally:

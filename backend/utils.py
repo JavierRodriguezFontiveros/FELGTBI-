@@ -2,6 +2,7 @@
 import psycopg2
 import os
 from dotenv import load_dotenv
+import pandas as pd
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -94,8 +95,14 @@ import plotly.express as px
 #Configurar los renderer
 pio.renderers.default = "svg"
 
-def crear_grafico_pie(dataframe, viven_espana=True):
-    # Filtro para el DataFrame
+def grafico_pie(dataframe, viven_espana=True):
+    # Verificar que las columnas necesarias existen en el DataFrame
+    columnas_requeridas = ['vives_en_espana', 'orientacion_sexual']
+    for columna in columnas_requeridas:
+        if columna not in dataframe.columns:
+            raise ValueError(f"Falta la columna requerida: {columna}")
+
+    # Filtrar el DataFrame según el parámetro
     filtro = dataframe['vives_en_espana'] == viven_espana
     df_filtrado = dataframe[filtro]
     
@@ -103,7 +110,7 @@ def crear_grafico_pie(dataframe, viven_espana=True):
     colectivos_count = df_filtrado['orientacion_sexual'].value_counts().reset_index()
     colectivos_count.columns = ['Orientacion', 'Cantidad']
     
-    # Tener en cuenta ambas posibilidades
+    # Configurar título según el filtro
     titulo = "Distribución de Orientación Sexual"
     if viven_espana:
         titulo += " (Personas que Viven en España)"
@@ -112,60 +119,130 @@ def crear_grafico_pie(dataframe, viven_espana=True):
     
     # Crear gráfico de pastel
     fig = px.pie(colectivos_count, 
-                values='Cantidad', 
-                names='Orientacion', 
-                title=titulo,
-                color_discrete_sequence=px.colors.qualitative.Pastel)
+                 values='Cantidad', 
+                 names='Orientacion', 
+                 title=titulo,
+                 color_discrete_sequence=px.colors.qualitative.Pastel)
+    
+    return fig
+
+def create_bar_chart_plotly_html(df):
+
+    try:
+        # Definir los rangos de edades y las etiquetas correspondientes
+        bins = [0, 15, 19, 24, 29, 39, 49, 59, 100]
+        labels = ['Menores de 16', 'Adolescentes (15-19)', 'Jóvenes adultos (20-24)', 
+                  'Adultos jóvenes (25-29)', 'Adultos en plena madurez (30-39)', 
+                  'Adultos maduros (40-49)', 'Adultos mayores (50-59)', 'Mayores de 60']
+
+        # Asegurarse de que la columna 'edad' está en formato numérico
+        df['edad'] = pd.to_numeric(df['edad'], errors='coerce')
+
+        # Crear una nueva columna 'grupo_edad' con las categorías de edad
+        df['grupo_edad'] = pd.cut(df['edad'], bins=bins, labels=labels, right=False)
+
+        # Contar la cantidad de personas en cada grupo de edad
+        edad_grupo = df.groupby('grupo_edad').size().reset_index(name='cantidad')
+
+        # Crear el gráfico de barras con Plotly
+        fig = px.bar(
+            edad_grupo,
+            x='grupo_edad',
+            y='cantidad',
+            title="Distribución de Edad por Grupo",
+            labels={'grupo_edad': "Grupo de Edad", 'cantidad': "Cantidad de Personas"},
+            text='cantidad'
+        )
+
+        # Ajustar diseño del gráfico
+        fig.update_traces(marker_color='blue', textposition='outside')
+        fig.update_layout(xaxis_title="Grupo de Edad", yaxis_title="Cantidad de Personas")
+
+        # Exportar el gráfico como HTML
+        return fig.to_html(full_html=False)
+    except Exception as e:
+        raise RuntimeError(f"Error al generar el gráfico: {e}")
+    
+
+
+
+def barras_apiladas_genero_orientacion_html(dataframe):
+
+    try:
+        # Agrupar y contar las combinaciones de género y orientación
+        datos_agrupados = dataframe.groupby(['identidad_genero', 'orientacion_sexual']).size().reset_index(name='Cantidad')
+
+        # Configurar el gráfico de barras apiladas
+        fig = px.bar(
+            datos_agrupados,
+            x='identidad_genero',
+            y='Cantidad',
+            color='orientacion_sexual',
+            title='Distribución de Género y Orientación Sexual',
+            labels={'identidad_genero': 'Género', 'orientacion_sexual': 'Orientación Sexual'},
+            barmode='stack',
+            color_discrete_sequence=px.colors.qualitative.Pastel
+        )
+
+        # Exportar el gráfico como HTML
+        return fig.to_html(full_html=False)
+    except Exception as e:
+        raise RuntimeError(f"Error al generar el gráfico: {e}")
+
+
+
+
+
+def graficar_permiso_residencia_html(dataframe):
+    """
+    Genera un gráfico de pastel (pie chart) sobre la distribución de permisos de residencia,
+    basado en un DataFrame dado, y lo devuelve como HTML.
+
+    Args:
+        dataframe (pd.DataFrame): DataFrame con la columna 'permiso_residencia'.
+
+    Returns:
+        str: El contenido HTML del gráfico generado.
+    """
+    try:
+        # Contar las frecuencias de los valores en la columna 'permiso_residencia'
+        permiso_count = dataframe['permiso_residencia'].value_counts().reset_index()
+        permiso_count.columns = ['Permiso de Residencia', 'Cantidad']
+
+        # Calcular los porcentajes
+        total = permiso_count['Cantidad'].sum()
+        permiso_count['Porcentaje'] = (permiso_count['Cantidad'] / total) * 100
+
+        # Calcular el índice de la sección con el valor más grande
+        max_value_index = permiso_count['Cantidad'].idxmax()
+
+        # Crear un vector donde la porción con el valor más grande será destacada
+        pull_values = [0 if i != max_value_index else 0.1 for i in range(len(permiso_count))]
+
+        # Crear gráfico de pastel (pie chart) con cantidades y porcentajes
+        fig = px.pie(
+            permiso_count,
+            names='Permiso de Residencia',
+            values='Cantidad',
+            title='Distribución de Permisos de Residencia',
+            labels={'Permiso de Residencia': 'Tipo de Permiso'},
+            color='Permiso de Residencia',
+            color_discrete_sequence=px.colors.qualitative.Set1,
+            hole=0.3  # Pie chart con un agujero en el centro (tipo donut)
+        )
+
+        # Añadir texto de porcentajes y cantidades dentro del gráfico
+        fig.update_traces(pull=pull_values)
+
+        # Exportar el gráfico como HTML
+        return fig.to_html(full_html=False)
+    except Exception as e:
+        raise RuntimeError(f"Error al generar el gráfico: {e}")
     
     return fig
 
 
 
-def barras_apiladas_genero_orientacion(dataframe):
-    # Agrupar y contar las combinaciones de género y orientación
-    datos_agrupados = dataframe.groupby(['identidad_genero', 'orientacion_sexual']).size().reset_index(name='Cantidad')
-
-    # Configurar el gráfico de barras apiladas
-    fig = px.bar(datos_agrupados,
-                x='identidad_genero',
-                y='Cantidad',
-                color='orientacion_sexual',
-                title='Distribución de Género y Orientación Sexual',
-                labels={'identidad_genero': 'Género', 'orientacion_sexual': 'Orientación Sexual'},
-                barmode='stack',  
-                color_discrete_sequence=px.colors.qualitative.Pastel)
-
-    return fig
-
-def graficar_permiso_residencia(dataframe):
-    # Contar las frecuencias de los valores en la columna 'permiso_residencia'
-    permiso_count = dataframe['permiso_residencia'].value_counts().reset_index()
-    permiso_count.columns = ['Permiso de Residencia', 'Cantidad']
-    
-    # Calcular los porcentajes
-    total = permiso_count['Cantidad'].sum()
-    permiso_count['Porcentaje'] = (permiso_count['Cantidad'] / total) * 100
-    
-    # Calcular el índice de la sección con el valor más grande
-    max_value_index = permiso_count['Cantidad'].idxmax()
-    
-    # Crear un vector donde la porción con el valor más grande será destacada
-    pull_values = [0 if i != max_value_index else 0.1 for i in range(len(permiso_count))]
-    
-    # Crear gráfico de pastel (pie chart) con cantidades y porcentajes
-    fig = px.pie(permiso_count, 
-                names='Permiso de Residencia', 
-                values='Cantidad', 
-                title='Distribución de Permisos de Residencia',
-                labels={'Permiso de Residencia': 'Tipo de Permiso'},
-                color='Permiso de Residencia',
-                color_discrete_sequence=px.colors.qualitative.Set1,
-                hole=0.3)  # Pie chart con un agujero en el centro (tipo donut)
-    
-    # Añadir texto de porcentajes y cantidades dentro del gráfico
-    fig.update_traces(pull=pull_values)
-    
-    return fig
 
 
 def graficar_combinaciones(dataframe):
@@ -179,12 +256,12 @@ def graficar_combinaciones(dataframe):
     
     # Configuración gráfico de barras
     fig = px.bar(combinaciones, 
-                x='Combinación', 
-                y='Cantidad', 
-                title='Frecuencia de Combinaciones de Condiciones',
-                labels={'Combinación': 'Combinación de Condiciones', 'Cantidad': 'Número de Personas'},
-                color='Cantidad',
-                color_continuous_scale='Viridis')
+                 x='Combinación', 
+                 y='Cantidad', 
+                 title='Frecuencia de Combinaciones de Condiciones',
+                 labels={'Combinación': 'Combinación de Condiciones', 'Cantidad': 'Número de Personas'},
+                 color='Cantidad',
+                 color_continuous_scale='Viridis')
 
     # Etiquetas en el gráfico
     fig.update_layout(xaxis_tickangle=45)
@@ -211,35 +288,51 @@ def obtener_top_5_ciudades(dataframe):
     return top_5_ciudades
 
 
-def graficar_especialidad(dataframe):
-    # Contar las frecuencias de los valores en la columna 'ambito laboral'
-    especialidad_count = dataframe['ambito_laboral'].value_counts().reset_index()
-    especialidad_count.columns = ['Ambito Laboral', 'Cantidad']
-    
-    # Calcular los porcentajes
-    total = especialidad_count['Cantidad'].sum()
-    especialidad_count['Porcentaje'] = (especialidad_count['Cantidad'] / total) * 100
-    
-    # Calcular el índice de la sección con el valor más grande
-    max_value_index = especialidad_count['Cantidad'].idxmax()
-    
-    # Crear un vector donde la porción con el valor más grande será destacada
-    pull_values = [0 if i != max_value_index else 0.1 for i in range(len(especialidad_count))]
-    
-    # Crear gráfico de pastel (pie chart) con cantidades y porcentajes
-    fig = px.pie(especialidad_count,
-                 names='Ambito Laboral',
-                 values='Cantidad',
-                 title='Distribución de Especialidades',
-                 labels={'Ambito Laboral': 'Ambito Laboral'},
-                 color='Ambito Laboral',
-                 color_discrete_sequence=px.colors.qualitative.Set1,
-                 hole=0.3)
-    
-    #Añadir texto de porcentajes
-    fig.update_traces(pull=pull_values)
-    
-    return fig
+def graficar_especialidad_html(dataframe):
+    """
+    Genera un gráfico de pastel (pie chart) sobre la distribución de especialidades,
+    basado en un DataFrame dado, y lo devuelve como HTML.
+
+    Args:
+        dataframe (pd.DataFrame): DataFrame con la columna 'ambito_laboral'.
+
+    Returns:
+        str: El contenido HTML del gráfico generado.
+    """
+    try:
+        # Contar las frecuencias de los valores en la columna 'ambito laboral'
+        especialidad_count = dataframe['ambito_laboral'].value_counts().reset_index()
+        especialidad_count.columns = ['Ambito Laboral', 'Cantidad']
+
+        # Calcular los porcentajes
+        total = especialidad_count['Cantidad'].sum()
+        especialidad_count['Porcentaje'] = (especialidad_count['Cantidad'] / total) * 100
+
+        # Calcular el índice de la sección con el valor más grande
+        max_value_index = especialidad_count['Cantidad'].idxmax()
+
+        # Crear un vector donde la porción con el valor más grande será destacada
+        pull_values = [0 if i != max_value_index else 0.1 for i in range(len(especialidad_count))]
+
+        # Crear gráfico de pastel (pie chart) con cantidades y porcentajes
+        fig = px.pie(
+            especialidad_count,
+            names='Ambito Laboral',
+            values='Cantidad',
+            title='Distribución de Especialidades',
+            labels={'Ambito Laboral': 'Ambito Laboral'},
+            color='Ambito Laboral',
+            color_discrete_sequence=px.colors.qualitative.Set1,
+            hole=0.3  # Tipo donut
+        )
+
+        # Añadir texto de porcentajes y cantidades dentro del gráfico
+        fig.update_traces(pull=pull_values)
+
+        # Exportar el gráfico como HTML
+        return fig.to_html(full_html=False)
+    except Exception as e:
+        raise RuntimeError(f"Error al generar el gráfico: {e}")
 
 
 
