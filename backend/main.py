@@ -1072,6 +1072,17 @@ async def preguntas_user():
 
 
 
+@app.get("/get-table/{table_name}")
+def get_table_data(table_name: str):
+    connection = connect_to_db()
+    cur = connection.cursor()
+    try:
+        data = fetch_all_from_table(cur, table_name)
+        return {"table_name": table_name, "data": data}
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -1100,16 +1111,3 @@ if __name__ == "__main__":
 #   }
 # }
 
-
-connection = connect_to_db()
-cur = connection.cursor()
-
-@app.get("/get-table/{table_name}")
-def get_table_data(table_name: str):
-    try:
-        data = fetch_all_from_table(cur, table_name)
-        return {"table_name": table_name, "data": data}
-    except ValueError as ve:
-        raise HTTPException(status_code=400, detail=str(ve))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Internal server error")
