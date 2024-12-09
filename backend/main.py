@@ -1082,10 +1082,8 @@ async def preguntas_user():
 
 @app.get("/get-table/{table_name}")
 def get_table_data(table_name: str):
-    connection = connect_to_db()
-    cur = connection.cursor()
     try:
-        data = fetch_all_from_table(cur, table_name)
+        data = fetch_all_from_table(table_name)
         return {"table_name": table_name, "data": data}
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
