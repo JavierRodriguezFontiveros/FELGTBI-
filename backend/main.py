@@ -3,13 +3,13 @@ from fastapi import FastAPI, Query #Api
 import uvicorn #Despliegue en Local
 
 import pandas as pd
-
+import psycopg2
+from psycopg2 import extras
 from fastapi.responses import StreamingResponse
 import io
 import matplotlib.pyplot as plt
 
 from utils import crear_grafico_pie, barras_apiladas_genero_orientacion, graficar_permiso_residencia, graficar_combinaciones, buscar_ciudad, obtener_top_5_ciudades, graficar_especialidad,connect_to_db,fetch_all_from_table, prompt_basico, prueba
-
 
 from io import BytesIO
 
@@ -760,12 +760,17 @@ async def personalizar_prompt(user_data: UserData):
                 id_usuario = None
 
                 id_usuario = seccion.get("id_usuario")
-                id_usuario = str(id_usuario)        
-            # Conectar a la base de datos
+                # id_usuario = str(id_usuario)
+                print(f"ID Usuario recibido: {id_usuario}")   
+                if not id_usuario.isalnum():
+                    return {"error": "ID de usuario no válido."}     
+                
                 connection = connect_to_db()
 
                 if connection is None:
                     return {"error": "No se pudo conectar a la base de datos."}
+
+                cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
                 try:
                     # Escribir la consulta SQL para obtener los datos
@@ -774,29 +779,34 @@ async def personalizar_prompt(user_data: UserData):
                         FROM no_sociosanit_formulario
                         WHERE id_usuario = %s
                     """
+                    cursor.execute(query, (id_usuario,))
 
-                    # Usar pandas para ejecutar la consulta y convertirla en un DataFrame
-                    df = pd.read_sql_query(query, connection, params=(id_usuario,))
+                    # Obtener el resultado de la consulta
+                    resultados = cursor.fetchone()
 
-                    # Cerrar la conexión después de obtener los datos
-                    connection.close()
+                    if not resultados:
+                        return {"error": "No se encontraron datos para el ID de usuario proporcionado."}
+                
+                    provincia = resultados["provincia"]
+                    pronombres = []
+
+                    if resultados["pronombre_el"]:
+                        pronombres.append("Él")
+                    if resultados["pronombre_ella"]:
+                        pronombres.append("Ella")
+                    if resultados["pronombre_elle"]:
+                        pronombres.append("Elle/Pronombre neutro")
+
+                    pronombres = ", ".join(pronombres)
 
                 except Exception as e:
-                    return {"error": f"Ocurrió un error al procesar la solicitud: {e}"}
-    ## Extraer datos necesarios del df
-                resultados = df.to_dict(orient="records")[0]
-                provincia = resultados["provincia"]
-                pronombres = []
-
-                if resultados["pronombre_el"]:
-                    pronombres.append("Él")
-                if resultados["pronombre_ella"]:
-                    pronombres.append("Ella")
-                if resultados["pronombre_elle"]:
-                    pronombres.append("Elle/Pronombre neutro")
-
-                pronombres = ", ".join(pronombres)
-
+                    # Cerrar la conexión en caso de error
+                    if connection:
+                        cursor.close()
+                        connection.close()
+                    return {"error": f"Error al procesar la solicitud: {str(e)}"}
+                cursor.close()
+                connection.close()
 ## TRAS EXTRAER DATOS, CONFECCIONAR PROMPT
                 if key.startswith("1.1"):
                     tiempo_diagnostico = preguntas.get("¿Cuándo te diagnosticaron?", [""])[0]
@@ -855,13 +865,18 @@ async def personalizar_prompt(user_data: UserData):
                 #EXTRAER ID_USUARIO
                 id_usuario = None
 
-                id_usuario = next((seccion.get("id_usuario") for _, seccion in user_data.data.items()), None)
-                    
+                id_usuario = seccion.get("id_usuario")
+                # id_usuario = str(id_usuario)
+                print(f"ID Usuario recibido: {id_usuario}")   
+                if not id_usuario.isalnum():
+                    return {"error": "ID de usuario no válido."}    
             # Conectar a la base de datos
                 connection = connect_to_db()
 
                 if connection is None:
                     return {"error": "No se pudo conectar a la base de datos."}
+
+                cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
                 try:
                     # Escribir la consulta SQL para obtener los datos
@@ -870,20 +885,26 @@ async def personalizar_prompt(user_data: UserData):
                         FROM sociosanit_formulario
                         WHERE id_usuario = %s
                     """
+                    cursor.execute(query, (id_usuario,))
 
-                    # Usar pandas para ejecutar la consulta y convertirla en un DataFrame
-                    df = pd.read_sql_query(query, connection, params=(id_usuario,))
+                    # Obtener el resultado de la consulta
+                    resultados = cursor.fetchone()
+                    if not resultados:
+                        return {"error": "No se encontraron datos para el ID de usuario proporcionado."}
 
-                    # Cerrar la conexión después de obtener los datos
-                    connection.close()
+                    
+                    provincia = resultados["provincia"]
+                    ambito_laboral = resultados["ambito_laboral"]
 
                 except Exception as e:
-                    return {"error": f"Ocurrió un error al procesar la solicitud: {e}"}
-    ## Extraer datos necesarios del df
-                resultados = df.to_dict(orient="records")[0]
-                provincia = resultados["provincia"]
-                ambito_laboral = resultados["ambito_laboral"]
-
+                    # Cerrar la conexión en caso de error
+                    if connection:
+                        cursor.close()
+                        connection.close()
+                    return {"error": f"Error al procesar la solicitud: {str(e)}"}
+                cursor.close()
+                connection.close()
+                
                 if key.startswith("2.1"):
                     eleccion = preguntas.get("¿Qué necesitas?", [" "])[0]
 
