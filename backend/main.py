@@ -9,7 +9,7 @@ from fastapi.responses import StreamingResponse
 import io
 import matplotlib.pyplot as plt
 
-from utils import crear_grafico_pie, barras_apiladas_genero_orientacion, graficar_permiso_residencia, graficar_combinaciones, buscar_ciudad, obtener_top_5_ciudades, graficar_especialidad,connect_to_db,fetch_all_from_table, prompt_basico, prueba
+from utils import graficar_combinaciones, buscar_ciudad, obtener_top_5_ciudades,connect_to_db,fetch_all_from_table, prompt_basico, prueba
 
 from io import BytesIO
 
