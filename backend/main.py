@@ -76,7 +76,7 @@ app.add_middleware(
 async def home():
     return {"message": """
 Hola buenas bienvenido a este proyecto de tripulaciones
-                   """}
+                    """}
 
 
 
@@ -103,8 +103,8 @@ def generate_bar_chart():
         # Definir los rangos de edades y las etiquetas correspondientes
         bins = [0, 15, 19, 24, 29, 39, 49, 59, 100]
         labels = ['Menores de 16', 'Adolescentes (15-19)', 'Jóvenes adultos (20-24)', 
-                  'Adultos jóvenes (25-29)', 'Adultos en plena madurez (30-39)', 
-                  'Adultos maduros (40-49)', 'Adultos mayores (50-59)', 'Mayores de 60']
+                'Adultos jóvenes (25-29)', 'Adultos en plena madurez (30-39)', 
+                'Adultos maduros (40-49)', 'Adultos mayores (50-59)', 'Mayores de 60']
 
         # Asegurarse de que la columna 'edad' está en formato numérico
         df['edad'] = pd.to_numeric(df['edad'], errors='coerce')
@@ -623,15 +623,15 @@ async def submit_data(user_data: UserData):
 
     # Aquí ajustamos la consulta y los datos
     query = """
-           INSERT INTO no_sociosanit_formulario (edad, pronombre_el, pronombre_ella, pronombre_elle, identidad_genero,
+            INSERT INTO no_sociosanit_formulario (edad, pronombre_el, pronombre_ella, pronombre_elle, identidad_genero,
                                                 orientacion_sexual, vives_en_espana, nacionalidad, permiso_residencia,
                                                 persona_racializada, persona_discapacitada, persona_sin_hogar,
                                                 persona_migrante, persona_intersexual, nivel_estudios, situacion_afectiva,
                                                 provincia)
-           VALUES (%(edad)s, %(pronombre_el)s, %(pronombre_ella)s, %(pronombre_elle)s, %(identidad_genero)s,
-                   %(orientacion_sexual)s, %(vives_en_espana)s, %(nacionalidad)s, %(permiso_residencia)s,
-                   %(persona_racializada)s, %(persona_discapacitada)s, %(persona_sin_hogar)s, %(persona_migrante)s,
-                   %(persona_intersexual)s, %(nivel_estudios)s, %(situacion_afectiva)s, %(provincia)s)
+            VALUES (%(edad)s, %(pronombre_el)s, %(pronombre_ella)s, %(pronombre_elle)s, %(identidad_genero)s,
+                    %(orientacion_sexual)s, %(vives_en_espana)s, %(nacionalidad)s, %(permiso_residencia)s,
+                    %(persona_racializada)s, %(persona_discapacitada)s, %(persona_sin_hogar)s, %(persona_migrante)s,
+                    %(persona_intersexual)s, %(nivel_estudios)s, %(situacion_afectiva)s, %(provincia)s)
     """
     
     data = {
@@ -1085,7 +1085,7 @@ async def preguntas_user():
             .to_dict(orient='records')
         )
         
-        # # json_data = df.to_dict(orient="records")
+        # json_data = df.to_dict(orient="records")
         # json_data = json.dumps(result, indent=3, ensure_ascii=False)
         
         # print(json_data)
@@ -1124,7 +1124,6 @@ if __name__ == "__main__":
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
 
 # {
 #   "data": {

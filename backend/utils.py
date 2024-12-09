@@ -113,10 +113,10 @@ def crear_grafico_pie(dataframe, viven_espana=True):
     
     # Crear gráfico de pastel
     fig = px.pie(colectivos_count, 
-                 values='Cantidad', 
-                 names='Orientacion', 
-                 title=titulo,
-                 color_discrete_sequence=px.colors.qualitative.Pastel)
+                values='Cantidad', 
+                names='Orientacion', 
+                title=titulo,
+                color_discrete_sequence=px.colors.qualitative.Pastel)
     
     return fig
 
@@ -128,13 +128,13 @@ def barras_apiladas_genero_orientacion(dataframe):
 
     # Configurar el gráfico de barras apiladas
     fig = px.bar(datos_agrupados,
-                 x='identidad_genero',
-                 y='Cantidad',
-                 color='orientacion_sexual',
-                 title='Distribución de Género y Orientación Sexual',
-                 labels={'identidad_genero': 'Género', 'orientacion_sexual': 'Orientación Sexual'},
-                 barmode='stack',  
-                 color_discrete_sequence=px.colors.qualitative.Pastel)
+                x='identidad_genero',
+                y='Cantidad',
+                color='orientacion_sexual',
+                title='Distribución de Género y Orientación Sexual',
+                labels={'identidad_genero': 'Género', 'orientacion_sexual': 'Orientación Sexual'},
+                barmode='stack',  
+                color_discrete_sequence=px.colors.qualitative.Pastel)
 
     return fig
 
@@ -155,13 +155,13 @@ def graficar_permiso_residencia(dataframe):
     
     # Crear gráfico de pastel (pie chart) con cantidades y porcentajes
     fig = px.pie(permiso_count, 
-                 names='Permiso de Residencia', 
-                 values='Cantidad', 
-                 title='Distribución de Permisos de Residencia',
-                 labels={'Permiso de Residencia': 'Tipo de Permiso'},
-                 color='Permiso de Residencia',
-                 color_discrete_sequence=px.colors.qualitative.Set1,
-                 hole=0.3)  # Pie chart con un agujero en el centro (tipo donut)
+                names='Permiso de Residencia', 
+                values='Cantidad', 
+                title='Distribución de Permisos de Residencia',
+                labels={'Permiso de Residencia': 'Tipo de Permiso'},
+                color='Permiso de Residencia',
+                color_discrete_sequence=px.colors.qualitative.Set1,
+                hole=0.3)  # Pie chart con un agujero en el centro (tipo donut)
     
     # Añadir texto de porcentajes y cantidades dentro del gráfico
     fig.update_traces(pull=pull_values)
@@ -180,12 +180,12 @@ def graficar_combinaciones(dataframe):
     
     # Configuración gráfico de barras
     fig = px.bar(combinaciones, 
-                 x='Combinación', 
-                 y='Cantidad', 
-                 title='Frecuencia de Combinaciones de Condiciones',
-                 labels={'Combinación': 'Combinación de Condiciones', 'Cantidad': 'Número de Personas'},
-                 color='Cantidad',
-                 color_continuous_scale='Viridis')
+                x='Combinación', 
+                y='Cantidad', 
+                title='Frecuencia de Combinaciones de Condiciones',
+                labels={'Combinación': 'Combinación de Condiciones', 'Cantidad': 'Número de Personas'},
+                color='Cantidad',
+                color_continuous_scale='Viridis')
 
     # Etiquetas en el gráfico
     fig.update_layout(xaxis_tickangle=45)
