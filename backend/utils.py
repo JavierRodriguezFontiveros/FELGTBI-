@@ -227,18 +227,16 @@ def graficar_especialidad(dataframe):
     pull_values = [0 if i != max_value_index else 0.1 for i in range(len(especialidad_count))]
     
     # Crear gráfico de pastel (pie chart) con cantidades y porcentajes
-    fig = px.pie(
-        especialidad_count,
-        names='Ambito Laboral',
-        values='Cantidad',
-        title='Distribución de Especialidades',
-        labels={'Ambito Laboral': 'Ambito Laboral'},
-        color='Ambito Laboral',
-        color_discrete_sequence=px.colors.qualitative.Set1,
-        hole=0.3  # Tipo donut
-    )
+    fig = px.pie(especialidad_count,
+                 names='Ambito Laboral',
+                 values='Cantidad',
+                 title='Distribución de Especialidades',
+                 labels={'Ambito Laboral': 'Ambito Laboral'},
+                 color='Ambito Laboral',
+                 color_discrete_sequence=px.colors.qualitative.Set1,
+                 hole=0.3)
     
-    # Añadir texto de porcentajes y cantidades dentro del gráfico
+    #Añadir texto de porcentajes
     fig.update_traces(pull=pull_values)
     
     return fig
@@ -246,7 +244,7 @@ def graficar_especialidad(dataframe):
 
 
 
-#####Prueba
+#Funciona
 def prueba(dataframe, viven_espana=True):
     # Verificar que las columnas necesarias existen en el DataFrame
     columnas_requeridas = ['vives_en_espana', 'orientacion_sexual']
@@ -270,12 +268,10 @@ def prueba(dataframe, viven_espana=True):
         titulo += " (Personas que No Viven en España)"
     
     # Crear gráfico de pastel
-    fig = px.pie(
-        colectivos_count, 
-        values='Cantidad', 
-        names='Orientacion', 
-        title=titulo,
-        color_discrete_sequence=px.colors.qualitative.Pastel
-    )
+    fig = px.pie(colectivos_count, 
+                 values='Cantidad', 
+                 names='Orientacion', 
+                 title=titulo,
+                 color_discrete_sequence=px.colors.qualitative.Pastel)
     
     return fig
