@@ -545,7 +545,7 @@ class Province(str, Enum):
 
 #Clase Completa
 class UserData(BaseModel):
-    id_usuario: str
+    #id_usuario: str
     edad: int
 
     pronombre_el: bool  
