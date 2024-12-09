@@ -13,6 +13,12 @@ La aplicación está dirigida a:
 - Profesionales de la salud que buscan recursos adicionales.  
 - Comunidad general que desea información fiable y empática.
 
+Esta seria la interfaz principal 
+![web](Imagenes/interfaz_web.png)
+
+
+
+
 ---
 
 ## **Características Principales**
@@ -22,31 +28,26 @@ La aplicación está dirigida a:
 - **Autoevaluación:** Herramientas interactivas para evaluar riesgos y obtener recomendaciones.  
 - **Mapa de servicios:** Localización de clínicas, centros de prueba y organizaciones de apoyo cercanas.  
 - **Noticias y actualizaciones:** Información actualizada sobre avances en el tratamiento y leyes relacionadas con el VIH/SIDA.
-
+![no_sociosanitario](Imagenes/no_sociosanitario.png)
 ---
 
 ## **Tecnologías Utilizadas**
 
-### **Frontend**
-- React.js para interfaces dinámicas y amigables.  
-- Bootstrap o Tailwind CSS para diseño responsivo.  
 
 ### **Backend**
-- Node.js y Express.js para la lógica de negocio.  
-- Base de datos MongoDB o PostgreSQL para el almacenamiento de información.  
+- Fastapi
+- Modelo LLM de Gemini  
+- Base de datos alojada en AWS(irlanda) 
 
-### **Integraciones**
-- API de geolocalización para el mapa de servicios.  
-- Integración con servicios de chat en tiempo real (ej. Socket.io).  
-
-### **Seguridad**
-- Cifrado de datos sensibles con JWT y bcrypt.  
-- Políticas de privacidad robustas para garantizar la confidencialidad de los usuarios.
-
----
+![sociosanitario](Imagenes/sociosanitario.png)
+### **Frontend** 
+- Tiene
 
 ## **Instalación y Configuración**
 
-1. Clona este repositorio:  
+1. Pincha en el link para probarlo directamente.
+
+
+2. Clona este repositorio si quieres acceder al coódigo  
    ```bash
    git clone https://github.com/usuario/repo.git

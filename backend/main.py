@@ -9,8 +9,10 @@ from fastapi.responses import StreamingResponse
 import io
 import matplotlib.pyplot as plt
 
-from graficas import crear_grafico_pie, barras_apiladas_genero_orientacion, graficar_permiso_residencia, graficar_combinaciones, buscar_ciudad, obtener_top_5_ciudades, graficar_especialidad, prueba
-from utils import connect_to_db
+from graficas import crear_grafico_pie, barras_apiladas_genero_orientacion, graficar_permiso_residencia, graficar_combinaciones, buscar_ciudad, obtener_top_5_ciudades, graficar_especialidad
+from repo.FELGTBI_plus.backend.utils.utils_connexion import connect_to_db
+from repo.FELGTBI_plus.backend.utils.utils_database import fetch_all_from_table
+
 
 from io import BytesIO
 
@@ -1068,17 +1070,15 @@ if __name__ == "__main__":
 # }
 
 
+connection = connect_to_db()
+cur = connection.cursor()
 
-
-
-
-
-
-
-# {
-#   "error": "Ocurrió un error al procesar el gráfico: \nImage export using the "kaleido" engine requires the kaleido package,\nwhich can be installed using pip:\n    $ pip install -U kaleido\n"
-# }
-
-
-
-
+@app.get("/get-table/{table_name}")
+def get_table_data(table_name: str):
+    try:
+        data = fetch_all_from_table(cur, table_name)
+        return {"table_name": table_name, "data": data}
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal server error")
