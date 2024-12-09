@@ -1,12 +1,16 @@
+#Bibliotecas:
 import psycopg2
 import os
 from dotenv import load_dotenv
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+#Conexión base de datos:
 def connect_to_db():
-    # Cargar las variables de entorno desde el archivo .env
+    
     load_dotenv(dotenv_path="../credenciales.env")
     
-    # Configura los parámetros de la conexión
+    #Acceder a las variables de entorno
     db_host = os.getenv("DB_HOST_AWS")
     db_username = os.getenv("DB_USER_AWS")
     db_password = os.getenv("DB_PASSWORD_AWS")
@@ -14,13 +18,13 @@ def connect_to_db():
     db_port = int(os.getenv("DB_PORT_AWS", 5432))
 
 
-    print(f"DB Host: {db_host}")
-    print(f"DB User: {db_username}")
-    print(f"DB Password: {db_password}")
-    print(f"DB Database: {db_database}")
-    print(f"DB Port: {db_port}")
+    # print(f"DB Host: {db_host}")
+    # print(f"DB User: {db_username}")
+    # print(f"DB Password: {db_password}")
+    # print(f"DB Database: {db_database}")
+    # print(f"DB Port: {db_port}")
 
-    # Establecer la conexión
+    #Probando la conexión:
     try:
         connection = psycopg2.connect(host=db_host,
                                       database=db_database,
@@ -40,15 +44,10 @@ def connect_to_db():
         print("Error desconocido:", error)
         return None  
 
-
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-
-
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 conn = connect_to_db()
 cur = conn.cursor()
-
-
 
 #function to retrieve all data
 def fetch_all_from_table(table_name: str) -> dict:
@@ -68,8 +67,7 @@ def fetch_all_from_table(table_name: str) -> dict:
     
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 prompt_basico = (
     "Eres un experto sociosanitario especializado en vih y sida. "
     "Siempre que escribas 'vih', lo haces en minúscula, sin excepción. "
@@ -87,12 +85,13 @@ prompt_basico = (
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+#Gráficos:
 import plotly.io as pio
 import plotly.express as px
 
 
-# Configurar renderer
+#Configurar los renderer
 pio.renderers.default = "svg"
 
 def crear_grafico_pie(dataframe, viven_espana=True):
@@ -228,18 +227,16 @@ def graficar_especialidad(dataframe):
     pull_values = [0 if i != max_value_index else 0.1 for i in range(len(especialidad_count))]
     
     # Crear gráfico de pastel (pie chart) con cantidades y porcentajes
-    fig = px.pie(
-        especialidad_count,
-        names='Ambito Laboral',
-        values='Cantidad',
-        title='Distribución de Especialidades',
-        labels={'Ambito Laboral': 'Ambito Laboral'},
-        color='Ambito Laboral',
-        color_discrete_sequence=px.colors.qualitative.Set1,
-        hole=0.3  # Tipo donut
-    )
+    fig = px.pie(especialidad_count,
+                 names='Ambito Laboral',
+                 values='Cantidad',
+                 title='Distribución de Especialidades',
+                 labels={'Ambito Laboral': 'Ambito Laboral'},
+                 color='Ambito Laboral',
+                 color_discrete_sequence=px.colors.qualitative.Set1,
+                 hole=0.3)
     
-    # Añadir texto de porcentajes y cantidades dentro del gráfico
+    #Añadir texto de porcentajes
     fig.update_traces(pull=pull_values)
     
     return fig
@@ -247,7 +244,7 @@ def graficar_especialidad(dataframe):
 
 
 
-#####Prueba
+#Funciona
 def prueba(dataframe, viven_espana=True):
     # Verificar que las columnas necesarias existen en el DataFrame
     columnas_requeridas = ['vives_en_espana', 'orientacion_sexual']
@@ -271,12 +268,10 @@ def prueba(dataframe, viven_espana=True):
         titulo += " (Personas que No Viven en España)"
     
     # Crear gráfico de pastel
-    fig = px.pie(
-        colectivos_count, 
-        values='Cantidad', 
-        names='Orientacion', 
-        title=titulo,
-        color_discrete_sequence=px.colors.qualitative.Pastel
-    )
+    fig = px.pie(colectivos_count, 
+                 values='Cantidad', 
+                 names='Orientacion', 
+                 title=titulo,
+                 color_discrete_sequence=px.colors.qualitative.Pastel)
     
     return fig
