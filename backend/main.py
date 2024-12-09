@@ -668,9 +668,9 @@ async def submit_data(sociosanitary_data: SociosanitaryData):
 
     # Aquí ajustamos la consulta y los datos
     query = """
-           INSERT INTO sociosanitarios_formulario (provincia, 
+            INSERT INTO sociosanitarios_formulario (provincia, 
                                                     ambito_laboral)
-           VALUES (%(provincia)s, %(ambito_laboral)s)
+            VALUES (%(provincia)s, %(ambito_laboral)s)
     """
     
     data = {
@@ -736,6 +736,32 @@ def generar_respuesta(prompt):
 @app.post("/personalizar_prompt")
 async def personalizar_prompt(user_data: UserData):
     print(f"API Key en uso: {gemini_api_key}")  # Verifica si la clave está accesible aquí
+
+    # Conectar a la base de datos
+    connection = connect_to_db()
+
+    if connection is None:
+        return {"error": "No se pudo conectar a la base de datos."}
+    
+    try:
+        # Escribir la consulta SQL para obtener los datos
+        query = "SELECT provincia, pronombre_elle, pronombre_el, pronombre_ella FROM no_sociosanit_formulario"  # Cambia esta consulta según sea necesario
+
+        # Usar pandas para ejecutar la consulta y convertirla en un DataFrame
+        df = pd.read_sql_query(query, connection)
+
+        # Cerrar la conexión después de obtener los datos
+        connection.close()
+
+    except Exception as e:
+        return {"error": f"Ocurrió un error al procesar la solicitud: {e}"}
+
+    # if key.startswith("1"):
+    #     tipo_user = "usuario"
+    # else:
+    #     tipo_user = "sociosanitario"
+
+
     try:
         # Determinar el tipo de sección y construir el prompt dinámicamente
         for key, seccion in user_data.data.items():

@@ -44,4 +44,3 @@ def connect_to_db():
         print("Error desconocido:", error)
         return None  
     
-connect_to_db()
