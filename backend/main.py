@@ -55,15 +55,15 @@ except Exception as e:
 
 
 # Configurar orígenes permitidos
-# origins = [
-#     "http://localhost:5173/",  # React u otras apps locales
-#     "https://felgtbiqplus.netlify.app/",      # Dominio de producción
-# ]
+origins = [
+    "http://localhost:5173/",  # React u otras apps locales
+    "https://felgtbiqplus.netlify.app/"      # Dominio de producción
+]
 
 # Añadir middleware de CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],             # Orígenes permitidos
+    allow_origins=origins,             # Orígenes permitidos
     allow_credentials=True,            # Permitir credenciales como cookies o headers de autenticación
     allow_methods=["*"],               # Métodos HTTP permitidos (GET, POST, PUT, DELETE, etc.)
     allow_headers=["*"],               # Headers HTTP permitidos
