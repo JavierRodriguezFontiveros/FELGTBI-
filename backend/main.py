@@ -865,7 +865,7 @@ async def personalizar_prompt(user_data: UserData):
                     eleccion = preguntas.get("¿Qué necesitas?", [" "])[0]
 
                     # Crear el prompt para la sección 2.1
-                    prompt = ("Mis pronombres (dirígete a mi conjugando como corresponda, si es elle, en género neutro, si es él/ella, pues en masculino/femenino, si te digo varios, usa solo uno de los que te diga) son:" + pronombres + ". \n"
+                    prompt = ("Usa el pronombre neutro (elle) conmigo"
                             "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
                             "Soy personal sanitario y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
                             "Necesito información sobre" + eleccion + ".")
@@ -874,7 +874,7 @@ async def personalizar_prompt(user_data: UserData):
                     eleccion2 = preguntas.get("¿Qué necesitas?", [" "])[0]
 
                     # Crear el prompt para la sección 2.1
-                    prompt = ("Mis pronombres (dirígete a mi conjugando como corresponda, si es elle, en género neutro, si es él/ella, pues en masculino/femenino, si te digo varios, usa solo uno de los que te diga) son:" + pronombres + ". \n"
+                    prompt = ("Usa el pronombre neutro (elle) conmigo"
                             "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
                             "Soy trabajador social y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
                             "Necesito información sobre" + eleccion2 + ".")
@@ -883,7 +883,7 @@ async def personalizar_prompt(user_data: UserData):
                     eleccion3 = preguntas.get("¿Qué necesitas?", [" "])[0]
 
                     # Crear el prompt para la sección 2.1
-                    prompt = ("Mis pronombres (dirígete a mi conjugando como corresponda, si es elle, en género neutro, si es él/ella, pues en masculino/femenino, si te digo varios, usa solo uno de los que te diga) son:" + pronombres + ". \n"
+                    prompt = ("Usa el pronombre neutro (elle) conmigo"
                             "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
                             "Soy psicólogo y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
                             "Necesito información sobre" + eleccion3 + ".")
@@ -892,7 +892,7 @@ async def personalizar_prompt(user_data: UserData):
                     eleccion4 = preguntas.get("¿Qué necesitas?", [" "])[0]
 
                     # Crear el prompt para la sección 2.1
-                    prompt = ("Mis pronombres (dirígete a mi conjugando como corresponda, si es elle, en género neutro, si es él/ella, pues en masculino/femenino, si te digo varios, usa solo uno de los que te diga) son:" + pronombres + ". \n"
+                    prompt = ("Usa el pronombre neutro (elle) conmigo"
                             "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
                             "Soy educador y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
                             "Necesito información sobre" + eleccion4 + ".")
@@ -901,7 +901,7 @@ async def personalizar_prompt(user_data: UserData):
                     eleccion5 = preguntas.get("¿Qué necesitas?", [" "])[0]
 
                     # Crear el prompt para la sección 2.1
-                    prompt = ("Mis pronombres (dirígete a mi conjugando como corresponda, si es elle, en género neutro, si es él/ella, pues en masculino/femenino, si te digo varios, usa solo uno de los que te diga) son:" + pronombres + ". \n"
+                    prompt = ("Usa el pronombre neutro (elle) conmigo"
                             "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
                             "Soy voluntario/cuidador y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
                             "Necesito información sobre" + eleccion5 + ".")
