@@ -17,8 +17,6 @@ Esta seria la interfaz principal
 ![web](Imagenes/interfaz_web.png)
 
 
-
-
 ---
 
 ## **Características Principales**
