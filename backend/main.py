@@ -57,8 +57,7 @@ except Exception as e:
 # Configurar orígenes permitidos
 origins = [
     "http://localhost:5173/",  # React u otras apps locales
-    "https://felgtbiqplus.netlify.app/",      # Dominio de producción
-    "*"                       # Permitir todos los orígenes (útil para pruebas, no recomendado en producción)
+    "https://felgtbiqplus.netlify.app/"      # Dominio de producción
 ]
 
 # Añadir middleware de CORS
