@@ -73,6 +73,29 @@ def fetch_all_from_table(table_name: str) -> dict:
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+def modify_table_records(table_name:str, column:str, new_value:str, id:int) -> None:
+    valid_tables = {"categorias_chatbot", "preguntas_chatbot", "opciones_chatbot"}
+    
+    if table_name not in valid_tables:
+        raise ValueError("Invalid table name provided.")
+    
+    conn = connect_to_db()
+    if not conn:
+        raise RuntimeError("Database connection could not be established.")
+
+    try:
+        with conn.cursor() as cur:
+            query = f"UPDATE {table_name} SET {column} = {new_value} WHERE id = {id};"
+            cur.execute(query)
+    
+    except Exception as e:
+        raise RuntimeError(f"Error fetching data: {e}")
+    finally:
+        conn.close()
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 prompt_basico = (
     "Eres un experto sociosanitario especializado en vih y sida. Pero no digas que lo eres, actúa como tal."
     "Siempre que escribas 'vih', lo haces en minúscula, sin excepción. "
