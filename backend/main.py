@@ -295,11 +295,11 @@ from enum import Enum
 
 
 class GenderIdentity(str, Enum):
-    hombre_cis = "Hombre Cis"
-    hombre_trans = "Hombre Trans"
-    mujer_cis = "Mujer Cis"
-    mujer_trans = "Mujer Trans"
-    no_binario = "No binario"
+    hombre_cis = "Hombre cis"
+    hombre_trans = "Hombre trans"
+    mujer_cis = "Mujer cis"
+    mujer_trans = "Mujer trans"
+    no_binario = "No binarie"
     otro = "Otro"
 
 class SexualOrientation(str, Enum):
@@ -320,11 +320,11 @@ class EducationLevel(str, Enum):
     otro = "Otro"
 
 class AffectiveSituation(str, Enum):
-    soltero = "Soltero"
+    soltero = "Soltere"
     en_pareja = "En pareja"
-    casado = "Casado"
-    divorciado = "Divorciado"
-    viudo = "Viudo"
+    casado = "Casade"
+    divorciado = "Divorciade"
+    viudo = "Viude"
     otro = "Otro"
 
 class Nacionalidad(str,Enum):
@@ -545,7 +545,7 @@ class Province(str, Enum):
 
 #Clase Completa
 class UserData(BaseModel):
-    #id_usuario: str
+    id_usuario: str
     edad: int
 
     pronombre_el: bool  
@@ -584,15 +584,16 @@ async def submit_data(user_data: UserData):
                                                 orientacion_sexual, vives_en_espana, nacionalidad, permiso_residencia,
                                                 persona_racializada, persona_discapacitada, persona_sin_hogar,
                                                 persona_migrante, persona_intersexual, nivel_estudios, situacion_afectiva,
-                                                provincia)
+                                                provincia, id_usuario)
             VALUES (%(edad)s, %(pronombre_el)s, %(pronombre_ella)s, %(pronombre_elle)s, %(identidad_genero)s,
                     %(orientacion_sexual)s, %(vives_en_espana)s, %(nacionalidad)s, %(permiso_residencia)s,
                     %(persona_racializada)s, %(persona_discapacitada)s, %(persona_sin_hogar)s, %(persona_migrante)s,
-                    %(persona_intersexual)s, %(nivel_estudios)s, %(situacion_afectiva)s, %(provincia)s)
+                    %(persona_intersexual)s, %(nivel_estudios)s, %(situacion_afectiva)s, %(provincia)s, %(id_usuario)s)
     """
     
     data = {
             "edad": user_data.edad,
+            "id_usuario": user_data.id_usuario,
             "pronombre_el": user_data.pronombre_el,
             "pronombre_ella": user_data.pronombre_ella,
             "pronombre_elle": user_data.pronombre_elle,
@@ -608,7 +609,7 @@ async def submit_data(user_data: UserData):
             "persona_intersexual": user_data.persona_intersexual,
             "nivel_estudios": user_data.nivel_estudios,
             "situacion_afectiva": user_data.situacion_afectiva,
-            "provincia": user_data.provincia,
+            "provincia": user_data.provincia
             }
 
     try:
