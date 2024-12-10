@@ -240,7 +240,7 @@ def create_bar_chart_plotly_html(df):
 
 
 
-#EDITADO
+###EDITADA###
 
 def barras_apiladas_genero_orientacion_html(dataframe):
 
@@ -317,16 +317,14 @@ def graficar_permiso_residencia_html(dataframe):
         pull_values = [0 if i != max_value_index else 0.1 for i in range(len(permiso_count))]
 
         # Crear gráfico de pastel (pie chart) con cantidades y porcentajes
-        fig = px.pie(
-            permiso_count,
-            names='Permiso de Residencia',
-            values='Cantidad',
-            title='Distribución de Permisos de Residencia',
-            labels={'Permiso de Residencia': 'Tipo de Permiso'},
-            color='Permiso de Residencia',
-            color_discrete_sequence=px.colors.qualitative.Pastel,
-            hole=0.3  # Pie chart con un agujero en el centro (tipo donut)
-        )
+        fig = px.pie(permiso_count,
+                     names='Permiso de Residencia',
+                     values='Cantidad',
+                     title='Distribución de Permisos de Residencia',
+                     labels={'Permiso de Residencia': 'Tipo de Permiso'},
+                     color='Permiso de Residencia',
+                     color_discrete_sequence=px.colors.qualitative.Pastel,
+                     hole=0.3) 
 
         # Añadir texto de porcentajes y cantidades dentro del gráfico
         fig.update_traces(pull=pull_values)
