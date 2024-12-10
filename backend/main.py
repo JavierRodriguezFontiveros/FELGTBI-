@@ -194,7 +194,7 @@ def generar_grafico_permiso_residencia():
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-@app.get("/grafico-combinaciones/")
+@app.get("/colectivos/")
 def generar_grafico_combinaciones():
     connection = connect_to_db()
     try:

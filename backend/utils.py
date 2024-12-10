@@ -401,27 +401,41 @@ def graficar_permiso_residencia_html(dataframe):
 
 
 def colectivos(dataframe):
-    # Agrupación y conteo de combinaciones
-    combinaciones = dataframe.groupby(['persona_racializada', 'persona_discapacitada', 'persona_sin_hogar', 'persona_migrante','persona_intersexual']).size().reset_index(name='Cantidad')
+    # Contar las ocurrencias de cada valor en cada una de las 5 variables
+    columnas = ['persona_racializada', 'persona_discapacitada', 'persona_sin_hogar', 'persona_migrante', 'persona_intersexual']
+    
+    conteos = []
+    
+    # Realizar el conteo para cada columna
+    for columna in columnas:
+        conteo = dataframe[columna].value_counts().reset_index()
+        conteo.columns = [columna, 'Cantidad']
+        conteo['Condición'] = columna
+        conteos.append(conteo)
 
-    # Crear un gráfico de barras que muestre el conteo de combinaciones
-    fig = px.bar(combinaciones, 
-                 x=combinaciones.index,  # Usamos el índice para que no aparezca como texto largo
+    # Combinar los conteos de todas las columnas en un solo DataFrame
+    df_conteos = pd.concat(conteos, ignore_index=True)
+    
+    # Crear un gráfico de barras para mostrar el conteo de cada variable
+    fig = px.bar(df_conteos, 
+                 x='Condición', 
                  y='Cantidad', 
-                 title='Frecuencia de Combinaciones de Condiciones',
-                 labels={'Cantidad': 'Número de Personas'},
-                 color='Cantidad',
-                 color_continuous_scale='Viridis')
-
-    # Ajustar el diseño y etiquetas del gráfico
-    fig.update_layout(xaxis=dict(title='Combinación de Condiciones', tickvals=combinaciones.index, ticktext=[f"Combinación {i+1}" for i in combinaciones.index]),
-                      xaxis_tickangle=45,  # Para rotar las etiquetas del eje X
-                      title={'text': "Frecuencia de Combinaciones de Condiciones", 'x': 0.5, 'xanchor': 'center'},
-                      title_font=dict(size=22),
-                      xaxis_title_font=dict(size=18),
-                      yaxis_title_font=dict(size=18),
-                      xaxis_tickfont=dict(size=16),
-                      yaxis_tickfont=dict(size=16))
+                 color='Condición',
+                 title="Frecuencia de Condiciones por Variable",
+                 labels={'Cantidad': 'Número de Personas', 'Condición': 'Variable'},
+                 color_discrete_sequence=px.colors.qualitative.Pastel)
+    
+    # Personalizar el gráfico
+    fig.update_layout(
+        title={'text': "Frecuencia de Condiciones por Variable", 'x': 0.5, 'xanchor': 'center'},
+        title_font=dict(size=22),
+        xaxis_title_font=dict(size=18),
+        yaxis_title_font=dict(size=18),
+        xaxis_tickfont=dict(size=16),
+        yaxis_tickfont=dict(size=16),
+        xaxis_tickangle=45,  # Rotar etiquetas del eje X para mejor visibilidad
+        showlegend=False  # No mostrar leyenda, ya que las variables están ya indicadas en el eje X
+    )
 
     return fig
 
