@@ -512,32 +512,30 @@ def graficar_top_5_ciudades(dataframe):
 
 ###EDITADA###
 def ambito_laboral(dataframe):
-    """
-    Genera un gráfico de pastel (pie chart) sobre la distribución de especialidades,
-    basado en un DataFrame dado, y lo devuelve como HTML.
-
-    Args:
-        dataframe (pd.DataFrame): DataFrame con la columna 'ambito_laboral'.
-
-    Returns:
-        str: El contenido HTML del gráfico generado.
-    """
     try:
-        # Contar las frecuencias de los valores en la columna 'ambito laboral'
+        # Contar las frecuencias de los valores en la columna 'ambito_laboral'
         especialidad_count = dataframe['ambito_laboral'].value_counts().reset_index()
         especialidad_count.columns = ['Ambito Laboral', 'Cantidad']
 
-        # Calcular los porcentajes
+        # Validar si hay datos procesados
+        if especialidad_count.empty:
+            raise ValueError("No se encontraron valores en 'ambito_laboral'.")
+
+        # Calcular porcentajes
         total = especialidad_count['Cantidad'].sum()
         especialidad_count['Porcentaje'] = (especialidad_count['Cantidad'] / total) * 100
 
-        # Calcular el índice de la sección con el valor más grande
+        # Validar nulos
+        if especialidad_count['Ambito Laboral'].isnull().any() or especialidad_count['Cantidad'].isnull().any():
+            raise ValueError("Existen valores nulos en los datos.")
+
+        # Determinar el índice del valor máximo
         max_value_index = especialidad_count['Cantidad'].idxmax()
 
-        # Crear un vector donde la porción con el valor más grande será destacada
-        pull_values = [0 if i != max_value_index else 0.1 for i in range(len(especialidad_count))]
+        # Destacar la sección con el valor máximo
+        pull_values = [0.1 if i == max_value_index else 0 for i in range(len(especialidad_count))]
 
-        # Crear gráfico de pastel (pie chart) con cantidades y porcentajes
+        # Crear gráfico de pastel (pie chart)
         fig = px.pie(
             especialidad_count,
             names='Ambito Laboral',
@@ -546,14 +544,15 @@ def ambito_laboral(dataframe):
             labels={'Ambito Laboral': 'Ambito Laboral'},
             color='Ambito Laboral',
             color_discrete_sequence=px.colors.qualitative.Pastel,
-            hole=0.3  # Tipo donut
+            hole=0.3
         )
 
-        # Añadir texto de porcentajes y cantidades dentro del gráfico
+        # Añadir texto de porcentajes y cantidades
         fig.update_traces(pull=pull_values)
 
         # Exportar el gráfico como HTML
         return fig.to_html(full_html=False)
+    
     except Exception as e:
         raise RuntimeError(f"Error al generar el gráfico: {e}")
 
