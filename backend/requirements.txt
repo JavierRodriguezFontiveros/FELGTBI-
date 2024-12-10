@@ -9,3 +9,4 @@ google-generativeai==0.8.3
 kaleido==0.2.1
 ipython==8.12.3
 nbformat>=4.2.0
+googlemaps==4.10.0

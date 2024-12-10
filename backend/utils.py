@@ -4,6 +4,32 @@ import os
 from dotenv import load_dotenv
 import pandas as pd
 
+from langchain_community.tools import GooglePlacesTool
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+#Conexión GooglePlaces
+load_dotenv(dotenv_path="../credenciales.env")
+google_places = os.getenv("GPLACES_API_KEY")
+
+# Imprimir la clave para verificar (debería mostrar la clave si está bien cargada)
+print("API Key:", google_places)
+
+# Configurar la clave de API como variable de entorno
+os.environ["GPLACES_API_KEY"] = google_places
+
+# Crear instancia de GooglePlacesTool
+places = GooglePlacesTool()
+
+# Realizar la búsqueda
+try:
+    result = places.run("Sevilla, centro vih")
+    print(result)
+except Exception as e:
+    print(f"Hubo un error al realizar la búsqueda: {e}")
+
+
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 #Conexión base de datos:
