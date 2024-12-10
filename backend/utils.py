@@ -401,18 +401,6 @@ def graficar_combinaciones(dataframe):
     
     return fig
 
-#Hay que eliminarlo
-def buscar_ciudad(dataframe, ciudad_a_buscar):
-    ciudad_filtrada = dataframe[dataframe['provincia'].str.lower() == ciudad_a_buscar.lower()]
-    info_ciudad = {
-        "Provincia": ciudad_a_buscar,
-        "Cantidad": len(ciudad_filtrada)
-        } if not ciudad_filtrada.empty else {
-        "Provincia": ciudad_a_buscar,
-        "Cantidad": 0
-    }
-    return info_ciudad
-
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -425,10 +413,12 @@ def obtener_top_5_ciudades(dataframe):
 
 
 def graficar_top_5_ciudades(dataframe):
-
     # Obtener las 5 ciudades más frecuentes
     top_5_ciudades = obtener_top_5_ciudades(dataframe)
     
+    # Ordenar las ciudades de mayor a menor según la cantidad
+    top_5_ciudades = sorted(top_5_ciudades, key=lambda x: x['Cantidad'], reverse=True)
+
     # Crear gráfico de barras con Plotly
     fig = px.bar(top_5_ciudades, 
                  x='Provincia', 
@@ -453,6 +443,7 @@ def graficar_top_5_ciudades(dataframe):
     )
     
     return fig
+
 
 
 
