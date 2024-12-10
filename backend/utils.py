@@ -221,7 +221,10 @@ def create_bar_chart_plotly_html(df):
             plot_bgcolor="white",  # Fondo del área del gráfico
             paper_bgcolor="white",  # Fondo general del gráfico
             showlegend=False,  # Eliminar la leyenda
-            title_x=0.5  # Centrar el título
+            title={
+                'text': "Distribución de edades por grupo<br><span style='font-size:14px;color:gray;'>El gráfico muestra los porcentajes por grupo de edad.</span>",
+                'x': 0.5,
+                'xanchor': 'center'},
         )
 
         # Exportar el gráfico como HTML
