@@ -399,14 +399,15 @@ def graficar_permiso_residencia_html(dataframe):
 
 
 
+###EDITADA###
 
 def colectivos(dataframe):
-    # Contar las ocurrencias de cada valor en cada una de las 5 variables
+    # Contar las ocurrencias de cada valor en las 5 variables
     columnas = ['persona_racializada', 'persona_discapacitada', 'persona_sin_hogar', 'persona_migrante', 'persona_intersexual']
     
     conteos = []
-    
-    # Realizar el conteo para cada columna
+
+    # Realizar el conteo de cada valor en las columnas
     for columna in columnas:
         conteo = dataframe[columna].value_counts().reset_index()
         conteo.columns = [columna, 'Cantidad']
@@ -415,8 +416,11 @@ def colectivos(dataframe):
 
     # Combinar los conteos de todas las columnas en un solo DataFrame
     df_conteos = pd.concat(conteos, ignore_index=True)
-    
-    # Crear un gráfico de barras para mostrar el conteo de cada variable
+
+    # Ordenar por la cantidad de forma descendente
+    df_conteos = df_conteos.sort_values(by='Cantidad', ascending=False)
+
+    # Crear un gráfico de barras para mostrar el conteo de cada valor
     fig = px.bar(df_conteos, 
                  x='Condición', 
                  y='Cantidad', 
@@ -424,23 +428,27 @@ def colectivos(dataframe):
                  title="Frecuencia de Condiciones por Variable",
                  labels={'Cantidad': 'Número de Personas', 'Condición': 'Variable'},
                  color_discrete_sequence=px.colors.qualitative.Pastel)
-    
+
     # Personalizar el gráfico
     fig.update_layout(
-        title={'text': "Frecuencia de Condiciones por Variable", 'x': 0.5, 'xanchor': 'center'},
+        title={'text': "Frecuencia de Condiciones por Variable<br><span style='font-size:14px;color:gray;'>El gráfico muestra el número de personas en cada condición.</span>",
+               'x': 0.5, 'xanchor': 'center'},
         title_font=dict(size=22),
         xaxis_title_font=dict(size=18),
         yaxis_title_font=dict(size=18),
         xaxis_tickfont=dict(size=16),
         yaxis_tickfont=dict(size=16),
-        xaxis_tickangle=45,  # Rotar etiquetas del eje X para mejor visibilidad
-        showlegend=False  # No mostrar leyenda, ya que las variables están ya indicadas en el eje X
+        plot_bgcolor="white",  # Fondo blanco para el área del gráfico
+        paper_bgcolor="white",  # Fondo blanco para el gráfico completo
+        showlegend=False,  # No mostrar la leyenda
+        xaxis_tickangle=45  # Rotar las etiquetas del eje X para mejor visibilidad
     )
 
     return fig
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+###EDITADA###
 
 def obtener_top_5_ciudades(dataframe):
 
