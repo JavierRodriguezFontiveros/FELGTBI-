@@ -400,7 +400,7 @@ def graficar_permiso_residencia_html(dataframe):
 
 
 
-def graficar_combinaciones(dataframe):
+def colectivos(dataframe):
     # Agrupación y conteo de combinaciones
     combinaciones = dataframe.groupby(['persona_racializada', 'persona_discapacitada', 'persona_sin_hogar', 'persona_migrante','persona_intersexual']).size().reset_index(name='Cantidad')
 

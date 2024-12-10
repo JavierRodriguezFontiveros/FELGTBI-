@@ -9,7 +9,7 @@ from fastapi.responses import StreamingResponse
 import io
 import matplotlib.pyplot as plt
 
-from utils import graficar_combinaciones,connect_to_db,fetch_all_from_table, prompt_basico, modify_table_records
+from utils import colectivos,connect_to_db,fetch_all_from_table, prompt_basico, modify_table_records
 
 from io import BytesIO
 
@@ -208,7 +208,7 @@ def generar_grafico_combinaciones():
         connection.close()
 
         # Generar el gráfico de combinaciones
-        fig = graficar_combinaciones(df)
+        fig = colectivos(df)
 
         # Guardar el gráfico como imagen en un buffer
         img_bytes = fig.to_image(format="png")
