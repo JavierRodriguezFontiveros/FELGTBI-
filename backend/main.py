@@ -879,33 +879,6 @@ async def personalizar_prompt_usuario_ss(user_data: UserData):
         raise HTTPException(status_code=500, detail=str(e))    
 
 
-@app.get("/prueba/", response_class=HTMLResponse)
-def generar_grafico_pie(viven_espana: bool = True):
-    try:
-        # Conexión a la base de datos
-        connection = connect_to_db()
-        
-        # Escribir la consulta SQL para obtener los datos
-        query = "SELECT * FROM no_sociosanit_formulario"  # Cambia esta consulta según sea necesario
-
-        # Usar pandas para ejecutar la consulta y convertirla en un DataFrame
-        df = pd.read_sql_query(query, connection)
-        
-        # Cerrar la conexión después de obtener los datos
-        connection.close()
-
-        # Crear el gráfico de pastel
-        fig = prueba(df, viven_espana)
-
-        # Exportar el gráfico como HTML
-        html_content = fig.to_html(full_html=False)  # Genera solo el cuerpo del HTML
-
-        # Devolver el HTML como respuesta
-        return HTMLResponse(content=html_content, media_type="text/html")
-    
-    except Exception as e:
-        return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
-
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
