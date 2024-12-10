@@ -469,6 +469,7 @@ def graficar_top_5_ciudades(dataframe):
 
 
 
+
 def graficar_especialidad_html(dataframe):
     """
     Genera un gráfico de pastel (pie chart) sobre la distribución de especialidades,
