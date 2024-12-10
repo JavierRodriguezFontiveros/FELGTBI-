@@ -153,6 +153,17 @@ conn.commit()
 print("tablas preguntas_opciones_chatbot creada")
 
 
+cur.execute(
+  """CREATE TABLE IF NOT EXISTS respuestas_modelo (
+    user_id INT,
+    question_id INT,
+    selected_option TEXT,
+    PRIMARY KEY (user_id, question_id)
+);
+"""
+)
+print('tabla respuestas_modelo creada')
+
 # Cerrar el cursor y la bbdd
 cur.close()
 conn.close() 
