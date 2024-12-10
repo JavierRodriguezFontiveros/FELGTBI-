@@ -164,6 +164,10 @@ import plotly.express as px
 import pandas as pd
 import plotly.express as px
 
+import pandas as pd
+import plotly.express as px
+
+
 def create_bar_chart_plotly_html(df):
     try:
         # Definir los rangos de edades y las etiquetas correspondientes
@@ -209,20 +213,22 @@ def create_bar_chart_plotly_html(df):
         # Ajustar diseño del gráfico
         fig.update_traces(textposition='outside')  # Mostrar texto fuera de las barras
 
-        # Eliminar la leyenda
+        # Eliminar la leyenda y centrar el título
         fig.update_layout(
             xaxis_title="Grupo de Edad", 
             yaxis_title="Porcentaje (%)",
             xaxis=dict(tickangle=0),
             plot_bgcolor="white",  # Fondo del área del gráfico
             paper_bgcolor="white",  # Fondo general del gráfico
-            showlegend=False  # Eliminar la leyenda
+            showlegend=False,  # Eliminar la leyenda
+            title_x=0.5  # Centrar el título
         )
 
         # Exportar el gráfico como HTML
         return fig.to_html(full_html=False)
     except Exception as e:
         raise RuntimeError(f"Error al generar el gráfico: {e}")
+
 
 
 
