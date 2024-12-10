@@ -866,10 +866,10 @@ async def personalizar_prompt_usuario_ss(user_data: UserData):
 
             eleccion = preguntas.get("¿Qué necesitas?", [" "])[0]
             prompt = (
-                f"Usa el pronombre neutro (elle) conmigo. "
+                f"Mi pronombre es el neutro (elle). "
                 f"Vivo en {provincia}. Dame respuestas orientadas a ese lugar.\n"
                 f"Soy personal sanitario y trabajo en este ámbito laboral: {ambito_laboral}.\n"
-                f"Necesito información sobre {eleccion}."
+                f"Estoy trabajando actualmente con vih (úsalo siempre en minúscula). Necesito información profesional sobre {eleccion}."
             )
 
             respuesta_chatbot = generar_respuesta(prompt)
@@ -1103,7 +1103,7 @@ if __name__ == "__main__":
 # {
 #   "data": {
 #     "1.1": {
-#       "id_usuario" : "12345-abcd",
+#       "id_usuario" : "1234abcd",
 #       "titulo": "Tengo VIH",
 #       "preguntas": {
 #         "¿Cuándo te diagnosticaron?": ["Hace menos de 6 meses"],
@@ -1115,3 +1115,14 @@ if __name__ == "__main__":
 #   }
 # }
 
+# {
+#   "data": {
+#     "2.1": {
+#       "id_usuario" : "789abc",
+#       "titulo": "Personal sanitario",
+#       "preguntas": {
+#         "¿Qué necesitas?" : ["Manejo clínico de pacientes con VIH"]
+#       }
+#     }
+#   }
+# }
