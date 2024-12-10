@@ -253,10 +253,10 @@ def generate_bar_chart():
         return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
     
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-@app.get("/grafico-ambito_laboral/", response_class=HTMLResponse)
-def ambito_laboral():
+@app.get("/grafico-ambito-laboral/", response_class=HTMLResponse)
+def generate_ambito_laboral_chart():
     """
-    Endpoint para generar y mostrar un gráfico de especialidades en HTML.
+    Endpoint para generar y mostrar un gráfico de ámbito laboral en HTML.
     """
     try:
         # Conectar a la base de datos
@@ -264,21 +264,27 @@ def ambito_laboral():
         if connection is None:
             return {"error": "No se pudo conectar a la base de datos."}
 
-        # Consulta para obtener los datos
-        query = "SELECT * FROM sociosanitarios_formulario"  # Cambia esta consulta según sea necesario
+        # Consulta SQL para obtener los datos
+        query = "SELECT * FROM sociosanitarios_formulario"  # Cambia el nombre de la tabla si es necesario
 
-        # Convertir los datos en un DataFrame
+        # Cargar los datos en un DataFrame
         df = pd.read_sql_query(query, connection)
 
-        # Generar el gráfico de especialidades como HTML
-        html_content = ambito_laboral(df)
+        # Cerrar la conexión
+        connection.close()
 
-        # Devolver el HTML como respuesta
+        # Generar el gráfico de ámbito laboral
+        fig = ambito_laboral(df)
+
+        # Convertir el gráfico a HTML
+        html_content = fig.to_html(full_html=False)
+
+        # Devolver el HTML del gráfico
         return HTMLResponse(content=html_content, media_type="text/html")
+    
     except Exception as e:
         return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
-    finally:
-        connection.close()
+
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
