@@ -146,10 +146,10 @@ def grafico_pie(dataframe, viven_espana=True):
     
     # Crear gráfico de pastel
     fig = px.pie(colectivos_count, 
-                 values='Cantidad', 
-                 names='Orientacion', 
-                 title=titulo,
-                 color_discrete_sequence=px.colors.qualitative.Pastel)
+                values='Cantidad', 
+                names='Orientacion', 
+                title=titulo,
+                color_discrete_sequence=px.colors.qualitative.Pastel)
     
     return fig
 
@@ -254,7 +254,7 @@ def graficar_permiso_residencia_html(dataframe):
             title='Distribución de Permisos de Residencia',
             labels={'Permiso de Residencia': 'Tipo de Permiso'},
             color='Permiso de Residencia',
-            color_discrete_sequence=px.colors.qualitative.Set1,
+            color_discrete_sequence=px.colors.qualitative.Pastel,
             hole=0.3  # Pie chart con un agujero en el centro (tipo donut)
         )
 
@@ -349,7 +349,7 @@ def graficar_especialidad_html(dataframe):
             title='Distribución de Especialidades',
             labels={'Ambito Laboral': 'Ambito Laboral'},
             color='Ambito Laboral',
-            color_discrete_sequence=px.colors.qualitative.Set1,
+            color_discrete_sequence=px.colors.qualitative.Pastel,
             hole=0.3  # Tipo donut
         )
 
@@ -389,9 +389,9 @@ def prueba(dataframe, viven_espana=True):
     
     # Crear gráfico de pastel
     fig = px.pie(colectivos_count, 
-                 values='Cantidad', 
-                 names='Orientacion', 
-                 title=titulo,
-                 color_discrete_sequence=px.colors.qualitative.Pastel)
+                values='Cantidad', 
+                names='Orientacion', 
+                title=titulo,
+                color_discrete_sequence=px.colors.qualitative.Pastel)
     
     return fig
