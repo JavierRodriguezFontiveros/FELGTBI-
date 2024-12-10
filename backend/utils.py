@@ -167,7 +167,7 @@ import plotly.express as px
 import pandas as pd
 import plotly.express as px
 
-
+###EDITADA###
 def create_bar_chart_plotly_html(df):
     try:
         # Definir los rangos de edades y las etiquetas correspondientes
@@ -207,25 +207,26 @@ def create_bar_chart_plotly_html(df):
             title="Distribución de Edad",
             labels={'grupo_edad': "Grupo de Edad", 'porcentaje_entero': "Porcentaje (%)"},
             text='porcentaje_entero',
-            color_discrete_sequence=["#F1A7C2"],  # Usar color rosa de la paleta Pastel
-        )
+            color_discrete_sequence=["#F1A7C2"])
 
-        # Ajustar diseño del gráfico
-        fig.update_traces(textposition='outside')  # Mostrar texto fuera de las barras
+        
+        fig.update_traces(textposition='outside')  
 
         # Eliminar la leyenda y centrar el título
-        fig.update_layout(
-            xaxis_title="Grupo de Edad", 
-            yaxis_title="Porcentaje (%)",
-            xaxis=dict(tickangle=0),
-            plot_bgcolor="white",  # Fondo del área del gráfico
-            paper_bgcolor="white",  # Fondo general del gráfico
-            showlegend=False,  # Eliminar la leyenda
-            title={
-                'text': "Distribución de edades por grupo<br><span style='font-size:14px;color:gray;'>El gráfico muestra los porcentajes por grupo de edad.</span>",
-                'x': 0.5,
-                'xanchor': 'center'},
-        )
+        fig.update_layout(xaxis_title="Grupo de Edad", 
+                          yaxis_title="Porcentaje (%)",
+                          xaxis=dict(tickangle=0),
+                          plot_bgcolor="white",  
+                          paper_bgcolor="white",  
+                          showlegend=False,  
+                          title={'text': "Distribución de edades por grupo<br><span style='font-size:14px;color:gray;'>El gráfico muestra los porcentajes por grupo de edad.</span>",
+                                 'x': 0.5,
+                                 'xanchor': 'center'},
+                          title_font=dict(size=22),
+                          xaxis_title_font=dict(size=18),  
+                          yaxis_title_font=dict(size=18),  
+                          xaxis_tickfont=dict(size=16),  
+                          yaxis_tickfont=dict(size=16))
 
         # Exportar el gráfico como HTML
         return fig.to_html(full_html=False)
