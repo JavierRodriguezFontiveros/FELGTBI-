@@ -9,7 +9,7 @@ from fastapi.responses import StreamingResponse
 import io
 import matplotlib.pyplot as plt
 
-from utils import colectivos,connect_to_db,fetch_all_from_table, prompt_basico, modify_table_records
+from utils import colectivos,connect_to_db,fetch_all_from_table, prompt_basico, modify_table_records, prompt_basico_chat, memory
 
 from io import BytesIO
 
@@ -692,11 +692,11 @@ def generar_respuesta(prompt):
         print(f"Error en generar_respuesta: {e}")
         return f"Error al generar respuesta para historia: {str(e)}"
     
-def generar_respuesta_final(prompt):
+def generar_respuesta_final(prompt_chat, memory):
     try:
         def call_model():
             model = genai.GenerativeModel("gemini-1.5-flash")
-            return model.generate_content(prompt + prompt_basico_chat)
+            return model.generate_content("Teniendo en cuenta lo qeu acabamos de hablar (" + memory + "), resuélveme esta consulta:" + prompt_chat)
 
         # Usar un executor para manejar el tiempo límite
         with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -901,11 +901,14 @@ async def personalizar_prompt_usuario_ss(user_data: UserData):
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ### CHATBOT FINAL DE CONVERSACIÓN, ENTRADA DE TEXTO
+
+memory = []
+
 @app.get("/chatbot")
-async def chatbot(consulta: str = Query(None), memory = str):  ## IMPORTAR QUERY EN FASTAPI
+async def chatbot(prompt_chat: str = Query(None), memory = str):  ## IMPORTAR QUERY EN FASTAPI
 
     try:
-        respuesta = generar_respuesta(consulta)
+        respuesta = generar_respuesta_final(prompt_chat, memory)
         return {"respuesta_chatbot": respuesta}
 
     except Exception as e:

@@ -131,9 +131,6 @@ prompt_basico = (
     "Importante: Investiga en internet recursos concretos cuando sea necesario y nunca inventes información."
 )
 
-
-
-
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 #Gráficos:
