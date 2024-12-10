@@ -828,116 +828,55 @@ async def personalizar_prompt_usuario_no_ss(user_data: UserData):
 @app.post("/personalizar_prompt_usuario_ss")
 async def personalizar_prompt_usuario_ss(user_data: UserData):
     print(f"API Key en uso: {gemini_api_key}")
-
     try:
-        # Determinar el tipo de sección y construir el prompt dinámicamente
         for key, seccion in user_data.data.items():
             titulo = seccion.get("titulo", " ")
             preguntas = seccion.get("preguntas", {})
+            id_usuario = seccion.get("id_usuario")
 
-        if key.startswith("2"):
-                #EXTRAER ID_USUARIO
-                id_usuario = None
+            if not id_usuario or not id_usuario.isalnum():
+                return {"error": "ID de usuario no válido."}
 
-                id_usuario = seccion.get("id_usuario")
-                # id_usuario = str(id_usuario)
-                print(f"ID Usuario recibido: {id_usuario}")   
-                if not id_usuario.isalnum():
-                    return {"error": "ID de usuario no válido."}    
-            # Conectar a la base de datos
-                connection = connect_to_db()
+            connection = connect_to_db()
+            if connection is None:
+                return {"error": "No se pudo conectar a la base de datos."}
 
-                if connection is None:
-                    return {"error": "No se pudo conectar a la base de datos."}
+            cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            try:
+                query = """
+                    SELECT ambito_laboral, provincia
+                    FROM sociosanit_formulario
+                    WHERE id_usuario = %s
+                """
+                cursor.execute(query, (id_usuario,))
+                resultados = cursor.fetchone()
 
-                cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+                if not resultados:
+                    return {"error": "No se encontraron datos para el ID de usuario proporcionado."}
 
-                try:
-                    # Escribir la consulta SQL para obtener los datos
-                    query = """
-                        SELECT ambito_laboral, provincia
-                        FROM sociosanit_formulario
-                        WHERE id_usuario = %s
-                    """
-                    cursor.execute(query, (id_usuario,))
-
-                    # Obtener el resultado de la consulta
-                    resultados = cursor.fetchone()
-                    if not resultados:
-                        return {"error": "No se encontraron datos para el ID de usuario proporcionado."}
-
-                    
-                    provincia = resultados["provincia"]
-                    ambito_laboral = resultados["ambito_laboral"]
-
-                except Exception as e:
-                    # Cerrar la conexión en caso de error
-                    if connection:
-                        cursor.close()
-                        connection.close()
-                    return {"error": f"Error al procesar la solicitud: {str(e)}"}
+                provincia = resultados["provincia"]
+                ambito_laboral = resultados["ambito_laboral"]
+            except Exception as e:
                 cursor.close()
                 connection.close()
-                
-                if key.startswith("2.1"):
-                    eleccion = preguntas.get("¿Qué necesitas?", [" "])[0]
+                return {"error": f"Error al procesar la solicitud: {str(e)}"}
 
-                    # Crear el prompt para la sección 2.1
-                    prompt = ("Usa el pronombre neutro (elle) conmigo"
-                            "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
-                            "Soy personal sanitario y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
-                            "Necesito información sobre" + eleccion + ".")
-                    
-                elif key.startswith("2.2"):
-                    eleccion2 = preguntas.get("¿Qué necesitas?", [" "])[0]
+            cursor.close()
+            connection.close()
 
-                    # Crear el prompt para la sección 2.1
-                    prompt = ("Usa el pronombre neutro (elle) conmigo"
-                            "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
-                            "Soy trabajador social y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
-                            "Necesito información sobre" + eleccion2 + ".")
+            eleccion = preguntas.get("¿Qué necesitas?", [" "])[0]
+            prompt = (
+                f"Usa el pronombre neutro (elle) conmigo. "
+                f"Vivo en {provincia}. Dame respuestas orientadas a ese lugar.\n"
+                f"Soy personal sanitario y trabajo en este ámbito laboral: {ambito_laboral}.\n"
+                f"Necesito información sobre {eleccion}."
+            )
 
-                elif key.startswith("2.3"):
-                    eleccion3 = preguntas.get("¿Qué necesitas?", [" "])[0]
+            respuesta_chatbot = generar_respuesta(prompt)
+            return {"respuesta_chatbot": respuesta_chatbot}
 
-                    # Crear el prompt para la sección 2.1
-                    prompt = ("Usa el pronombre neutro (elle) conmigo"
-                            "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
-                            "Soy psicólogo y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
-                            "Necesito información sobre" + eleccion3 + ".")
-                    
-                elif key.startswith("2.4"):
-                    eleccion4 = preguntas.get("¿Qué necesitas?", [" "])[0]
-
-                    # Crear el prompt para la sección 2.1
-                    prompt = ("Usa el pronombre neutro (elle) conmigo"
-                            "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
-                            "Soy educador y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
-                            "Necesito información sobre" + eleccion4 + ".")
-                    
-                elif key.startswith("2.5"):
-                    eleccion5 = preguntas.get("¿Qué necesitas?", [" "])[0]
-
-                    # Crear el prompt para la sección 2.1
-                    prompt = ("Usa el pronombre neutro (elle) conmigo"
-                            "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
-                            "Soy voluntario/cuidador y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
-                            "Necesito información sobre" + eleccion5 + ".")
-
-                else:
-                    prompt = "Título: "
-
-                # Generar la respuesta del modelo
-                respuesta_chatbot = generar_respuesta(prompt)
-
-                # Devolver la respuesta del chatbot
-                return {"respuesta_chatbot": respuesta_chatbot}
-    
-        else:
-            prompt = "Título: "
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    
+        raise HTTPException(status_code=500, detail=str(e))    
 
 
 @app.get("/prueba/", response_class=HTMLResponse)
