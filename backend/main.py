@@ -843,15 +843,12 @@ async def personalizar_prompt_usuario_no_ss(data: dict):
 
         # Query adaptada
         query = """INSERT INTO respuestas_chatbot_nosanitarios 
-        (id_usuario, pregunta1, respuesta1, pregunta2, respuesta2, pregunta3, respuesta3, 
-        pregunta4, respuesta4, pregunta5, respuesta5, pregunta6, respuesta6, pregunta7, respuesta7) 
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+        (id_usuario, pregunta1, respuesta1, response_array) 
+        VALUES (%s, %s, %s, %s)"""
 
         # Asignar los datos a los placeholders
         datos_no_ss = (
-            raw_data[0], raw_data[1], raw_data[2], raw_data[3], raw_data[4], 
-            raw_data[5], raw_data[6], raw_data[7], raw_data[8], raw_data[9], 
-            raw_data[10], raw_data[11], raw_data[12], raw_data[13], raw_data[14]
+            raw_data[0], raw_data[1], raw_data[2], json.dumps(raw_data[3:])
         )
         cursor.execute(query, datos_no_ss)
         connection.commit()
@@ -936,15 +933,17 @@ async def personalizar_prompt_usuario_ss(data: dict):
 
 ### GUARDAR CONSULTAS Y EL ARBOL DE CHAT
         raw_data = data["data"]
-
+        respuesta_chatbot = generar_respuesta(prompt)
+        raw_data = data["data"]
+        
         # Query adaptada
         query = """INSERT INTO respuestas_chatbot_sanitarios 
-        (id_usuario, pregunta1, respuesta1, pregunta2, respuesta2) 
-        VALUES (%s, %s, %s, %s, %s)"""
+        (id_usuario, pregunta1, respuesta1, response_array) 
+        VALUES (%s, %s, %s, %s)"""
 
         # Asignar los datos a los placeholders
         datos_ss = (
-            raw_data[0], raw_data[1], raw_data[2], raw_data[3], raw_data[4]
+            raw_data[0], raw_data[1], raw_data[2], json.dumps(raw_data[3:])
         )
 
         # Aquí iría la ejecución en tu conexión a la base de datos
@@ -1218,8 +1217,8 @@ if __name__ == "__main__":
 #     "Apoyo psicológico"
 # ]}
 # SOCIOSANITARIO
-# {[
-# 789abc
+# {"data" :[
+#     "789abc",
 #     "Especialidad",
 #     "Personal sanitario",
 #     "¿Qué necesitas como personal sanitario?",
