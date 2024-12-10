@@ -9,7 +9,7 @@ from fastapi.responses import StreamingResponse
 import io
 import matplotlib.pyplot as plt
 
-from utils import graficar_combinaciones, buscar_ciudad, obtener_top_5_ciudades,connect_to_db,fetch_all_from_table, prompt_basico, prueba, modify_table_records
+from utils import colectivos,connect_to_db,fetch_all_from_table, prompt_basico, modify_table_records
 
 from io import BytesIO
 
@@ -57,7 +57,9 @@ except Exception as e:
 # Configurar orígenes permitidos
 origins = [
     "http://localhost:5173",  # React u otras apps locales
-    "https://felgtbiqplus.netlify.app"      # Dominio de producción
+    "https://felgtbiqplus.netlify.app",
+    "https://chatbot-felgtbiq-front.onrender.com/"
+    # Dominio de producción
 ]
 
 # Añadir middleware de CORS
@@ -78,9 +80,9 @@ Hola buenas bienvenido a este proyecto de tripulaciones
 
 
 
-from utils import create_bar_chart_plotly_html,barras_apiladas_genero_orientacion_html,graficar_permiso_residencia_html,graficar_especialidad_html, grafico_pie
+from utils import create_bar_chart_plotly_html,barras_apiladas_genero_orientacion_html,graficar_permiso_residencia_html,graficar_especialidad_html, grafico_pie,graficar_top_5_ciudades,check_admin_details
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-###FUNCIONA###
+###FUNCIONA_EDITADA###
 @app.get("/bar-chart/", response_class=HTMLResponse)
 def generate_bar_chart():
     try:
@@ -104,7 +106,7 @@ def generate_bar_chart():
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-###FUNCIONA###
+###FUNCIONA_EDITADA###
 @app.get("/pie-chart/", response_class=HTMLResponse)
 def generar_grafico_pie(viven_espana: bool = True):
     try:
@@ -135,6 +137,7 @@ def generar_grafico_pie(viven_espana: bool = True):
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+###FUNCIONA_EDITADA###
 @app.get("/barras-apiladas/", response_class=HTMLResponse)
 def generar_barras_apiladas():
 
@@ -205,7 +208,7 @@ def generar_grafico_combinaciones():
         connection.close()
 
         # Generar el gráfico de combinaciones
-        fig = graficar_combinaciones(df)
+        fig = colectivos(df)
 
         # Guardar el gráfico como imagen en un buffer
         img_bytes = fig.to_image(format="png")
@@ -223,43 +226,35 @@ def generar_grafico_combinaciones():
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-@app.get("/buscar-ciudad/")
-def endpoint_buscar_ciudad(ciudad: str = Query(..., description="Nombre de la ciudad a buscar en la tabla.")):
-    connection = connect_to_db()
+###FUNCIONA_EDITADA###
+@app.get("/top-5-ciudades/", response_class=HTMLResponse)
+def generate_bar_chart():
     try:
-        # Obtener datos de la base de datos
-        query = "SELECT * FROM sociosanitarios_formulario"  # Cambia la consulta según sea necesario
+        # Conectar a la base de datos
+        connection = connect_to_db()
+        if connection is None:
+            return {"error": "No se pudo conectar a la base de datos."}
+
+        # Consulta SQL para obtener los datos
+        query = "SELECT * FROM no_sociosanit_formulario"  # Asegúrate de usar el nombre correcto de la tabla
+
+        # Cargar los datos en un DataFrame
         df = pd.read_sql_query(query, connection)
+
+        # Cerrar la conexión
         connection.close()
 
-        # Buscar información de la ciudad
-        info_ciudad = buscar_ciudad(df, ciudad)
+        # Generar el gráfico de barras
+        fig = graficar_top_5_ciudades(df)
 
-        # Devolver la respuesta
-        return JSONResponse(content=info_ciudad)
+        # Convertir el gráfico a HTML
+        html_content = fig.to_html(full_html=False)
+
+        # Devolver el HTML del gráfico
+        return HTMLResponse(content=html_content, media_type="text/html")
     
     except Exception as e:
-        return {"error": f"Ocurrió un error al procesar la solicitud: {e}"}
-
-
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-@app.get("/top-5-ciudades/")
-def endpoint_top_5_ciudades():
-    connection = connect_to_db()
-    try:
-        # Obtener datos de la base de datos
-        query = "SELECT * FROM sociosanitarios_formulario"  # Cambia la consulta según sea necesario
-        df = pd.read_sql_query(query, connection)
-        connection.close()
-
-        # Obtener el top 5 de ciudades
-        top_5_ciudades = obtener_top_5_ciudades(df)
-
-        # Devolver la respuesta
-        return JSONResponse(content={"Top_5_Ciudades": top_5_ciudades})
-    
-    except Exception as e:
-        return {"error": f"Ocurrió un error al procesar la solicitud: {e}"}
+        return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
     
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 @app.get("/grafico-especialidad/", response_class=HTMLResponse)
@@ -702,8 +697,8 @@ def generar_respuesta(prompt):
         return f"Error al generar respuesta para historia: {str(e)}"
 
 
-@app.post("/personalizar_prompt")
-async def personalizar_prompt(user_data: UserData):
+@app.post("/personalizar_prompt_usuario_no_ss")
+async def personalizar_prompt_usuario_no_ss(user_data: UserData):
     print(f"API Key en uso: {gemini_api_key}")
 
     try:
@@ -818,137 +813,72 @@ async def personalizar_prompt(user_data: UserData):
                             "Estoy acompañando a una persona seropositiva." + acceso_grupos + "tengo acceso a recursos locales o grupos de apoyo. /n"
                             "He compartido mi preocupación con" + preocupacion4 + ". /n"
                             "Me gustaría orientación para conseguir" + apoyo_necesario)
-                    
-# SI ES SOCIOSANITARIO
-            elif key.startswith("2"):
-                #EXTRAER ID_USUARIO
-                id_usuario = None
 
-                id_usuario = seccion.get("id_usuario")
-                # id_usuario = str(id_usuario)
-                print(f"ID Usuario recibido: {id_usuario}")   
-                if not id_usuario.isalnum():
-                    return {"error": "ID de usuario no válido."}    
-            # Conectar a la base de datos
-                connection = connect_to_db()
+                # Generar la respuesta del modelo
+                respuesta_chatbot = generar_respuesta(prompt)
 
-                if connection is None:
-                    return {"error": "No se pudo conectar a la base de datos."}
-
-                cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-
-                try:
-                    # Escribir la consulta SQL para obtener los datos
-                    query = """
-                        SELECT ambito_laboral, provincia
-                        FROM sociosanit_formulario
-                        WHERE id_usuario = %s
-                    """
-                    cursor.execute(query, (id_usuario,))
-
-                    # Obtener el resultado de la consulta
-                    resultados = cursor.fetchone()
-                    if not resultados:
-                        return {"error": "No se encontraron datos para el ID de usuario proporcionado."}
-
-                    
-                    provincia = resultados["provincia"]
-                    ambito_laboral = resultados["ambito_laboral"]
-
-                except Exception as e:
-                    # Cerrar la conexión en caso de error
-                    if connection:
-                        cursor.close()
-                        connection.close()
-                    return {"error": f"Error al procesar la solicitud: {str(e)}"}
-                cursor.close()
-                connection.close()
-                
-                if key.startswith("2.1"):
-                    eleccion = preguntas.get("¿Qué necesitas?", [" "])[0]
-
-                    # Crear el prompt para la sección 2.1
-                    prompt = ("Usa el pronombre neutro (elle) conmigo"
-                            "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
-                            "Soy personal sanitario y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
-                            "Necesito información sobre" + eleccion + ".")
-                    
-                elif key.startswith("2.2"):
-                    eleccion2 = preguntas.get("¿Qué necesitas?", [" "])[0]
-
-                    # Crear el prompt para la sección 2.1
-                    prompt = ("Usa el pronombre neutro (elle) conmigo"
-                            "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
-                            "Soy trabajador social y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
-                            "Necesito información sobre" + eleccion2 + ".")
-
-                elif key.startswith("2.3"):
-                    eleccion3 = preguntas.get("¿Qué necesitas?", [" "])[0]
-
-                    # Crear el prompt para la sección 2.1
-                    prompt = ("Usa el pronombre neutro (elle) conmigo"
-                            "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
-                            "Soy psicólogo y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
-                            "Necesito información sobre" + eleccion3 + ".")
-                    
-                elif key.startswith("2.4"):
-                    eleccion4 = preguntas.get("¿Qué necesitas?", [" "])[0]
-
-                    # Crear el prompt para la sección 2.1
-                    prompt = ("Usa el pronombre neutro (elle) conmigo"
-                            "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
-                            "Soy educador y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
-                            "Necesito información sobre" + eleccion4 + ".")
-                    
-                elif key.startswith("2.5"):
-                    eleccion5 = preguntas.get("¿Qué necesitas?", [" "])[0]
-
-                    # Crear el prompt para la sección 2.1
-                    prompt = ("Usa el pronombre neutro (elle) conmigo"
-                            "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
-                            "Soy voluntario/cuidador y trabajo en este ámbito laboral:" + ambito_laboral + ". /n"
-                            "Necesito información sobre" + eleccion5 + ".")
-
-                else:
-                    prompt = "Título: "
-
-            # Generar la respuesta del modelo
-            respuesta_chatbot = generar_respuesta(prompt)
-
-            # Devolver la respuesta del chatbot
-            return {"respuesta_chatbot": respuesta_chatbot}
+                # Devolver la respuesta del chatbot
+                return {"respuesta_chatbot": respuesta_chatbot}
+        else:
+            prompt = "Título: "
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
 
-
-@app.get("/prueba/", response_class=HTMLResponse)
-def generar_grafico_pie(viven_espana: bool = True):
+@app.post("/personalizar_prompt_usuario_ss")
+async def personalizar_prompt_usuario_ss(user_data: UserData):
+    print(f"API Key en uso: {gemini_api_key}")
     try:
-        # Conexión a la base de datos
-        connection = connect_to_db()
-        
-        # Escribir la consulta SQL para obtener los datos
-        query = "SELECT * FROM no_sociosanit_formulario"  # Cambia esta consulta según sea necesario
+        for key, seccion in user_data.data.items():
+            titulo = seccion.get("titulo", " ")
+            preguntas = seccion.get("preguntas", {})
+            id_usuario = seccion.get("id_usuario")
 
-        # Usar pandas para ejecutar la consulta y convertirla en un DataFrame
-        df = pd.read_sql_query(query, connection)
-        
-        # Cerrar la conexión después de obtener los datos
-        connection.close()
+            if not id_usuario or not id_usuario.isalnum():
+                return {"error": "ID de usuario no válido."}
 
-        # Crear el gráfico de pastel
-        fig = prueba(df, viven_espana)
+            connection = connect_to_db()
+            if connection is None:
+                return {"error": "No se pudo conectar a la base de datos."}
 
-        # Exportar el gráfico como HTML
-        html_content = fig.to_html(full_html=False)  # Genera solo el cuerpo del HTML
+            cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            try:
+                query = """
+                    SELECT ambito_laboral, provincia
+                    FROM sociosanitarios_formulario
+                    WHERE id_usuario = %s
+                """
+                cursor.execute(query, (id_usuario,))
+                resultados = cursor.fetchone()
 
-        # Devolver el HTML como respuesta
-        return HTMLResponse(content=html_content, media_type="text/html")
-    
+                if not resultados:
+                    return {"error": "No se encontraron datos para el ID de usuario proporcionado."}
+
+                provincia = resultados["provincia"]
+                ambito_laboral = resultados["ambito_laboral"]
+            except Exception as e:
+                cursor.close()
+                connection.close()
+                return {"error": f"Error al procesar la solicitud: {str(e)}"}
+
+            cursor.close()
+            connection.close()
+
+            eleccion = preguntas.get("¿Qué necesitas?", [" "])[0]
+            prompt = (
+                f"Mi pronombre es el neutro (elle). "
+                f"Vivo en {provincia}. Dame respuestas orientadas a ese lugar.\n"
+                f"Soy personal sanitario y trabajo en este ámbito laboral: {ambito_laboral}.\n"
+                f"Estoy trabajando actualmente con vih (úsalo siempre en minúscula). Necesito información profesional sobre {eleccion}."
+            )
+
+            respuesta_chatbot = generar_respuesta(prompt)
+            return {"respuesta_chatbot": respuesta_chatbot}
+
     except Exception as e:
-        return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
+        raise HTTPException(status_code=500, detail=str(e))    
+
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -1079,7 +1009,8 @@ async def preguntas_user():
         return {"error": f"Ha ocurrido algún problema obteniendo las preguntas: {e}"}
 
 
-
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 
 
@@ -1093,6 +1024,8 @@ def get_table_data(table_name: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail="Internal server error")
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 @app.put("/modify-records/")
 async def modify_records_endpoint(
@@ -1110,6 +1043,25 @@ async def modify_records_endpoint(
         raise HTTPException(status_code=500, detail=str(re))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {e}")
+    
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+
+class AdminLogin(BaseModel):
+    email: str
+    password: str
+
+@app.post("/admin/login")
+async def admin_login(admin: AdminLogin):
+    # Call the check_admin_details function with the provided email and password
+    is_valid = check_admin_details(admin.email, admin.password)
+    
+    if is_valid:
+        return {"message": "Login successful"}
+    else:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -1125,7 +1077,7 @@ if __name__ == "__main__":
 # {
 #   "data": {
 #     "1.1": {
-#       "id_usuario" : "12345-abcd",
+#       "id_usuario" : "1234abcd",
 #       "titulo": "Tengo VIH",
 #       "preguntas": {
 #         "¿Cuándo te diagnosticaron?": ["Hace menos de 6 meses"],
@@ -1137,3 +1089,14 @@ if __name__ == "__main__":
 #   }
 # }
 
+# {
+#   "data": {
+#     "2.1": {
+#       "id_usuario" : "789abc",
+#       "titulo": "Personal sanitario",
+#       "preguntas": {
+#         "¿Qué necesitas?" : ["Manejo clínico de pacientes con VIH"]
+#       }
+#     }
+#   }
+# }

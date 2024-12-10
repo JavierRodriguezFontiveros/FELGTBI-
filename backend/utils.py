@@ -96,6 +96,28 @@ def modify_table_records(table_name:str, column:str, new_value:str, id:int) -> N
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+def check_admin_details(email: str, password: str) -> bool:
+    conn = connect_to_db()  
+    if not conn:
+        raise RuntimeError("Database connection could not be established.")
+    
+    try:
+        with conn.cursor() as cur:
+            query = "SELECT * FROM admin_data WHERE email = %s AND password = %s;"
+            cur.execute(query, (email, password))
+            result = cur.fetchone()
+            if result:
+                return True  # Valid credentials
+            else:
+                return False  # Invalid credentials
+        
+    except Exception as e:
+        raise RuntimeError(f"Error fetching data: {e}")
+    finally:
+        conn.close()
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 prompt_basico = (
     "Eres un experto sociosanitario especializado en vih y sida. Pero no digas que lo eres, actúa como tal."
     "Siempre que escribas 'vih', lo haces en minúscula, sin excepción. "
@@ -122,6 +144,8 @@ import plotly.express as px
 #Configurar los renderer
 pio.renderers.default = "svg"
 
+
+###EDITADA###
 def grafico_pie(dataframe, viven_espana=True):
     # Verificar que las columnas necesarias existen en el DataFrame
     columnas_requeridas = ['vives_en_espana', 'orientacion_sexual']
@@ -137,6 +161,20 @@ def grafico_pie(dataframe, viven_espana=True):
     colectivos_count = df_filtrado['orientacion_sexual'].value_counts().reset_index()
     colectivos_count.columns = ['Orientacion', 'Cantidad']
     
+    # Calcular los porcentajes
+    total = colectivos_count['Cantidad'].sum()
+    colectivos_count['Porcentaje'] = (colectivos_count['Cantidad'] / total) * 100
+    
+    # Redondear los porcentajes a enteros
+    colectivos_count['Porcentaje_Redondeado'] = colectivos_count['Porcentaje'].round().astype(int)
+
+    # Ajustar los residuos para asegurar que la suma de los porcentajes es 100
+    diferencia = 100 - colectivos_count['Porcentaje_Redondeado'].sum()
+    if diferencia > 0:
+        # Ajustar los porcentajes más grandes para cerrar la diferencia
+        ajuste_indices = colectivos_count.nlargest(diferencia, 'Porcentaje').index
+        colectivos_count.loc[ajuste_indices, 'Porcentaje_Redondeado'] += 1
+
     # Configurar título según el filtro
     titulo = "Distribución de Orientación Sexual"
     if viven_espana:
@@ -146,26 +184,48 @@ def grafico_pie(dataframe, viven_espana=True):
     
     # Crear gráfico de pastel
     fig = px.pie(colectivos_count, 
-                values='Cantidad', 
-                names='Orientacion', 
-                title=titulo,
-                color_discrete_sequence=px.colors.qualitative.Pastel)
+                 values='Porcentaje_Redondeado', 
+                 names='Orientacion', 
+                 title=titulo,
+                 color_discrete_sequence=px.colors.qualitative.Pastel)
     
+    # Personalizar el gráfico
+    fig.update_traces(
+        textinfo='percent',  # Mostrar solo el porcentaje dentro del gráfico
+        textfont_size=14,  # Ajustar el tamaño del texto
+        pull=[0.1 if i == colectivos_count['Porcentaje_Redondeado'].idxmax() else 0 for i in range(len(colectivos_count))]  # Resaltar la sección más grande
+    )
+
+    # Ajustar el diseño del gráfico con el título y formato adicional
+    fig.update_layout(
+        title={'text': "Distribución de Orientación Sexual<br><span style='font-size:14px;color:gray;'>El gráfico muestra los porcentajes por cada orientación sexual.</span>",
+               'x': 0.5, 
+               'xanchor': 'center'},  # Centrado del título
+        title_font=dict(size=22),
+        xaxis_title_font=dict(size=18),  
+        yaxis_title_font=dict(size=18),  
+        xaxis_tickfont=dict(size=16),  
+        yaxis_tickfont=dict(size=16),  
+        showlegend=True,  # Mostrar la leyenda
+        legend_title="Orientación Sexual",  # Título de la leyenda
+        legend=dict(
+            x=1,  # Mover la leyenda a la derecha del gráfico
+            xanchor='left',  # Alineación de la leyenda a la izquierda
+            y=0.5,  # Alineación vertical de la leyenda
+            yanchor='middle',  # Centrar la leyenda en el medio
+            traceorder='normal',  # Orden de las leyendas
+            font=dict(size=14),  # Tamaño de la fuente en la leyenda
+            bgcolor="white",  # Fondo blanco para la leyenda
+            bordercolor="Black",  # Borde de la leyenda
+            borderwidth=1  # Grosor del borde de la leyenda
+        ),
+        plot_bgcolor="white",  # Fondo blanco para el área del gráfico
+        paper_bgcolor="white",  # Fondo blanco para el gráfico completo
+    )
+
     return fig
 
-import pandas as pd
-import plotly.express as px
 
-import pandas as pd
-import plotly.express as px
-
-
-
-import pandas as pd
-import plotly.express as px
-
-import pandas as pd
-import plotly.express as px
 
 ###EDITADA###
 def create_bar_chart_plotly_html(df):
@@ -340,47 +400,76 @@ def graficar_permiso_residencia_html(dataframe):
 
 
 
-def graficar_combinaciones(dataframe):
-    # Agrupación y conteo
-    combinaciones = dataframe.groupby(['persona_racializada', 'persona_discapacitada', 'persona_sin_hogar', 'persona_migrante']).size().reset_index(name='Cantidad')
-    
-    # Crear una nueva columna que combine las condiciones
-    combinaciones['Combinación'] = combinaciones.apply(
-        lambda row: f"persona_racializada: {row['persona_racializada']}, persona_discapacitada: {row['persona_discapacitada']}, "
-                    f"persona_sin_hogar: {row['persona_sin_hogar']}, persona_migrante: {row['persona_migrante']}", axis=1)
-    
-    # Configuración gráfico de barras
-    fig = px.bar(combinaciones, 
-                x='Combinación', 
-                y='Cantidad', 
-                title='Frecuencia de Combinaciones de Condiciones',
-                labels={'Combinación': 'Combinación de Condiciones', 'Cantidad': 'Número de Personas'},
-                color='Cantidad',
-                color_continuous_scale='Viridis')
+def colectivos(dataframe):
+    # Agrupación y conteo de combinaciones
+    combinaciones = dataframe.groupby(['persona_racializada', 'persona_discapacitada', 'persona_sin_hogar', 'persona_migrante','persona_intersexual']).size().reset_index(name='Cantidad')
 
-    # Etiquetas en el gráfico
-    fig.update_layout(xaxis_tickangle=45)
-    
+    # Crear un gráfico de barras que muestre el conteo de combinaciones
+    fig = px.bar(combinaciones, 
+                 x=combinaciones.index,  # Usamos el índice para que no aparezca como texto largo
+                 y='Cantidad', 
+                 title='Frecuencia de Combinaciones de Condiciones',
+                 labels={'Cantidad': 'Número de Personas'},
+                 color='Cantidad',
+                 color_continuous_scale='Viridis')
+
+    # Ajustar el diseño y etiquetas del gráfico
+    fig.update_layout(xaxis=dict(title='Combinación de Condiciones', tickvals=combinaciones.index, ticktext=[f"Combinación {i+1}" for i in combinaciones.index]),
+                      xaxis_tickangle=45,  # Para rotar las etiquetas del eje X
+                      title={'text': "Frecuencia de Combinaciones de Condiciones", 'x': 0.5, 'xanchor': 'center'},
+                      title_font=dict(size=22),
+                      xaxis_title_font=dict(size=18),
+                      yaxis_title_font=dict(size=18),
+                      xaxis_tickfont=dict(size=16),
+                      yaxis_tickfont=dict(size=16))
+
     return fig
 
 
-def buscar_ciudad(dataframe, ciudad_a_buscar):
-    ciudad_filtrada = dataframe[dataframe['provincia'].str.lower() == ciudad_a_buscar.lower()]
-    info_ciudad = {
-        "Provincia": ciudad_a_buscar,
-        "Cantidad": len(ciudad_filtrada)
-        } if not ciudad_filtrada.empty else {
-        "Provincia": ciudad_a_buscar,
-        "Cantidad": 0
-    }
-    return info_ciudad
-
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 def obtener_top_5_ciudades(dataframe):
+
     ciudades_count = dataframe['provincia'].value_counts().reset_index()
     ciudades_count.columns = ['Provincia', 'Cantidad']
     top_5_ciudades = ciudades_count.head(5).to_dict(orient='records')
     return top_5_ciudades
+
+
+def graficar_top_5_ciudades(dataframe):
+    # Obtener las 5 ciudades más frecuentes
+    top_5_ciudades = obtener_top_5_ciudades(dataframe)
+    
+    # Ordenar las ciudades de mayor a menor según la cantidad
+    top_5_ciudades = sorted(top_5_ciudades, key=lambda x: x['Cantidad'], reverse=True)
+
+    # Crear gráfico de barras con Plotly
+    fig = px.bar(top_5_ciudades, 
+                 x='Provincia', 
+                 y='Cantidad', 
+                 title="Top 5 Ciudades Más Frecuentes",
+                 labels={'Provincia': 'Ciudad', 'Cantidad': 'Frecuencia'},
+                 color='Provincia',
+                 color_discrete_sequence=px.colors.qualitative.Pastel)
+    
+    # Personalizar el gráfico
+    fig.update_layout(
+        title={'text': "Top 5 Ciudades Más Frecuentes<br><span style='font-size:14px;color:gray;'>Las cinco ciudades más frecuentes en los datos.</span>",
+               'x': 0.5, 
+               'xanchor': 'center'},
+        title_font=dict(size=22),
+        xaxis_title_font=dict(size=18),  
+        yaxis_title_font=dict(size=18),  
+        xaxis_tickfont=dict(size=16),  
+        yaxis_tickfont=dict(size=16),  
+        plot_bgcolor="white",  # Fondo blanco para el área del gráfico
+        paper_bgcolor="white",  # Fondo blanco para el gráfico completo
+    )
+    
+    return fig
+
+
+
 
 
 def graficar_especialidad_html(dataframe):
@@ -431,35 +520,3 @@ def graficar_especialidad_html(dataframe):
 
 
 
-
-#Funciona
-def prueba(dataframe, viven_espana=True):
-    # Verificar que las columnas necesarias existen en el DataFrame
-    columnas_requeridas = ['vives_en_espana', 'orientacion_sexual']
-    for columna in columnas_requeridas:
-        if columna not in dataframe.columns:
-            raise ValueError(f"Falta la columna requerida: {columna}")
-
-    # Filtrar el DataFrame según el parámetro
-    filtro = dataframe['vives_en_espana'] == viven_espana
-    df_filtrado = dataframe[filtro]
-    
-    # Conteo de orientaciones
-    colectivos_count = df_filtrado['orientacion_sexual'].value_counts().reset_index()
-    colectivos_count.columns = ['Orientacion', 'Cantidad']
-    
-    # Configurar título según el filtro
-    titulo = "Distribución de Orientación Sexual"
-    if viven_espana:
-        titulo += " (Personas que Viven en España)"
-    else:
-        titulo += " (Personas que No Viven en España)"
-    
-    # Crear gráfico de pastel
-    fig = px.pie(colectivos_count, 
-                values='Cantidad', 
-                names='Orientacion', 
-                title=titulo,
-                color_discrete_sequence=px.colors.qualitative.Pastel)
-    
-    return fig
