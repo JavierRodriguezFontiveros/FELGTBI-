@@ -401,26 +401,30 @@ def graficar_permiso_residencia_html(dataframe):
 
 
 def graficar_combinaciones(dataframe):
-    # Agrupación y conteo
+    # Agrupación y conteo de combinaciones
     combinaciones = dataframe.groupby(['persona_racializada', 'persona_discapacitada', 'persona_sin_hogar', 'persona_migrante']).size().reset_index(name='Cantidad')
-    
-    # Crear una nueva columna que combine las condiciones
-    combinaciones['Combinación'] = combinaciones.apply(
-        lambda row: f"persona_racializada: {row['persona_racializada']}, persona_discapacitada: {row['persona_discapacitada']}, "
-                    f"persona_sin_hogar: {row['persona_sin_hogar']}, persona_migrante: {row['persona_migrante']}", axis=1)
-    
-    # Configuración gráfico de barras
-    fig = px.bar(combinaciones, 
-                x='Combinación', 
-                y='Cantidad', 
-                title='Frecuencia de Combinaciones de Condiciones',
-                labels={'Combinación': 'Combinación de Condiciones', 'Cantidad': 'Número de Personas'},
-                color='Cantidad',
-                color_continuous_scale='Viridis')
 
-    # Etiquetas en el gráfico
-    fig.update_layout(xaxis_tickangle=45)
-    
+    # Crear un gráfico de barras que muestre el conteo de combinaciones
+    fig = px.bar(combinaciones, 
+                 x=combinaciones.index,  # Usamos el índice para que no aparezca como texto largo
+                 y='Cantidad', 
+                 title='Frecuencia de Combinaciones de Condiciones',
+                 labels={'Cantidad': 'Número de Personas'},
+                 color='Cantidad',
+                 color_continuous_scale='Viridis')
+
+    # Ajustar el diseño y etiquetas del gráfico
+    fig.update_layout(
+        xaxis=dict(title='Combinación de Condiciones', tickvals=combinaciones.index, ticktext=[f"Combinación {i+1}" for i in combinaciones.index]),
+        xaxis_tickangle=45,  # Para rotar las etiquetas del eje X
+        title={'text': "Frecuencia de Combinaciones de Condiciones", 'x': 0.5, 'xanchor': 'center'},
+        title_font=dict(size=22),
+        xaxis_title_font=dict(size=18),
+        yaxis_title_font=dict(size=18),
+        xaxis_tickfont=dict(size=16),
+        yaxis_tickfont=dict(size=16)
+    )
+
     return fig
 
 
