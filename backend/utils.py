@@ -153,6 +153,9 @@ def grafico_pie(dataframe, viven_espana=True):
     
     return fig
 
+import pandas as pd
+import plotly.express as px
+
 def create_bar_chart_plotly_html(df):
     try:
         # Definir los rangos de edades y las etiquetas correspondientes
@@ -172,30 +175,43 @@ def create_bar_chart_plotly_html(df):
 
         # Calcular el porcentaje sobre el total
         total = edad_grupo['cantidad'].sum()
-        edad_grupo['porcentaje'] = (edad_grupo['cantidad'] / total * 100).round(2)
+        edad_grupo['porcentaje'] = (edad_grupo['cantidad'] / total * 100)
+
+        # Aplicar redondeo sin exceder el 100%
+        edad_grupo['porcentaje_entero'] = edad_grupo['porcentaje'].apply(int)  # Parte entera
+        edad_grupo['residuo'] = edad_grupo['porcentaje'] - edad_grupo['porcentaje_entero']
+        diferencia = 100 - edad_grupo['porcentaje_entero'].sum()
+
+        # Ajustar los residuos más altos para cerrar la diferencia
+        if diferencia > 0:
+            ajuste_indices = edad_grupo.nlargest(diferencia, 'residuo').index
+            edad_grupo.loc[ajuste_indices, 'porcentaje_entero'] += 1
 
         # Crear el gráfico de barras con Plotly
         fig = px.bar(edad_grupo,
                      x='grupo_edad',
-                     y='porcentaje',
-                     title="Distribución de Edad por Grupo (Porcentaje)",
-                     labels={'grupo_edad': "Grupo de Edad", 'porcentaje': "Porcentaje (%)"},
-                     text='porcentaje',
+                     y='porcentaje_entero',
+                     title="Distribución de Edad",
+                     labels={'grupo_edad': "Grupo de Edad", 'porcentaje_entero': "Porcentaje (%)"},
+                     text='porcentaje_entero',
                      color_discrete_sequence=px.colors.qualitative.Pastel)
 
         # Ajustar diseño del gráfico
-        fig.update_traces(textposition='outside')
+        fig.update_traces(textposition='outside')  # Mostrar texto fuera de las barras
 
-        fig.update_layout(xaxis_title="Grupo de Edad", 
-                          yaxis_title="Porcentaje (%)",
-                          xaxis=dict(tickangle=0),
-                          plot_bgcolor="white",  
-                          paper_bgcolor="white")
+        fig.update_layout(
+            xaxis_title="Grupo de Edad", 
+            yaxis_title="Porcentaje (%)",
+            xaxis=dict(tickangle=0),
+            plot_bgcolor="white",  # Fondo del área del gráfico
+            paper_bgcolor="white"  # Fondo general del gráfico
+        )
 
         # Exportar el gráfico como HTML
         return fig.to_html(full_html=False)
     except Exception as e:
         raise RuntimeError(f"Error al generar el gráfico: {e}")
+
     
 
 
