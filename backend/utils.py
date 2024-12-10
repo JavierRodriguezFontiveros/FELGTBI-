@@ -429,7 +429,7 @@ def colectivos(dataframe):
                  color_discrete_sequence=px.colors.qualitative.Pastel)
 
     # Personalizar el gráfico
-    fig.update_layout(title={'text': "Frecuencia de Condiciones por Variable (Solo True)<br><span style='font-size:14px;color:gray;'>El gráfico muestra cuántas personas tienen cada condición como True.</span>",
+    fig.update_layout(title={'text': "Conteo de personas por Colectivo<br><span style='font-size:14px;color:gray;'>El gráfico muestra cuántas personas pertenecen a un colectivo.</span>",
                             'x': 0.5, 
                             'xanchor': 'center'},
                       title_font=dict(size=22),
@@ -447,7 +447,6 @@ def colectivos(dataframe):
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ###EDITADA###
-
 def obtener_top_5_ciudades(dataframe):
 
     ciudades_count = dataframe['provincia'].value_counts().reset_index()
