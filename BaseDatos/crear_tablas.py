@@ -22,61 +22,61 @@ conn = psycopg2.connect(database = db_database,
 
 # Generamos un cursor para operar dentro de la bbdd
 cur = conn.cursor()
-# # Comando para crear tabla de admin
-# cur.execute("""CREATE TABLE IF NOT EXISTS admin_data(
-#             admin_id SERIAL PRIMARY KEY,
-#             admin_name VARCHAR (50) UNIQUE NOT NULL,
-#             password VARCHAR (24) NOT NULL);
-#             """)
-# # Grabar los cambios en la bbdd
-# conn.commit()
-# print("tabla admin creada")
-
-# # Comando para crear tabla de preguntas
-# cur.execute("""CREATE TABLE IF NOT EXISTS preguntas(
-#             pregunta_id SERIAL PRIMARY KEY,
-#             texto VARCHAR (200) NOT NULL);
-#             """)
-# # Grabar los cambios en la bbdd
-# conn.commit()
-# print("tabla preguntas creada")
+# Comando para crear tabla de admin
+cur.execute("""CREATE TABLE IF NOT EXISTS admin_data(
+            admin_id SERIAL PRIMARY KEY,
+            admin_name VARCHAR (50) UNIQUE NOT NULL,
+            password VARCHAR (24) NOT NULL);
+            """)
+# Grabar los cambios en la bbdd
+conn.commit()
+print("tabla admin creada")
 
 # Comando para crear tabla de preguntas
-# cur.execute("""
-#             CREATE TABLE IF NOT EXISTS preguntas_front (
-#             id_categoria VARCHAR(10),  -- categoría en formato "1.1", "1.2", etc.
-#             titulo_categoria VARCHAR(255),
-#             texto_pregunta TEXT,
-#             texto_opcion TEXT,
-#             -- opcionalmente podemos generar un ID de opción único basado en la categoría
-#             CONSTRAINT unique_categoria_opcion UNIQUE (id_categoria, texto_pregunta, texto_opcion));
-#             """)
-# # Grabar los cambios en la bbdd
-# conn.commit()
-# print("tabla preguntas creada")
+cur.execute("""CREATE TABLE IF NOT EXISTS preguntas(
+            pregunta_id SERIAL PRIMARY KEY,
+            texto VARCHAR (200) NOT NULL);
+            """)
+# Grabar los cambios en la bbdd
+conn.commit()
+print("tabla preguntas creada")
+
+# Comando para crear tabla de preguntas
+cur.execute("""
+            CREATE TABLE IF NOT EXISTS preguntas_front (
+            id_categoria VARCHAR(10),  -- categoría en formato "1.1", "1.2", etc.
+            titulo_categoria VARCHAR(255),
+            texto_pregunta TEXT,
+            texto_opcion TEXT,
+            -- opcionalmente podemos generar un ID de opción único basado en la categoría
+            CONSTRAINT unique_categoria_opcion UNIQUE (id_categoria, texto_pregunta, texto_opcion));
+            """)
+# Grabar los cambios en la bbdd
+conn.commit()
+print("tabla preguntas creada")
 
 # Comando para crear tabla de usuario ¡¡¡¡¡¡¡Pendiente!!!!!!
-# cur.execute("""CREATE TABLE IF NOT EXISTS no_sociosanit_formulario(
-#             no_sociosanit_id SERIAL PRIMARY KEY,
-#             edad INTEGER NOT NULL,
-#             pronombre_el BOOLEAN NOT NULL,
-#             pronombre_ella BOOLEAN NOT NULL,
-#             pronombre_elle BOOLEAN NOT NULL,
-#             identidad_genero VARCHAR(50) NOT NULL,
-#             orientacion_sexual VARCHAR(50) NOT NULL,
-#             vives_en_espana BOOLEAN NOT NULL,
-#             nacionalidad VARCHAR(50) NOT NULL,
-#             permiso_residencia BOOLEAN NOT NULL,
-#             persona_racializada BOOLEAN NOT NULL,
-#             persona_discapacitada BOOLEAN NOT NULL,
-#             persona_sin_hogar BOOLEAN NOT NULL,
-#             persona_migrante BOOLEAN NOT NULL,
-#             persona_intersexual BOOLEAN NOT NULL,
-#             nivel_estudios VARCHAR(50) NOT NULL,
-#             situacion_afectiva VARCHAR(50) NOT NULL);
-#             """)
-# conn.commit()
-# print("tabla no sociosanitario creada")
+cur.execute("""CREATE TABLE IF NOT EXISTS no_sociosanit_formulario(
+            no_sociosanit_id SERIAL PRIMARY KEY,
+            edad INTEGER NOT NULL,
+            pronombre_el BOOLEAN NOT NULL,
+            pronombre_ella BOOLEAN NOT NULL,
+            pronombre_elle BOOLEAN NOT NULL,
+            identidad_genero VARCHAR(50) NOT NULL,
+            orientacion_sexual VARCHAR(50) NOT NULL,
+            vives_en_espana BOOLEAN NOT NULL,
+            nacionalidad VARCHAR(50) NOT NULL,
+            permiso_residencia BOOLEAN NOT NULL,
+            persona_racializada BOOLEAN NOT NULL,
+            persona_discapacitada BOOLEAN NOT NULL,
+            persona_sin_hogar BOOLEAN NOT NULL,
+            persona_migrante BOOLEAN NOT NULL,
+            persona_intersexual BOOLEAN NOT NULL,
+            nivel_estudios VARCHAR(50) NOT NULL,
+            situacion_afectiva VARCHAR(50) NOT NULL);
+            """)
+conn.commit()
+print("tabla no sociosanitario creada")
 
 
 
