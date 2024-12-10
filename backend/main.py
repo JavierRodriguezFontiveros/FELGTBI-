@@ -9,7 +9,7 @@ from fastapi.responses import StreamingResponse
 import io
 import matplotlib.pyplot as plt
 
-from utils import colectivos,connect_to_db,fetch_all_from_table, prompt_basico, modify_table_records
+from utils import colectivos,connect_to_db,fetch_all_from_table, prompt_basico, modify_table_records,ambito_laboral
 
 from io import BytesIO
 
@@ -80,7 +80,7 @@ Hola buenas bienvenido a este proyecto de tripulaciones
 
 
 
-from utils import create_bar_chart_plotly_html,barras_apiladas_genero_orientacion_html,graficar_permiso_residencia_html,graficar_especialidad_html, grafico_pie,graficar_top_5_ciudades,check_admin_details
+from utils import create_bar_chart_plotly_html,barras_apiladas_genero_orientacion_html,graficar_permiso_residencia_html, grafico_pie,graficar_top_5_ciudades,check_admin_details
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ###FUNCIONA_EDITADA###
 @app.get("/bar-chart/", response_class=HTMLResponse)
@@ -253,10 +253,10 @@ def generate_bar_chart():
         return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
     
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-@app.get("/grafico-especialidad/", response_class=HTMLResponse)
-def generar_grafico_especialidad():
+@app.get("/grafico-ambito-laboral/", response_class=HTMLResponse)
+def generate_ambito_laboral_chart():
     """
-    Endpoint para generar y mostrar un gráfico de especialidades en HTML.
+    Endpoint para generar y mostrar un gráfico de ámbito laboral en HTML.
     """
     try:
         # Conectar a la base de datos
@@ -264,21 +264,27 @@ def generar_grafico_especialidad():
         if connection is None:
             return {"error": "No se pudo conectar a la base de datos."}
 
-        # Consulta para obtener los datos
-        query = "SELECT * FROM sociosanitarios_formulario"  # Cambia esta consulta según sea necesario
+        # Consulta SQL para obtener los datos
+        query = "SELECT * FROM sociosanitarios_formulario"  # Cambia el nombre de la tabla si es necesario
 
-        # Convertir los datos en un DataFrame
+        # Cargar los datos en un DataFrame
         df = pd.read_sql_query(query, connection)
 
-        # Generar el gráfico de especialidades como HTML
-        html_content = graficar_especialidad_html(df)
+        # Cerrar la conexión
+        connection.close()
 
-        # Devolver el HTML como respuesta
+        # Generar el gráfico de ámbito laboral
+        fig = ambito_laboral(df)
+
+        # Convertir el gráfico a HTML
+        html_content = fig.to_html(full_html=False)
+
+        # Devolver el HTML del gráfico
         return HTMLResponse(content=html_content, media_type="text/html")
+    
     except Exception as e:
         return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
-    finally:
-        connection.close()
+
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
