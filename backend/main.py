@@ -9,7 +9,7 @@ from fastapi.responses import StreamingResponse
 import io
 import matplotlib.pyplot as plt
 
-from utils import colectivos,connect_to_db,fetch_all_from_table, prompt_basico, modify_table_records, graficar_permiso_residencia_html
+from utils import colectivos,connect_to_db,fetch_all_from_table, prompt_basico, modify_table_records, graficar_permiso_residencia_html,ambito_laboral
 
 from io import BytesIO
 
@@ -276,7 +276,7 @@ def generate_ambito_laboral_chart():
         connection.close()
 
         # Generar el gráfico de ámbito laboral
-        fig = graficar_permiso_residencia_html(df)
+        fig = ambito_laboral(df)
 
         # Convertir el gráfico a HTML
         html_content = fig.to_html(full_html=False)
