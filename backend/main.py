@@ -839,9 +839,9 @@ async def personalizar_prompt_usuario_no_ss(user_data: UserData):
                 # Generar la respuesta del modelo
                 respuesta_chatbot = generar_respuesta(prompt)
 
-                query = ''' INSERT INTO respuestas_modelo (respuesta_chatbot, id_usuario)
+                query = ''' INSERT INTO respuestas_modelo (id_usuario,respuesta_chatbot)
                             VALUES (%s, %s);'''
-                valores = (respuesta_chatbot, id_usuario)
+                valores = (id_usuario, respuesta_chatbot)
 
                 cursor.execute(query, valores)
                 connection.commit()
@@ -908,9 +908,9 @@ async def personalizar_prompt_usuario_ss(user_data: UserData):
 
             respuesta_chatbot = generar_respuesta(prompt)
 
-            query = ''' INSERT INTO respuestas_modelo (respuesta_chatbot, id_usuario)
-                        VALUES (%s, %s);'''
-            valores = (respuesta_chatbot, id_usuario)
+            query = ''' INSERT INTO respuestas_modelo (id_usuario,respuesta_chatbot)
+                            VALUES (%s, %s);'''
+            valores = (id_usuario, respuesta_chatbot)
 
             cursor.execute(query, valores)
             connection.commit()
