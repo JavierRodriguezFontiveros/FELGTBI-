@@ -194,34 +194,30 @@ def generar_grafico_permiso_residencia():
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-@app.get("/colectivos/")
+@app.get("/colectivos/", response_class=HTMLResponse)
 def generar_grafico_combinaciones():
-    connection = connect_to_db()
     try:
+        # Conectar a la base de datos
+        connection = connect_to_db()
+
         # Escribir la consulta SQL para obtener los datos
         query = "SELECT * FROM no_sociosanit_formulario"  # Cambia esta consulta según sea necesario
-
-        # Usar pandas para ejecutar la consulta y convertirla en un DataFrame
         df = pd.read_sql_query(query, connection)
 
         # Cerrar la conexión después de obtener los datos
         connection.close()
 
-        # Generar el gráfico de combinaciones
+        # Generar el gráfico interactivo
         fig = colectivos(df)
 
-        # Guardar el gráfico como imagen en un buffer
-        img_bytes = fig.to_image(format="png")
+        # Obtener el gráfico como HTML interactivo
+        html_content = fig.to_html(full_html=False)
 
-        # Crear un buffer de memoria
-        buf = BytesIO(img_bytes)
-        buf.seek(0)
+        # Devolver el gráfico interactivo como respuesta
+        return HTMLResponse(content=html_content)
 
-        # Devolver la imagen como respuesta
-        return StreamingResponse(buf, media_type="image/png")
-    
     except Exception as e:
-        return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
+        raise HTTPException(status_code=500, detail=f"Ocurrió un error al procesar el gráfico: {e}")
     
 
 
