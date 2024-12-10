@@ -9,7 +9,7 @@ from fastapi.responses import StreamingResponse
 import io
 import matplotlib.pyplot as plt
 
-from utils import graficar_combinaciones, buscar_ciudad, obtener_top_5_ciudades,connect_to_db,fetch_all_from_table, prompt_basico, prueba
+from utils import graficar_combinaciones, buscar_ciudad, obtener_top_5_ciudades,connect_to_db,fetch_all_from_table, prompt_basico, prueba, modify_table_records
 
 from io import BytesIO
 
@@ -1089,6 +1089,24 @@ def get_table_data(table_name: str):
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
         raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@app.put("/modify-records/")
+async def modify_records_endpoint(
+    table_name: str, 
+    column: str, 
+    new_value: str, 
+    id: int
+):
+    try:
+        modify_table_records(table_name, column, new_value, id)
+        return {"message": "Record successfully modified."}
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    except RuntimeError as re:
+        raise HTTPException(status_code=500, detail=str(re))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {e}")
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
