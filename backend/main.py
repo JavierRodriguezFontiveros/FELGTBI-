@@ -80,7 +80,7 @@ Hola buenas bienvenido a este proyecto de tripulaciones
 
 from utils import create_bar_chart_plotly_html,barras_apiladas_genero_orientacion_html,graficar_permiso_residencia_html,graficar_especialidad_html, grafico_pie,graficar_top_5_ciudades,check_admin_details
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-###FUNCIONA###
+###FUNCIONA_EDITADA###
 @app.get("/bar-chart/", response_class=HTMLResponse)
 def generate_bar_chart():
     try:
@@ -104,7 +104,7 @@ def generate_bar_chart():
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-###FUNCIONA###
+###FUNCIONA_EDITADA###
 @app.get("/pie-chart/", response_class=HTMLResponse)
 def generar_grafico_pie(viven_espana: bool = True):
     try:
@@ -135,6 +135,7 @@ def generar_grafico_pie(viven_espana: bool = True):
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+###FUNCIONA_EDITADA###
 @app.get("/barras-apiladas/", response_class=HTMLResponse)
 def generar_barras_apiladas():
 
@@ -223,10 +224,7 @@ def generar_grafico_combinaciones():
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-
-
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+###FUNCIONA_EDITADA###
 @app.get("/top-5-ciudades/", response_class=HTMLResponse)
 def generate_bar_chart():
     try:
