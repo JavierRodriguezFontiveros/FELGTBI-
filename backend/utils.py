@@ -122,6 +122,8 @@ import plotly.express as px
 #Configurar los renderer
 pio.renderers.default = "svg"
 
+
+###EDITADA###
 def grafico_pie(dataframe, viven_espana=True):
     # Verificar que las columnas necesarias existen en el DataFrame
     columnas_requeridas = ['vives_en_espana', 'orientacion_sexual']
@@ -137,6 +139,20 @@ def grafico_pie(dataframe, viven_espana=True):
     colectivos_count = df_filtrado['orientacion_sexual'].value_counts().reset_index()
     colectivos_count.columns = ['Orientacion', 'Cantidad']
     
+    # Calcular los porcentajes
+    total = colectivos_count['Cantidad'].sum()
+    colectivos_count['Porcentaje'] = (colectivos_count['Cantidad'] / total) * 100
+    
+    # Redondear los porcentajes a enteros
+    colectivos_count['Porcentaje_Redondeado'] = colectivos_count['Porcentaje'].round().astype(int)
+
+    # Ajustar los residuos para asegurar que la suma de los porcentajes es 100
+    diferencia = 100 - colectivos_count['Porcentaje_Redondeado'].sum()
+    if diferencia > 0:
+        # Ajustar los porcentajes más grandes para cerrar la diferencia
+        ajuste_indices = colectivos_count.nlargest(diferencia, 'Porcentaje').index
+        colectivos_count.loc[ajuste_indices, 'Porcentaje_Redondeado'] += 1
+
     # Configurar título según el filtro
     titulo = "Distribución de Orientación Sexual"
     if viven_espana:
@@ -146,26 +162,48 @@ def grafico_pie(dataframe, viven_espana=True):
     
     # Crear gráfico de pastel
     fig = px.pie(colectivos_count, 
-                values='Cantidad', 
-                names='Orientacion', 
-                title=titulo,
-                color_discrete_sequence=px.colors.qualitative.Pastel)
+                 values='Porcentaje_Redondeado', 
+                 names='Orientacion', 
+                 title=titulo,
+                 color_discrete_sequence=px.colors.qualitative.Pastel)
     
+    # Personalizar el gráfico
+    fig.update_traces(
+        textinfo='percent',  # Mostrar solo el porcentaje dentro del gráfico
+        textfont_size=14,  # Ajustar el tamaño del texto
+        pull=[0.1 if i == colectivos_count['Porcentaje_Redondeado'].idxmax() else 0 for i in range(len(colectivos_count))]  # Resaltar la sección más grande
+    )
+
+    # Ajustar el diseño del gráfico con el título y formato adicional
+    fig.update_layout(
+        title={'text': "Distribución de Orientación Sexual<br><span style='font-size:14px;color:gray;'>El gráfico muestra los porcentajes por cada orientación sexual.</span>",
+               'x': 0.5, 
+               'xanchor': 'center'},  # Centrado del título
+        title_font=dict(size=22),
+        xaxis_title_font=dict(size=18),  
+        yaxis_title_font=dict(size=18),  
+        xaxis_tickfont=dict(size=16),  
+        yaxis_tickfont=dict(size=16),  
+        showlegend=True,  # Mostrar la leyenda
+        legend_title="Orientación Sexual",  # Título de la leyenda
+        legend=dict(
+            x=1,  # Mover la leyenda a la derecha del gráfico
+            xanchor='left',  # Alineación de la leyenda a la izquierda
+            y=0.5,  # Alineación vertical de la leyenda
+            yanchor='middle',  # Centrar la leyenda en el medio
+            traceorder='normal',  # Orden de las leyendas
+            font=dict(size=14),  # Tamaño de la fuente en la leyenda
+            bgcolor="white",  # Fondo blanco para la leyenda
+            bordercolor="Black",  # Borde de la leyenda
+            borderwidth=1  # Grosor del borde de la leyenda
+        ),
+        plot_bgcolor="white",  # Fondo blanco para el área del gráfico
+        paper_bgcolor="white",  # Fondo blanco para el gráfico completo
+    )
+
     return fig
 
-import pandas as pd
-import plotly.express as px
 
-import pandas as pd
-import plotly.express as px
-
-
-
-import pandas as pd
-import plotly.express as px
-
-import pandas as pd
-import plotly.express as px
 
 ###EDITADA###
 def create_bar_chart_plotly_html(df):
