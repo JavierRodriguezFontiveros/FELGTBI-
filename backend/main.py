@@ -724,144 +724,108 @@ def generar_respuesta_final(prompt_chat, memory):
 
 
 @app.post("/personalizar_prompt_usuario_no_ss")
-async def personalizar_prompt_usuario_no_ss(user_data: UserData):
+async def personalizar_prompt_usuario_no_ss(data: list):
     print(f"API Key en uso: {gemini_api_key}")
 
     try:
-        # Determinar el tipo de sección y construir el prompt dinámicamente
-        for key, seccion in user_data.data.items():
-            titulo = seccion.get("titulo", " ")
-            preguntas = seccion.get("preguntas", {})
+        if not isinstance(data, list) or len(data) < 2:
+            return {"error": "Formato de datos no válido. Se requiere un array con al menos dos elementos."}
 
-# SI NO ES SOCIOSANITARIO
+        # Extraer el ID del usuario y la primera pregunta
+        id_usuario = data[0]
+        situacion = data[1]
 
-            if key.startswith("1"):
-    #EXTRAER ID_USUARIO
-                id_usuario = None
+        if not id_usuario or not isinstance(id_usuario, str) or not id_usuario.isalnum():
+            return {"error": "ID de usuario no válido."}
 
-                id_usuario = seccion.get("id_usuario")
-                # id_usuario = str(id_usuario)
-                print(f"ID Usuario recibido: {id_usuario}")   
-                if not id_usuario.isalnum():
-                    return {"error": "ID de usuario no válido."}     
-                
-                connection = connect_to_db()
+        connection = connect_to_db()
+        if connection is None:
+            return {"error": "No se pudo conectar a la base de datos."}
 
-                if connection is None:
-                    return {"error": "No se pudo conectar a la base de datos."}
+        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-                cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        try:
+            # Obtener los datos del usuario desde la base de datos
+            query = """
+                SELECT provincia, pronombre_elle, pronombre_el, pronombre_ella
+                FROM no_sociosanit_formulario
+                WHERE id_usuario = %s
+            """
+            cursor.execute(query, (id_usuario,))
+            resultados = cursor.fetchone()
 
-                try:
-                    # Escribir la consulta SQL para obtener los datos
-                    query = """
-                        SELECT provincia, pronombre_elle, pronombre_el, pronombre_ella
-                        FROM no_sociosanit_formulario
-                        WHERE id_usuario = %s
-                    """
-                    cursor.execute(query, (id_usuario,))
+            if not resultados:
+                return {"error": "No se encontraron datos para el ID de usuario proporcionado."}
 
-                    # Obtener el resultado de la consulta
-                    resultados = cursor.fetchone()
+            provincia = resultados["provincia"]
+            pronombres = []
 
-                    if not resultados:
-                        return {"error": "No se encontraron datos para el ID de usuario proporcionado."}
-                
-                    provincia = resultados["provincia"]
-                    pronombres = []
+            if resultados["pronombre_el"]:
+                pronombres.append("Él")
+            if resultados["pronombre_ella"]:
+                pronombres.append("Ella")
+            if resultados["pronombre_elle"]:
+                pronombres.append("Elle/Pronombre neutro")
 
-                    if resultados["pronombre_el"]:
-                        pronombres.append("Él")
-                    if resultados["pronombre_ella"]:
-                        pronombres.append("Ella")
-                    if resultados["pronombre_elle"]:
-                        pronombres.append("Elle/Pronombre neutro")
+            pronombres = ", ".join(pronombres)
+        except Exception as e:
+            cursor.close()
+            connection.close()
+            return {"error": f"Error al procesar la solicitud: {str(e)}"}
 
-                    pronombres = ", ".join(pronombres)
+        # Construcción del prompt en función de la situación
+        if situacion == "Creo que me he expuesto al virus":
+            tiempo_exposicion = data[3]
+            acceso_medico = data[5]
+            tipo_exposicion = data[7]
+            chem_sex = data[9]
+            conocimiento_pep = data[11]
+            preocupacion = data[13]
 
-                except Exception as e:
-                    # Cerrar la conexión en caso de error
-                    if connection:
-                        cursor.close()
-                        connection.close()
-                    return {"error": f"Error al procesar la solicitud: {str(e)}"}
-## TRAS EXTRAER DATOS, CONFECCIONAR PROMPT
-                if key.startswith("1.1"):
-                    tiempo_diagnostico = preguntas.get("¿Cuándo te diagnosticaron?", [""])[0]
-                    en_tratamiento = preguntas.get("¿Estás en tratamiento TAR?", [""])[0]
-                    acceso_medico = preguntas.get("¿Tienes acceso a un médico?", [""])[0]
-                    informacion_necesaria = preguntas.get("¿Quieres información sobre algún tema?", ["Ninguna"])[0]
-
-                    # Crear el prompt para la sección 1.1
-                    prompt = ("Mis pronombres (dirígete a mi conjugando como corresponda, si es elle, en género neutro, si es él/ella, pues en masculino/femenino, si te digo varios, usa solo uno de los que te diga) son:" + pronombres + ". \n"
-                            "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
-                            "Tengo VIH diagnosticado desde " + tiempo_diagnostico + ". \n"
-                            "¿Qué si estoy en tratamiento?" + en_tratamiento + ". \n"
-                            ". Y además " + acceso_medico + ". \n"
-                            "tengo acceso médico. La información que solicito es:"+ informacion_necesaria + "."
-                    )
-
-                elif key.startswith("1.2"):
-                    tipo_exposicion = preguntas.get("¿Qué tipo de exposición fue?", [" "])[0]
-                    tiempo_exposicion = preguntas.get("¿Cuándo ocurrió la posible infección?", [" "])[0]
-                    acceso_medico = preguntas.get("¿Tienes acceso a un médico?", [" "])[0]
-                    chem_sex = preguntas.get("¿Ha sido en un entorno de 'chem-sex'?", [" "])[0]
-                    preocupacion = preguntas.get("¿Has compartido tu preocupación con alguien?", [" "])[0]
-                    conocimiento_pep = preguntas.get("¿Sabes qué es la PEP?", [" "])[0]
-
-                    # Crear el prompt para la sección 1.2
-                    prompt = ("Mis pronombres (dirígete a mi conjugando como corresponda, si es elle, en género neutro, si es él/ella, pues en masculino/femenino, si te digo varios, usa solo uno de los que te diga) son:" + pronombres + ". \n"
-                            "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
-                            "Creo que me he expuesto al virus en " + tiempo_exposicion + ". \n"
-                            "El tipo de exposición ha sido:" + tipo_exposicion + ". \n"
-                            + chem_sex + "ha sido en entorno de chem-sex. \n"
-                            "He compartido mi preocupación con"+ preocupacion + "Y quiero más información sobre la PEP."
-                    )
-
-                elif key.startswith("1.3"):
-                    tema_informacion = preguntas.get("¿Sobre qué tema quieres información?", [" "])[0]
-
-                    # Crear el prompt para la sección 1.3
-                    prompt = ("Mis pronombres (dirígete a mi conjugando como corresponda, si es elle, en género neutro, si es él/ella, pues en masculino/femenino, si te digo varios, usa solo uno de los que te diga) son:" + pronombres + ". \n"
-                            "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
-                            "Quiero información sobre:" + tema_informacion)
-
-                elif key.startswith("1.4"):
-                    acceso_grupos = preguntas.get("¿Tienes acceso a recursos locales o grupos de apoyo?", [" "])[0]
-                    preocupacion4 = preguntas.get("¿Has compartido tu preocupación con alguien?", [" "])[0]
-                    apoyo_necesario = preguntas.get("¿Qué apoyo necesitas?", [" "])[0]
-
-                    # Crear el prompt para la sección 1.4
-                    prompt = ("Mis pronombres (dirígete a mi conjugando como corresponda, si es elle, en género neutro, si es él/ella, pues en masculino/femenino, si te digo varios, usa solo uno de los que te diga) son:" + pronombres + ". \n"
-                            "Vivo en" + provincia + ". Dame respuestas orientadas a ese lugar. \n"
-                            "Estoy acompañando a una persona seropositiva." + acceso_grupos + "tengo acceso a recursos locales o grupos de apoyo. /n"
-                            "He compartido mi preocupación con" + preocupacion4 + ". /n"
-                            "Me gustaría orientación para conseguir" + apoyo_necesario)
-
-                # Generar la respuesta del modelo
-                respuesta_chatbot = generar_respuesta(prompt)
-
-                query = ''' INSERT INTO respuestas_modelo (id_usuario,respuesta_modelo)
-                            VALUES (%s, %s);'''
-                valores = (id_usuario, respuesta_chatbot)
-
-                cursor.execute(query, valores)
-                connection.commit()
-                cursor.close()
-                connection.close()
-                print("Datos insertados correctamente.")
-                return {"respuesta_chatbot": respuesta_chatbot}
-
+            prompt = (
+                f"Mis pronombres son: {pronombres}. \n"
+                f"Vivo en {provincia}. Dame respuestas orientadas a ese lugar.\n"
+                f"Creo que me he expuesto al virus en {tiempo_exposicion}. \n"
+                f"El tipo de exposición fue: {tipo_exposicion}. \n"
+                f"{chem_sex}, ha sido en un entorno de chem-sex. \n"
+                f"Tengo acceso médico: {acceso_medico}. \n"
+                f"Quiero más información sobre la PEP: {conocimiento_pep}. \n"
+                f"Compartí mi preocupación con: {preocupacion}."
+            )
         else:
-            prompt = "Título: "
+            return {"error": "Situación no soportada."}
+
+        # Generar respuesta del chatbot
+        respuesta_chatbot = generar_respuesta(prompt)
+
+        # Insertar respuesta en la base de datos
+        query = '''
+            INSERT INTO respuestas_modelo (id_usuario, respuesta_modelo)
+            VALUES (%s, %s)
+            ON CONFLICT (id_usuario) DO UPDATE
+            SET respuesta_modelo = EXCLUDED.respuesta_modelo;
+        '''
+        valores = (id_usuario, respuesta_chatbot)
+
+        cursor.execute(query, valores)
+        connection.commit()
+        cursor.close()
+        connection.close()
+        print("Datos insertados correctamente.")
+        return {"respuesta_chatbot": respuesta_chatbot}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
+
     finally:
-        cursor.close()
-        connection.close()
-        print("Conexión cerrada")
+        try:
+            if cursor:
+                cursor.close()
+            if connection:
+                connection.close()
+        except:
+            print("Error cerrando la conexión.")
+
     
 
 @app.post("/personalizar_prompt_usuario_ss")
