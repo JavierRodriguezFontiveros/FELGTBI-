@@ -841,7 +841,7 @@ async def personalizar_prompt_usuario_no_ss(user_data: UserData):
                 # Generar la respuesta del modelo
                 respuesta_chatbot = generar_respuesta(prompt)
 
-                query = ''' INSERT INTO respuestas_modelo (id_usuario,respuesta_chatbot)
+                query = ''' INSERT INTO respuestas_modelo (id_usuario,respuesta_modelo)
                             VALUES (%s, %s);'''
                 valores = (id_usuario, respuesta_chatbot)
 
@@ -865,69 +865,73 @@ async def personalizar_prompt_usuario_no_ss(user_data: UserData):
     
 
 @app.post("/personalizar_prompt_usuario_ss")
-async def personalizar_prompt_usuario_ss(user_data: UserData):
+async def personalizar_prompt_usuario_ss(data: list):
     print(f"API Key en uso: {gemini_api_key}")
     try:
-        for key, seccion in user_data.data.items():
-            titulo = seccion.get("titulo", " ")
-            preguntas = seccion.get("preguntas", {})
-            id_usuario = seccion.get("id_usuario")
+        if len(data) < 4:
+            return {"error": "Formato de datos no válido. Se requieren al menos 4 elementos en la lista."}
 
-            if not id_usuario or not id_usuario.isalnum():
-                return {"error": "ID de usuario no válido."}
+        id_usuario, titulo, pregunta, eleccion = data[:4]
 
-            connection = connect_to_db()
-            if connection is None:
-                return {"error": "No se pudo conectar a la base de datos."}
+        if not id_usuario or not isinstance(id_usuario, str) or not id_usuario.isalnum():
+            return {"error": "ID de usuario no válido."}
 
-            cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-            try:
-                query = """
-                    SELECT ambito_laboral, provincia
-                    FROM sociosanitarios_formulario
-                    WHERE id_usuario = %s
-                """
-                cursor.execute(query, (id_usuario,))
-                resultados = cursor.fetchone()
+        connection = connect_to_db()
+        if connection is None:
+            return {"error": "No se pudo conectar a la base de datos."}
 
-                if not resultados:
-                    return {"error": "No se encontraron datos para el ID de usuario proporcionado."}
+        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        try:
+            query = """
+                SELECT ambito_laboral, provincia
+                FROM sociosanitarios_formulario
+                WHERE id_usuario = %s
+            """
+            cursor.execute(query, (id_usuario,))
+            resultados = cursor.fetchone()
 
-                provincia = resultados["provincia"]
-                ambito_laboral = resultados["ambito_laboral"]
-            except Exception as e:
-                cursor.close()
-                connection.close()
-                return {"error": f"Error al procesar la solicitud: {str(e)}"}
+            if not resultados:
+                return {"error": "No se encontraron datos para el ID de usuario proporcionado."}
 
-            eleccion = preguntas.get("¿Qué necesitas?", [" "])[0]
-            prompt = (
-                f"Mi pronombre es el neutro (elle). "
-                f"Vivo en {provincia}. Dame respuestas orientadas a ese lugar.\n"
-                f"Soy personal sanitario y trabajo en este ámbito laboral: {ambito_laboral}.\n"
-                f"Estoy trabajando actualmente con vih (úsalo siempre en minúscula). Necesito información profesional sobre {eleccion}."
-            )
-
-            respuesta_chatbot = generar_respuesta(prompt)
-
-            query = ''' INSERT INTO respuestas_modelo (id_usuario,respuesta_chatbot)
-                            VALUES (%s, %s);'''
-            valores = (id_usuario, respuesta_chatbot)
-
-            cursor.execute(query, valores)
-            connection.commit()
+            provincia = resultados["provincia"]
+            ambito_laboral = resultados["ambito_laboral"]
+        except Exception as e:
             cursor.close()
             connection.close()
-            print("Datos insertados correctamente.")
-            return {"respuesta_chatbot": respuesta_chatbot}
+            return {"error": f"Error al procesar la solicitud: {str(e)}"}
+
+        prompt = (
+            f"Mi pronombre es el neutro (elle). "
+            f"Vivo en {provincia}. Dame respuestas orientadas a ese lugar.\n"
+            f"Soy personal sanitario y trabajo en este ámbito laboral: {ambito_laboral}.\n"
+            f"Estoy trabajando actualmente con vih (úsalo siempre en minúscula). Necesito información profesional sobre {eleccion}."
+        )
+
+        respuesta_chatbot = generar_respuesta(prompt)
+
+        query = ''' INSERT INTO respuestas_modelo (id_usuario, respuesta_modelo)
+                        VALUES (%s, %s);'''
+        valores = (id_usuario, respuesta_chatbot)
+
+        cursor.execute(query, valores)
+        connection.commit()
+        cursor.close()
+        connection.close()
+        print("Datos insertados correctamente.")
+        return {"respuesta_chatbot": respuesta_chatbot}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
+
     finally:
-        cursor.close()
-        connection.close()
-        print("Conexión cerrada")
+        try:
+            if cursor:
+                cursor.close()
+            if connection:
+                connection.close()
+        except:
+            print("Error cerrando la conexión.")
+
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -1166,3 +1170,29 @@ if __name__ == "__main__":
 #     }
 #   }
 # }
+# SOCIOSANITARIO
+# {[
+# djashfkahksfjk
+#     "Especialidad",
+#     "Personal sanitario",
+#     "¿Qué necesitas como personal sanitario?",
+#     "Tratamientos (PREP, TAR)"
+# ]}
+# NO SOCIOSANITARIO
+# [
+# 237387273bfnasfbjsajdsa
+#     "¿Cuál es tu situación?",
+#     "Creo que me he expuesto al virus",
+#     "¿Cuándo ocurrió la posible infección?",
+#     "Últimas 72 horas",
+#     "¿Tienes acceso a un médico?",
+#     "Sí",
+#     "¿Qué tipo de exposición fue?",
+#     "Aguja compartida",
+#     "¿Ha sido en un entorno de 'chem-sex'?",
+#     "Sí",
+#     "¿Sabes qué es la PEP?",
+#     "Sí, quiero más información",
+#     "¿Has compartido tu preocupación con alguien?",
+#     "Compañere de trabajo"
+# ]
