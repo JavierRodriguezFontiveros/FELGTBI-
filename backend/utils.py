@@ -401,7 +401,7 @@ def graficar_combinaciones(dataframe):
     
     return fig
 
-
+#Hay que eliminarlo
 def buscar_ciudad(dataframe, ciudad_a_buscar):
     ciudad_filtrada = dataframe[dataframe['provincia'].str.lower() == ciudad_a_buscar.lower()]
     info_ciudad = {
@@ -414,11 +414,46 @@ def buscar_ciudad(dataframe, ciudad_a_buscar):
     return info_ciudad
 
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 def obtener_top_5_ciudades(dataframe):
+
     ciudades_count = dataframe['provincia'].value_counts().reset_index()
     ciudades_count.columns = ['Provincia', 'Cantidad']
     top_5_ciudades = ciudades_count.head(5).to_dict(orient='records')
     return top_5_ciudades
+
+
+def graficar_top_5_ciudades(dataframe):
+
+    # Obtener las 5 ciudades más frecuentes
+    top_5_ciudades = obtener_top_5_ciudades(dataframe)
+    
+    # Crear gráfico de barras con Plotly
+    fig = px.bar(top_5_ciudades, 
+                 x='Provincia', 
+                 y='Cantidad', 
+                 title="Top 5 Ciudades Más Frecuentes",
+                 labels={'Provincia': 'Ciudad', 'Cantidad': 'Frecuencia'},
+                 color='Provincia',
+                 color_discrete_sequence=px.colors.qualitative.Pastel)
+    
+    # Personalizar el gráfico
+    fig.update_layout(
+        title={'text': "Top 5 Ciudades Más Frecuentes<br><span style='font-size:14px;color:gray;'>Las cinco ciudades más frecuentes en los datos.</span>",
+               'x': 0.5, 
+               'xanchor': 'center'},
+        title_font=dict(size=22),
+        xaxis_title_font=dict(size=18),  
+        yaxis_title_font=dict(size=18),  
+        xaxis_tickfont=dict(size=16),  
+        yaxis_tickfont=dict(size=16),  
+        plot_bgcolor="white",  # Fondo blanco para el área del gráfico
+        paper_bgcolor="white",  # Fondo blanco para el gráfico completo
+    )
+    
+    return fig
+
 
 
 def graficar_especialidad_html(dataframe):

@@ -78,7 +78,7 @@ Hola buenas bienvenido a este proyecto de tripulaciones
 
 
 
-from utils import create_bar_chart_plotly_html,barras_apiladas_genero_orientacion_html,graficar_permiso_residencia_html,graficar_especialidad_html, grafico_pie
+from utils import create_bar_chart_plotly_html,barras_apiladas_genero_orientacion_html,graficar_permiso_residencia_html,graficar_especialidad_html, grafico_pie,graficar_top_5_ciudades
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ###FUNCIONA###
 @app.get("/bar-chart/", response_class=HTMLResponse)
@@ -223,43 +223,38 @@ def generar_grafico_combinaciones():
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-@app.get("/buscar-ciudad/")
-def endpoint_buscar_ciudad(ciudad: str = Query(..., description="Nombre de la ciudad a buscar en la tabla.")):
-    connection = connect_to_db()
-    try:
-        # Obtener datos de la base de datos
-        query = "SELECT * FROM sociosanitarios_formulario"  # Cambia la consulta según sea necesario
-        df = pd.read_sql_query(query, connection)
-        connection.close()
 
-        # Buscar información de la ciudad
-        info_ciudad = buscar_ciudad(df, ciudad)
-
-        # Devolver la respuesta
-        return JSONResponse(content=info_ciudad)
-    
-    except Exception as e:
-        return {"error": f"Ocurrió un error al procesar la solicitud: {e}"}
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-@app.get("/top-5-ciudades/")
-def endpoint_top_5_ciudades():
-    connection = connect_to_db()
+@app.get("/top-5-ciudades/", response_class=HTMLResponse)
+def generate_bar_chart():
     try:
-        # Obtener datos de la base de datos
-        query = "SELECT * FROM sociosanitarios_formulario"  # Cambia la consulta según sea necesario
+        # Conectar a la base de datos
+        connection = connect_to_db()
+        if connection is None:
+            return {"error": "No se pudo conectar a la base de datos."}
+
+        # Consulta SQL para obtener los datos
+        query = "SELECT * FROM no_sociosanit_formulario"  # Asegúrate de usar el nombre correcto de la tabla
+
+        # Cargar los datos en un DataFrame
         df = pd.read_sql_query(query, connection)
+
+        # Cerrar la conexión
         connection.close()
 
-        # Obtener el top 5 de ciudades
-        top_5_ciudades = obtener_top_5_ciudades(df)
+        # Generar el gráfico de barras
+        fig = graficar_top_5_ciudades(df)
 
-        # Devolver la respuesta
-        return JSONResponse(content={"Top_5_Ciudades": top_5_ciudades})
+        # Convertir el gráfico a HTML
+        html_content = fig.to_html(full_html=False)
+
+        # Devolver el HTML del gráfico
+        return HTMLResponse(content=html_content, media_type="text/html")
     
     except Exception as e:
-        return {"error": f"Ocurrió un error al procesar la solicitud: {e}"}
+        return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
     
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 @app.get("/grafico-especialidad/", response_class=HTMLResponse)
