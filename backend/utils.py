@@ -440,9 +440,7 @@ def colectivos(dataframe):
         yaxis_tickfont=dict(size=16),
         plot_bgcolor="white",  # Fondo blanco para el área del gráfico
         paper_bgcolor="white",  # Fondo blanco para el gráfico completo
-        showlegend=False,  # No mostrar la leyenda
-        xaxis_tickangle=45  # Rotar las etiquetas del eje X para mejor visibilidad
-    )
+        showlegend=False)
 
     return fig
 
