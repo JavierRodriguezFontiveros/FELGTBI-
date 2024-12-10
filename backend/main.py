@@ -845,7 +845,7 @@ async def personalizar_prompt_usuario_ss(user_data: UserData):
             try:
                 query = """
                     SELECT ambito_laboral, provincia
-                    FROM sociosanit_formulario
+                    FROM sociosanitarios_formulario
                     WHERE id_usuario = %s
                 """
                 cursor.execute(query, (id_usuario,))
