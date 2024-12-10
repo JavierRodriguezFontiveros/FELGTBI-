@@ -626,7 +626,7 @@ async def submit_data(user_data: UserData):
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 class WorkEnvironment(str, Enum):
-    centro_salud = "Centro de Salud"
+    centro_salud = "Centro de salud"
     hospital = "Hospital"
     centro_comunitario = "Centro comunitario"
     consulta_privada = "Consulta privada"
