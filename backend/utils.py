@@ -407,7 +407,7 @@ def graficar_permiso_residencia_html(dataframe):
             paper_bgcolor='white',
             title_font=dict(size=22),
             legend=dict(
-                x=0.9,
+                x=0.7,
                 y=0.7
             ),
             legend_font=dict(size=14),
