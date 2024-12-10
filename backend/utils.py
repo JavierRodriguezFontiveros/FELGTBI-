@@ -373,6 +373,8 @@ def barras_apiladas_genero_orientacion_html(dataframe):
 
 
 
+#Gráfico Editado
+
 def graficar_permiso_residencia_html(dataframe):
     """
     Genera un gráfico de pastel (pie chart) sobre la distribución de permisos de residencia,
@@ -389,15 +391,7 @@ def graficar_permiso_residencia_html(dataframe):
         permiso_count = dataframe['permiso_residencia'].value_counts().reset_index()
         permiso_count.columns = ['Permiso de Residencia', 'Cantidad']
 
-        # Calcular los porcentajes
-        total = permiso_count['Cantidad'].sum()
-        permiso_count['Porcentaje'] = (permiso_count['Cantidad'] / total) * 100
-
-        # Calcular el índice de la sección con el valor más grande
-        max_value_index = permiso_count['Cantidad'].idxmax()
-
-        # Crear un vector donde la porción con el valor más grande será destacada
-        pull_values = [0 if i != max_value_index else 0.1 for i in range(len(permiso_count))]
+        permiso_count['Permiso de Residencia'] = permiso_count['Permiso de Residencia'].map({True: 'Con Permiso', False: 'Sin Permiso'})
 
         # Crear gráfico de pastel (pie chart) con cantidades y porcentajes
         fig = px.pie(permiso_count,
@@ -408,17 +402,26 @@ def graficar_permiso_residencia_html(dataframe):
                     color='Permiso de Residencia',
                     color_discrete_sequence=px.colors.qualitative.Pastel,
                     hole=0.3) 
-
-        # Añadir texto de porcentajes y cantidades dentro del gráfico
-        fig.update_traces(pull=pull_values)
+        
+        fig.update_layout(
+            title={
+                'text': "Distribución de Permisos de Residencia<br><span style='font-size:18px;color:gray;'>El gráfico muestra la proporción de usuarios con y sin permiso de residencia.</span>",
+                'x': 0.5,  # Centrado horizontalmente
+                'xanchor': 'center'},
+            plot_bgcolor='white',
+            paper_bgcolor='white',
+            title_font=dict(size=22),
+            legend_font=dict(size=14),
+            legend=dict(
+                x=0.7,
+                y=0.9
+            )
+            )
 
         # Exportar el gráfico como HTML
         return fig.to_html(full_html=False)
     except Exception as e:
         raise RuntimeError(f"Error al generar el gráfico: {e}")
-    
-    return fig
-
 
 
 
