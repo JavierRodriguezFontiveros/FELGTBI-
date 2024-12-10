@@ -634,6 +634,7 @@ class WorkEnvironment(str, Enum):
     otro = "Otro"
 
 class SociosanitaryData(BaseModel):
+    id_usuario: str
     provincia: Province
     ambito_laboral: WorkEnvironment 
 
@@ -649,13 +650,14 @@ async def submit_data(sociosanitary_data: SociosanitaryData):
     # Aquí ajustamos la consulta y los datos
     query = """
             INSERT INTO sociosanitarios_formulario (provincia, 
-                                                    ambito_laboral)
-            VALUES (%(provincia)s, %(ambito_laboral)s)
+                                                    ambito_laboral, id_usuario)
+            VALUES (%(provincia)s, %(ambito_laboral)s, %(id_usuario)s)
     """
     
     data = {
             "provincia": sociosanitary_data.provincia,
-            "ambito_laboral": sociosanitary_data.ambito_laboral
+            "ambito_laboral": sociosanitary_data.ambito_laboral,
+            "id_usuario": sociosanitary_data.id_usuario
             }
 
     try:

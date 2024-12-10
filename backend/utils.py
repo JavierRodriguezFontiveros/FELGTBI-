@@ -356,13 +356,13 @@ def graficar_permiso_residencia_html(dataframe):
 
         # Crear gráfico de pastel (pie chart) con cantidades y porcentajes
         fig = px.pie(permiso_count,
-                     names='Permiso de Residencia',
-                     values='Cantidad',
-                     title='Distribución de Permisos de Residencia',
-                     labels={'Permiso de Residencia': 'Tipo de Permiso'},
-                     color='Permiso de Residencia',
-                     color_discrete_sequence=px.colors.qualitative.Pastel,
-                     hole=0.3) 
+                    names='Permiso de Residencia',
+                    values='Cantidad',
+                    title='Distribución de Permisos de Residencia',
+                    labels={'Permiso de Residencia': 'Tipo de Permiso'},
+                    color='Permiso de Residencia',
+                    color_discrete_sequence=px.colors.qualitative.Pastel,
+                    hole=0.3) 
 
         # Añadir texto de porcentajes y cantidades dentro del gráfico
         fig.update_traces(pull=pull_values)
