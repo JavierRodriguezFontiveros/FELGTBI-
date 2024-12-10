@@ -865,13 +865,16 @@ async def personalizar_prompt_usuario_no_ss(user_data: UserData):
     
 
 @app.post("/personalizar_prompt_usuario_ss")
-async def personalizar_prompt_usuario_ss(data: list):
+async def personalizar_prompt_usuario_ss(data: dict):
     print(f"API Key en uso: {gemini_api_key}")
     try:
-        if len(data) < 4:
-            return {"error": "Formato de datos no válido. Se requieren al menos 4 elementos en la lista."}
+        # Extraer el array del JSON
+        values = list(data.values())[0]  # Extrae el array contenido en el JSON
 
-        id_usuario, titulo, pregunta, eleccion = data[:4]
+        if not isinstance(values, list) or len(values) < 5:
+            return {"error": "Formato de datos no válido. El array debe contener al menos 5 elementos."}
+
+        id_usuario, titulo, tipo_personal, pregunta, eleccion = values[:5]
 
         if not id_usuario or not isinstance(id_usuario, str) or not id_usuario.isalnum():
             return {"error": "ID de usuario no válido."}
@@ -1172,11 +1175,11 @@ if __name__ == "__main__":
 # }
 # SOCIOSANITARIO
 # {[
-# djashfkahksfjk
+# 789abc
 #     "Especialidad",
 #     "Personal sanitario",
 #     "¿Qué necesitas como personal sanitario?",
-#     "Tratamientos (PREP, TAR)"
+#     "Manejo clínico de pacientes con VIH"
 # ]}
 # NO SOCIOSANITARIO
 # [
