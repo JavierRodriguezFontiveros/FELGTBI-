@@ -724,16 +724,23 @@ def generar_respuesta_final(prompt_chat, memory):
 
 
 @app.post("/personalizar_prompt_usuario_no_ss")
-async def personalizar_prompt_usuario_no_ss(data: list):
+async def personalizar_prompt_usuario_no_ss(data: dict):
     print(f"API Key en uso: {gemini_api_key}")
 
     try:
-        if not isinstance(data, list) or len(data) < 2:
-            return {"error": "Formato de datos no válido. Se requiere un array con al menos dos elementos."}
+        # Validar que el JSON tiene la estructura esperada
+        if "data" not in data or not isinstance(data["data"], list):
+            return {"error": "Formato de datos no válido. Se requiere un JSON con la clave 'data' y un array de valores."}
 
-        # Extraer el ID del usuario y la primera pregunta
-        id_usuario = data[0]
-        situacion = data[1]
+        # Extraer el array del JSON
+        values = data["data"]
+
+        if len(values) < 2:
+            return {"error": "El array debe contener al menos dos elementos."}
+
+        # Extraer el ID del usuario y la situación
+        id_usuario = values[0]
+        situacion = values[2]  # Según el formato, la situación está en el tercer elemento
 
         if not id_usuario or not isinstance(id_usuario, str) or not id_usuario.isalnum():
             return {"error": "ID de usuario no válido."}
@@ -773,14 +780,29 @@ async def personalizar_prompt_usuario_no_ss(data: list):
             connection.close()
             return {"error": f"Error al procesar la solicitud: {str(e)}"}
 
-        # Construcción del prompt en función de la situación
-        if situacion == "Creo que me he expuesto al virus":
-            tiempo_exposicion = data[3]
-            acceso_medico = data[5]
-            tipo_exposicion = data[7]
-            chem_sex = data[9]
-            conocimiento_pep = data[11]
-            preocupacion = data[13]
+        # Construcción del prompt basado en la situación
+        prompt = ""
+        if situacion == "Tengo VIH":
+            tiempo_diagnostico = values[4]
+            en_tratamiento = values[6]
+            acceso_medico = values[8]
+            informacion_necesaria = values[10]
+
+            prompt = (
+                f"Mis pronombres son: {pronombres}. \n"
+                f"Vivo en {provincia}. Dame respuestas orientadas a ese lugar.\n"
+                f"Tengo VIH diagnosticado desde {tiempo_diagnostico}. \n"
+                f"¿Estoy en tratamiento TAR? {en_tratamiento}. \n"
+                f"Tengo acceso a un médico: {acceso_medico}. \n"
+                f"Necesito información sobre: {informacion_necesaria}."
+            )
+        elif situacion == "Creo que me he expuesto al virus":
+            tiempo_exposicion = values[4]
+            acceso_medico = values[6]
+            tipo_exposicion = values[8]
+            chem_sex = values[10]
+            conocimiento_pep = values[12]
+            preocupacion = values[14]
 
             prompt = (
                 f"Mis pronombres son: {pronombres}. \n"
@@ -789,14 +811,50 @@ async def personalizar_prompt_usuario_no_ss(data: list):
                 f"El tipo de exposición fue: {tipo_exposicion}. \n"
                 f"{chem_sex}, ha sido en un entorno de chem-sex. \n"
                 f"Tengo acceso médico: {acceso_medico}. \n"
-                f"Quiero más información sobre la PEP: {conocimiento_pep}. \n"
+                f"Quiero más información sobre la PEP. \n"
                 f"Compartí mi preocupación con: {preocupacion}."
             )
+        elif situacion == "Quiero saber más sobre el vih/sida":
+            tema_informacion = values[4]
+
+            prompt = (
+                f"Mis pronombres son: {pronombres}. \n"
+                f"Vivo en {provincia}. Dame respuestas orientadas a ese lugar.\n"
+                f"Quiero información sobre: {tema_informacion}."
+            )
+        elif situacion == "Estoy apoyando a una persona seropositiva":
+            acceso_grupos = values[4]
+            preocupacion = values[6]
+            apoyo_necesario = values[8]
+
+            prompt = (
+                f"Mis pronombres son: {pronombres}. \n"
+                f"Vivo en {provincia}. Dame respuestas orientadas a ese lugar.\n"
+                f"Estoy apoyando a una persona seropositiva. {acceso_grupos}.\n"
+                f"Compartí mi preocupación con: {preocupacion}. \n"
+                f"Me gustaría orientación para conseguir: {apoyo_necesario}."
+            )
         else:
-            return {"error": "Situación no soportada."}
+            return {"error": f"Situación no soportada: '{situacion}'"}
 
         # Generar respuesta del chatbot
         respuesta_chatbot = generar_respuesta(prompt)
+        raw_data = data["data"]
+
+        # Query adaptada
+        query = """INSERT INTO respuestas_chatbot_nosanitarios 
+        (id_usuario, pregunta1, respuesta1, pregunta2, respuesta2, pregunta3, respuesta3, 
+        pregunta4, respuesta4, pregunta5, respuesta5, pregunta6, respuesta6, pregunta7, respuesta7) 
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+
+        # Asignar los datos a los placeholders
+        datos_no_ss = (
+            raw_data[0], raw_data[1], raw_data[2], raw_data[3], raw_data[4], 
+            raw_data[5], raw_data[6], raw_data[7], raw_data[8], raw_data[9], 
+            raw_data[10], raw_data[11], raw_data[12], raw_data[13], raw_data[14]
+        )
+        cursor.execute(query, datos_no_ss)
+        connection.commit()
 
         # Insertar respuesta en la base de datos
         query = '''
@@ -875,6 +933,23 @@ async def personalizar_prompt_usuario_ss(data: dict):
         )
 
         respuesta_chatbot = generar_respuesta(prompt)
+
+### GUARDAR CONSULTAS Y EL ARBOL DE CHAT
+        raw_data = data["data"]
+
+        # Query adaptada
+        query = """INSERT INTO respuestas_chatbot_sanitarios 
+        (id_usuario, pregunta1, respuesta1, pregunta2, respuesta2) 
+        VALUES (%s, %s, %s, %s, %s)"""
+
+        # Asignar los datos a los placeholders
+        datos_ss = (
+            raw_data[0], raw_data[1], raw_data[2], raw_data[3], raw_data[4]
+        )
+
+        # Aquí iría la ejecución en tu conexión a la base de datos
+        cursor.execute(query, datos_ss)
+        connection.commit()
 
         query = ''' INSERT INTO respuestas_modelo (id_usuario, respuesta_modelo)
                         VALUES (%s, %s);'''
@@ -1126,17 +1201,22 @@ if __name__ == "__main__":
 #   }
 # }
 
-# {
-#   "data": {
-#     "2.1": {
-#       "id_usuario" : "789abc",
-#       "titulo": "Personal sanitario",
-#       "preguntas": {
-#         "¿Qué necesitas?" : ["Manejo clínico de pacientes con VIH"]
-#       }
-#     }
-#   }
-# }
+# NO SOCIOSANITARIO
+# { "data" : [
+#     "1234abcd",
+#     "¿Cuál es tu situación?",
+#     "Tengo VIH",
+#     "¿Cuándo te diagnosticaron?",
+#     "Hace menos de 6 meses",
+#     "¿Estás en tratamiento TAR?",
+#     "Sí",
+#     "¿Tienes acceso a un médico?",
+#     "Sí",
+#     "¿Quieres información sobre algún tema?",
+#     "Sí",
+#     "¿Sabes qué es la PEP?",
+#     "Apoyo psicológico"
+# ]}
 # SOCIOSANITARIO
 # {[
 # 789abc
@@ -1145,21 +1225,3 @@ if __name__ == "__main__":
 #     "¿Qué necesitas como personal sanitario?",
 #     "Manejo clínico de pacientes con VIH"
 # ]}
-# NO SOCIOSANITARIO
-# [
-# 237387273bfnasfbjsajdsa
-#     "¿Cuál es tu situación?",
-#     "Creo que me he expuesto al virus",
-#     "¿Cuándo ocurrió la posible infección?",
-#     "Últimas 72 horas",
-#     "¿Tienes acceso a un médico?",
-#     "Sí",
-#     "¿Qué tipo de exposición fue?",
-#     "Aguja compartida",
-#     "¿Ha sido en un entorno de 'chem-sex'?",
-#     "Sí",
-#     "¿Sabes qué es la PEP?",
-#     "Sí, quiero más información",
-#     "¿Has compartido tu preocupación con alguien?",
-#     "Compañere de trabajo"
-# ]
