@@ -777,8 +777,6 @@ async def personalizar_prompt_usuario_no_ss(user_data: UserData):
                         cursor.close()
                         connection.close()
                     return {"error": f"Error al procesar la solicitud: {str(e)}"}
-                cursor.close()
-                connection.close()
 ## TRAS EXTRAER DATOS, CONFECCIONAR PROMPT
                 if key.startswith("1.1"):
                     tiempo_diagnostico = preguntas.get("¿Cuándo te diagnosticaron?", [""])[0]
@@ -835,13 +833,27 @@ async def personalizar_prompt_usuario_no_ss(user_data: UserData):
                 # Generar la respuesta del modelo
                 respuesta_chatbot = generar_respuesta(prompt)
 
-                # Devolver la respuesta del chatbot
+                query = ''' INSERT INTO respuestas_modelo (respuesta_chatbot, id_usuario)
+                            VALUES (%s, %s);'''
+                valores = (respuesta_chatbot, id_usuario)
+
+                cursor.execute(query, valores)
+                connection.commit()
+                cursor.close()
+                connection.close()
+                print("Datos insertados correctamente.")
                 return {"respuesta_chatbot": respuesta_chatbot}
+
         else:
             prompt = "Título: "
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+    finally:
+        cursor.close()
+        connection.close()
+        print("Conexión cerrada")
     
 
 @app.post("/personalizar_prompt_usuario_ss")
@@ -880,9 +892,6 @@ async def personalizar_prompt_usuario_ss(user_data: UserData):
                 connection.close()
                 return {"error": f"Error al procesar la solicitud: {str(e)}"}
 
-            cursor.close()
-            connection.close()
-
             eleccion = preguntas.get("¿Qué necesitas?", [" "])[0]
             prompt = (
                 f"Mi pronombre es el neutro (elle). "
@@ -892,10 +901,25 @@ async def personalizar_prompt_usuario_ss(user_data: UserData):
             )
 
             respuesta_chatbot = generar_respuesta(prompt)
+
+            query = ''' INSERT INTO respuestas_modelo (respuesta_chatbot, id_usuario)
+                        VALUES (%s, %s);'''
+            valores = (respuesta_chatbot, id_usuario)
+
+            cursor.execute(query, valores)
+            connection.commit()
+            cursor.close()
+            connection.close()
+            print("Datos insertados correctamente.")
             return {"respuesta_chatbot": respuesta_chatbot}
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))    
+        raise HTTPException(status_code=500, detail=str(e))
+    
+    finally:
+        cursor.close()
+        connection.close()
+        print("Conexión cerrada")
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
