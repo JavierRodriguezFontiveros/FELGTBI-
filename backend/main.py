@@ -691,6 +691,28 @@ def generar_respuesta(prompt):
     except Exception as e:
         print(f"Error en generar_respuesta: {e}")
         return f"Error al generar respuesta para historia: {str(e)}"
+    
+def generar_respuesta_final(prompt):
+    try:
+        def call_model():
+            model = genai.GenerativeModel("gemini-1.5-flash")
+            return model.generate_content(prompt + prompt_basico_chat)
+
+        # Usar un executor para manejar el tiempo límite
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(call_model)
+            response = future.result(timeout=30)  # Tiempo límite de 30 segundos
+
+        # Verificar si la respuesta es válida
+        if not response or not hasattr(response, 'text'):
+            raise ValueError("Respuesta vacía o no válida del modelo.")
+        return response.text
+    except concurrent.futures.TimeoutError:
+        print("El modelo tomó demasiado tiempo en responder.")
+        return "Error: El modelo tardó demasiado en responder."
+    except Exception as e:
+        print(f"Error en generar_respuesta: {e}")
+        return f"Error al generar respuesta para historia: {str(e)}"
 
 
 @app.post("/personalizar_prompt_usuario_no_ss")
@@ -875,6 +897,19 @@ async def personalizar_prompt_usuario_ss(user_data: UserData):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))    
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+### CHATBOT FINAL DE CONVERSACIÓN, ENTRADA DE TEXTO
+@app.get("/chatbot")
+async def chatbot(consulta: str = Query(None), memory = str):  ## IMPORTAR QUERY EN FASTAPI
+
+    try:
+        respuesta = generar_respuesta(consulta)
+        return {"respuesta_chatbot": respuesta}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
