@@ -11,3 +11,4 @@ ipython==8.12.3
 nbformat>=4.2.0
 googlemaps==4.10.0
 langchain_community==0.3.8
+python-multipart==0.0.19

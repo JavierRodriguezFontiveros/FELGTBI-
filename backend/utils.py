@@ -377,48 +377,41 @@ def barras_apiladas_genero_orientacion_html(dataframe):
 
 def graficar_permiso_residencia_html(dataframe):
     """
-    Genera un gráfico de pastel (pie chart) sobre la distribución de permisos de residencia (solo True),
+    Genera un gráfico de pastel (pie chart) sobre la distribución de permisos de residencia,
     basado en un DataFrame dado, y lo devuelve como HTML.
-
     Args:
         dataframe (pd.DataFrame): DataFrame con la columna 'permiso_residencia'.
-
     Returns:
         str: El contenido HTML del gráfico generado.
     """
     try:
-        # Filtrar solo los valores True en 'permiso_residencia'
-        permiso_count = dataframe[dataframe['permiso_residencia'] == True].value_counts().reset_index(name='Cantidad')
+        # Contar las frecuencias de los valores en la columna 'permiso_residencia'
+        permiso_count = dataframe['permiso_residencia'].value_counts().reset_index()
         permiso_count.columns = ['Permiso de Residencia', 'Cantidad']
-
-        # Mapear el valor True a un texto descriptivo
-        permiso_count['Permiso de Residencia'] = permiso_count['Permiso de Residencia'].map({True: 'Con Permiso'})
-
-        # Crear gráfico de pastel (pie chart) con cantidades y porcentajes
+        # Cambiar los valores True/False por 'Con Permiso' y 'Sin Permiso'
+        permiso_count['Permiso de Residencia'] = permiso_count['Permiso de Residencia'].map({True: 'Con Permiso', False: 'Sin Permiso'})
+        # Crear gráfico de pastel (pie chart) con cantidades
         fig = px.pie(permiso_count,
-                    names='Permiso de Residencia',
-                    values='Cantidad',
-                    title='Distribución de Permisos de Residencia (Con Permiso)',
-                    labels={'Permiso de Residencia': 'Tipo de Permiso'},
-                    color='Permiso de Residencia',
-                    color_discrete_sequence=px.colors.qualitative.Pastel,
-                    hole=0.3)
-
+                     names='Permiso de Residencia',
+                     values='Cantidad',
+                     title='Distribución de Permisos de Residencia',
+                     color='Permiso de Residencia',
+                     color_discrete_sequence=px.colors.qualitative.Pastel,
+                     hole=0.3)
         fig.update_layout(
             title={
-                'text': "Distribución de Permisos de Residencia<br><span style='font-size:18px;color:gray;'>Solo usuarios con permiso de residencia.</span>",
+                'text': "Distribución de Permisos de Residencia<br><span style='font-size:18px;color:gray;'>El gráfico muestra la proporción de usuarios con y sin permiso de residencia.</span>",
                 'x': 0.5,  # Centrado horizontalmente
                 'xanchor': 'center'},
             plot_bgcolor='white',
             paper_bgcolor='white',
             title_font=dict(size=22),
-            legend_font=dict(size=14),
             legend=dict(
-                x=0.7,
-                y=0.9
-            )
+                x=0.9,
+                y=0.7
+            ),
+            legend_font=dict(size=14),
         )
-
         # Exportar el gráfico como HTML
         return fig.to_html(full_html=False)
     except Exception as e:
