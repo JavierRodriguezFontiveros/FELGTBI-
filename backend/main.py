@@ -9,7 +9,7 @@ from fastapi.responses import StreamingResponse
 import io
 import matplotlib.pyplot as plt
 
-from utils import colectivos,connect_to_db,fetch_all_from_table, prompt_basico, modify_table_records, prompt_basico_chat, memory
+from utils import colectivos,connect_to_db,fetch_all_from_table, prompt_basico, modify_table_records
 
 from io import BytesIO
 
