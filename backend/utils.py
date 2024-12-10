@@ -161,6 +161,9 @@ import plotly.express as px
 
 
 
+import pandas as pd
+import plotly.express as px
+
 def create_bar_chart_plotly_html(df):
     try:
         # Definir los rangos de edades y las etiquetas correspondientes
@@ -192,7 +195,7 @@ def create_bar_chart_plotly_html(df):
             ajuste_indices = edad_grupo.nlargest(diferencia, 'residuo').index
             edad_grupo.loc[ajuste_indices, 'porcentaje_entero'] += 1
 
-        # Crear el gráfico de barras con colores únicos para cada barra
+        # Crear el gráfico de barras con un solo color
         fig = px.bar(
             edad_grupo,
             x='grupo_edad',
@@ -200,25 +203,27 @@ def create_bar_chart_plotly_html(df):
             title="Distribución de Edad",
             labels={'grupo_edad': "Grupo de Edad", 'porcentaje_entero': "Porcentaje (%)"},
             text='porcentaje_entero',
-            color='grupo_edad',  # Usar grupo de edad para asignar colores únicos
-            color_discrete_sequence=px.colors.qualitative.Pastel
+            color_discrete_sequence=["#F1A7C2"],  # Usar color rosa de la paleta Pastel
         )
 
         # Ajustar diseño del gráfico
         fig.update_traces(textposition='outside')  # Mostrar texto fuera de las barras
 
+        # Eliminar la leyenda
         fig.update_layout(
             xaxis_title="Grupo de Edad", 
             yaxis_title="Porcentaje (%)",
             xaxis=dict(tickangle=0),
             plot_bgcolor="white",  # Fondo del área del gráfico
-            paper_bgcolor="white"  # Fondo general del gráfico
+            paper_bgcolor="white",  # Fondo general del gráfico
+            showlegend=False  # Eliminar la leyenda
         )
 
         # Exportar el gráfico como HTML
         return fig.to_html(full_html=False)
     except Exception as e:
         raise RuntimeError(f"Error al generar el gráfico: {e}")
+
 
 
 
