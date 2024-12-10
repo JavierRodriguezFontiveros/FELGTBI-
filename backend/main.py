@@ -9,7 +9,7 @@ from fastapi.responses import StreamingResponse
 import io
 import matplotlib.pyplot as plt
 
-from utils import graficar_combinaciones, buscar_ciudad, obtener_top_5_ciudades,connect_to_db,fetch_all_from_table, prompt_basico, prueba, modify_table_records
+from utils import graficar_combinaciones,connect_to_db,fetch_all_from_table, prompt_basico, prueba, modify_table_records
 
 from io import BytesIO
 
@@ -78,7 +78,7 @@ Hola buenas bienvenido a este proyecto de tripulaciones
 
 
 
-from utils import create_bar_chart_plotly_html,barras_apiladas_genero_orientacion_html,graficar_permiso_residencia_html,graficar_especialidad_html, grafico_pie,graficar_top_5_ciudades
+from utils import create_bar_chart_plotly_html,barras_apiladas_genero_orientacion_html,graficar_permiso_residencia_html,graficar_especialidad_html, grafico_pie,graficar_top_5_ciudades,check_admin_details
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ###FUNCIONA###
 @app.get("/bar-chart/", response_class=HTMLResponse)
