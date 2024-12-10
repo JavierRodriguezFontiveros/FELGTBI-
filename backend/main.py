@@ -9,7 +9,7 @@ from fastapi.responses import StreamingResponse
 import io
 import matplotlib.pyplot as plt
 
-from utils import graficar_combinaciones, connect_to_db,fetch_all_from_table, prompt_basico, prueba, modify_table_records
+from utils import graficar_combinaciones, buscar_ciudad, obtener_top_5_ciudades,connect_to_db,fetch_all_from_table, prompt_basico, prueba, modify_table_records
 
 from io import BytesIO
 
@@ -1096,7 +1096,8 @@ async def preguntas_user():
         return {"error": f"Ha ocurrido algún problema obteniendo las preguntas: {e}"}
 
 
-
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 
 
@@ -1110,6 +1111,8 @@ def get_table_data(table_name: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail="Internal server error")
 
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 @app.put("/modify-records/")
 async def modify_records_endpoint(
@@ -1127,6 +1130,25 @@ async def modify_records_endpoint(
         raise HTTPException(status_code=500, detail=str(re))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {e}")
+    
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+
+class AdminLogin(BaseModel):
+    email: str
+    password: str
+
+@app.post("/admin/login")
+async def admin_login(admin: AdminLogin):
+    # Call the check_admin_details function with the provided email and password
+    is_valid = check_admin_details(admin.email, admin.password)
+    
+    if is_valid:
+        return {"message": "Login successful"}
+    else:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

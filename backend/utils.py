@@ -96,6 +96,28 @@ def modify_table_records(table_name:str, column:str, new_value:str, id:int) -> N
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+def check_admin_details(email: str, password: str) -> bool:
+    conn = connect_to_db()  
+    if not conn:
+        raise RuntimeError("Database connection could not be established.")
+    
+    try:
+        with conn.cursor() as cur:
+            query = "SELECT * FROM admin_data WHERE email = %s AND password = %s;"
+            cur.execute(query, (email, password))
+            result = cur.fetchone()
+            if result:
+                return True  # Valid credentials
+            else:
+                return False  # Invalid credentials
+        
+    except Exception as e:
+        raise RuntimeError(f"Error fetching data: {e}")
+    finally:
+        conn.close()
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 prompt_basico = (
     "Eres un experto sociosanitario especializado en vih y sida. Pero no digas que lo eres, actúa como tal."
     "Siempre que escribas 'vih', lo haces en minúscula, sin excepción. "
