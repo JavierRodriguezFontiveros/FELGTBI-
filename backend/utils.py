@@ -400,17 +400,16 @@ def graficar_permiso_residencia_html(dataframe):
 
 
 ###EDITADA###
-
 def colectivos(dataframe):
-    # Contar las ocurrencias de cada valor en las 5 variables
+    # Columnas que contienen las condiciones
     columnas = ['persona_racializada', 'persona_discapacitada', 'persona_sin_hogar', 'persona_migrante', 'persona_intersexual']
     
     conteos = []
 
-    # Realizar el conteo de cada valor en las columnas
+    # Realizar el conteo de True para cada columna
     for columna in columnas:
-        conteo = dataframe[columna].value_counts().reset_index()
-        conteo.columns = [columna, 'Cantidad']
+        conteo_true = dataframe[columna].sum()  # Contamos cuántos valores True hay
+        conteo = pd.DataFrame({columna: [columna], 'Cantidad': [conteo_true]})
         conteo['Condición'] = columna
         conteos.append(conteo)
 
@@ -420,29 +419,30 @@ def colectivos(dataframe):
     # Ordenar por la cantidad de forma descendente
     df_conteos = df_conteos.sort_values(by='Cantidad', ascending=False)
 
-    # Crear un gráfico de barras para mostrar el conteo de cada valor
+    # Crear un gráfico de barras para mostrar el conteo de True en cada columna
     fig = px.bar(df_conteos, 
                  x='Condición', 
                  y='Cantidad', 
                  color='Condición',
-                 title="Frecuencia de Condiciones por Variable",
+                 title="Frecuencia de Condiciones por Variable (Solo True)",
                  labels={'Cantidad': 'Número de Personas', 'Condición': 'Variable'},
                  color_discrete_sequence=px.colors.qualitative.Pastel)
 
     # Personalizar el gráfico
-    fig.update_layout(
-        title={'text': "Frecuencia de Condiciones por Variable<br><span style='font-size:14px;color:gray;'>El gráfico muestra el número de personas en cada condición.</span>",
-               'x': 0.5, 'xanchor': 'center'},
-        title_font=dict(size=22),
-        xaxis_title_font=dict(size=18),
-        yaxis_title_font=dict(size=18),
-        xaxis_tickfont=dict(size=16),
-        yaxis_tickfont=dict(size=16),
-        plot_bgcolor="white",  # Fondo blanco para el área del gráfico
-        paper_bgcolor="white",  # Fondo blanco para el gráfico completo
-        showlegend=False)
+    fig.update_layout(title={'text': "Frecuencia de Condiciones por Variable (Solo True)<br><span style='font-size:14px;color:gray;'>El gráfico muestra cuántas personas tienen cada condición como True.</span>",
+                            'x': 0.5, 
+                            'xanchor': 'center'},
+                      title_font=dict(size=22),
+                      xaxis_title_font=dict(size=18),
+                      yaxis_title_font=dict(size=18),
+                      xaxis_tickfont=dict(size=16),
+                      yaxis_tickfont=dict(size=16),
+                      plot_bgcolor="white",  
+                      paper_bgcolor="white",  
+                      showlegend=False)
 
     return fig
+
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
