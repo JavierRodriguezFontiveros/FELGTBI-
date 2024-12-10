@@ -9,7 +9,7 @@ from fastapi.responses import StreamingResponse
 import io
 import matplotlib.pyplot as plt
 
-from utils import colectivos,connect_to_db,fetch_all_from_table, prompt_basico, modify_table_records
+from utils import colectivos,connect_to_db,fetch_all_from_table, prompt_basico, modify_table_records,ambito_laboral
 
 from io import BytesIO
 
@@ -253,8 +253,8 @@ def generate_bar_chart():
         return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
     
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-@app.get("/grafico-especialidad/", response_class=HTMLResponse)
-def generar_grafico_especialidad():
+@app.get("/grafico-ambito_laboral/", response_class=HTMLResponse)
+def ambito_laboral():
     """
     Endpoint para generar y mostrar un gráfico de especialidades en HTML.
     """
@@ -271,7 +271,7 @@ def generar_grafico_especialidad():
         df = pd.read_sql_query(query, connection)
 
         # Generar el gráfico de especialidades como HTML
-        html_content = graficar_especialidad_html(df)
+        html_content = ambito_laboral(df)
 
         # Devolver el HTML como respuesta
         return HTMLResponse(content=html_content, media_type="text/html")
