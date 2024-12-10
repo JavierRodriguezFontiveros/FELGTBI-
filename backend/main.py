@@ -80,7 +80,7 @@ Hola buenas bienvenido a este proyecto de tripulaciones
 
 
 
-from utils import create_bar_chart_plotly_html,barras_apiladas_genero_orientacion_html,graficar_permiso_residencia_html,graficar_especialidad_html, grafico_pie,graficar_top_5_ciudades,check_admin_details
+from utils import create_bar_chart_plotly_html,barras_apiladas_genero_orientacion_html,graficar_permiso_residencia_html, grafico_pie,graficar_top_5_ciudades,check_admin_details
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ###FUNCIONA_EDITADA###
 @app.get("/bar-chart/", response_class=HTMLResponse)
