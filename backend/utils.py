@@ -156,6 +156,11 @@ def grafico_pie(dataframe, viven_espana=True):
 import pandas as pd
 import plotly.express as px
 
+import pandas as pd
+import plotly.express as px
+
+
+
 def create_bar_chart_plotly_html(df):
     try:
         # Definir los rangos de edades y las etiquetas correspondientes
@@ -187,14 +192,17 @@ def create_bar_chart_plotly_html(df):
             ajuste_indices = edad_grupo.nlargest(diferencia, 'residuo').index
             edad_grupo.loc[ajuste_indices, 'porcentaje_entero'] += 1
 
-        # Crear el gráfico de barras con Plotly
-        fig = px.bar(edad_grupo,
-                     x='grupo_edad',
-                     y='porcentaje_entero',
-                     title="Distribución de Edad",
-                     labels={'grupo_edad': "Grupo de Edad", 'porcentaje_entero': "Porcentaje (%)"},
-                     text='porcentaje_entero',
-                     color_discrete_sequence=px.colors.qualitative.Pastel)
+        # Crear el gráfico de barras con colores únicos para cada barra
+        fig = px.bar(
+            edad_grupo,
+            x='grupo_edad',
+            y='porcentaje_entero',
+            title="Distribución de Edad",
+            labels={'grupo_edad': "Grupo de Edad", 'porcentaje_entero': "Porcentaje (%)"},
+            text='porcentaje_entero',
+            color='grupo_edad',  # Usar grupo de edad para asignar colores únicos
+            color_discrete_sequence=px.colors.qualitative.Pastel
+        )
 
         # Ajustar diseño del gráfico
         fig.update_traces(textposition='outside')  # Mostrar texto fuera de las barras
@@ -212,7 +220,8 @@ def create_bar_chart_plotly_html(df):
     except Exception as e:
         raise RuntimeError(f"Error al generar el gráfico: {e}")
 
-    
+
+
 
 
 
