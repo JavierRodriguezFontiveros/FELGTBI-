@@ -28,11 +28,11 @@ def connect_to_db():
     #Probando la conexión:
     try:
         connection = psycopg2.connect(host=db_host,
-                                      database=db_database,
-                                      user=db_username,
-                                      password=db_password,
-                                      port=db_port,
-                                      sslmode="require")
+                                    database=db_database,
+                                    user=db_username,
+                                    password=db_password,
+                                    port=db_port,
+                                    sslmode="require")
         
         print("Conexión exitosa a la base de datos PostgreSQL con SSL")
         return connection  
@@ -283,12 +283,12 @@ def graficar_combinaciones(dataframe):
     
     # Configuración gráfico de barras
     fig = px.bar(combinaciones, 
-                 x='Combinación', 
-                 y='Cantidad', 
-                 title='Frecuencia de Combinaciones de Condiciones',
-                 labels={'Combinación': 'Combinación de Condiciones', 'Cantidad': 'Número de Personas'},
-                 color='Cantidad',
-                 color_continuous_scale='Viridis')
+                x='Combinación', 
+                y='Cantidad', 
+                title='Frecuencia de Combinaciones de Condiciones',
+                labels={'Combinación': 'Combinación de Condiciones', 'Cantidad': 'Número de Personas'},
+                color='Cantidad',
+                color_continuous_scale='Viridis')
 
     # Etiquetas en el gráfico
     fig.update_layout(xaxis_tickangle=45)
