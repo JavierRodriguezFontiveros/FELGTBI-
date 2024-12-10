@@ -696,7 +696,7 @@ def generar_respuesta_final(prompt_chat, memory):
     try:
         def call_model():
             model = genai.GenerativeModel("gemini-1.5-flash")
-            return model.generate_content("Teniendo en cuenta lo qeu acabamos de hablar (" + str(memory) + "), resuélveme esta consulta:" + prompt_chat)
+            return model.generate_content("Teniendo en cuenta lo que acabamos de hablar (" + str(memory) + "), resuélveme esta consulta:" + prompt_chat)
 
         # Usar un executor para manejar el tiempo límite
         with concurrent.futures.ThreadPoolExecutor() as executor:
