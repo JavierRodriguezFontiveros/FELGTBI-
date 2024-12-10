@@ -154,38 +154,31 @@ def grafico_pie(dataframe, viven_espana=True):
     return fig
 
 def create_bar_chart_plotly_html(df):
-
     try:
-        # Definir los rangos de edades y las etiquetas correspondientes
+
         bins = [0, 15, 19, 24, 29, 39, 49, 59, 100]
         labels = ['Menores de 16', 'Adolescentes (15-19)', 'Jóvenes adultos (20-24)', 
                   'Adultos jóvenes (25-29)', 'Adultos en plena madurez (30-39)', 
                   'Adultos maduros (40-49)', 'Adultos mayores (50-59)', 'Mayores de 60']
 
-        # Asegurarse de que la columna 'edad' está en formato numérico
         df['edad'] = pd.to_numeric(df['edad'], errors='coerce')
 
-        # Crear una nueva columna 'grupo_edad' con las categorías de edad
         df['grupo_edad'] = pd.cut(df['edad'], bins=bins, labels=labels, right=False)
 
-        # Contar la cantidad de personas en cada grupo de edad
         edad_grupo = df.groupby('grupo_edad').size().reset_index(name='cantidad')
 
-        # Crear el gráfico de barras con Plotly
-        fig = px.bar(
-            edad_grupo,
-            x='grupo_edad',
-            y='cantidad',
-            title="Distribución de Edad por Grupo",
-            labels={'grupo_edad': "Grupo de Edad", 'cantidad': "Cantidad de Personas"},
-            text='cantidad'
-        )
 
-        # Ajustar diseño del gráfico
-        fig.update_traces(marker_color='blue', textposition='outside')
+        fig = px.bar(edad_grupo,
+                     x='grupo_edad',
+                     y='cantidad',
+                     title="Distribución de Edad por Grupo",
+                     labels={'grupo_edad': "Grupo de Edad", 'cantidad': "Cantidad de Personas"},
+                     text='cantidad',
+                     color_discrete_sequence=px.colors.qualitative.Pastel)
+
+        fig.update_traces(textposition='outside')
         fig.update_layout(xaxis_title="Grupo de Edad", yaxis_title="Cantidad de Personas")
 
-        # Exportar el gráfico como HTML
         return fig.to_html(full_html=False)
     except Exception as e:
         raise RuntimeError(f"Error al generar el gráfico: {e}")
