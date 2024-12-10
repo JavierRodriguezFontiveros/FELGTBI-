@@ -701,8 +701,8 @@ def generar_respuesta(prompt):
         return f"Error al generar respuesta para historia: {str(e)}"
 
 
-@app.post("/personalizar_prompt")
-async def personalizar_prompt(user_data: UserData):
+@app.post("/personalizar_prompt_usuario_no_ss")
+async def personalizar_prompt_usuario_no_ss(user_data: UserData):
     print(f"API Key en uso: {gemini_api_key}")
 
     try:
@@ -817,9 +817,30 @@ async def personalizar_prompt(user_data: UserData):
                             "Estoy acompañando a una persona seropositiva." + acceso_grupos + "tengo acceso a recursos locales o grupos de apoyo. /n"
                             "He compartido mi preocupación con" + preocupacion4 + ". /n"
                             "Me gustaría orientación para conseguir" + apoyo_necesario)
-                    
-# SI ES SOCIOSANITARIO
-            elif key.startswith("2"):
+
+                # Generar la respuesta del modelo
+                respuesta_chatbot = generar_respuesta(prompt)
+
+                # Devolver la respuesta del chatbot
+                return {"respuesta_chatbot": respuesta_chatbot}
+        else:
+            prompt = "Título: "
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+
+@app.post("/personalizar_prompt_usuario_ss")
+async def personalizar_prompt_usuario_ss(user_data: UserData):
+    print(f"API Key en uso: {gemini_api_key}")
+
+    try:
+        # Determinar el tipo de sección y construir el prompt dinámicamente
+        for key, seccion in user_data.data.items():
+            titulo = seccion.get("titulo", " ")
+            preguntas = seccion.get("preguntas", {})
+
+        if key.startswith("2"):
                 #EXTRAER ID_USUARIO
                 id_usuario = None
 
@@ -911,12 +932,14 @@ async def personalizar_prompt(user_data: UserData):
                 else:
                     prompt = "Título: "
 
-            # Generar la respuesta del modelo
-            respuesta_chatbot = generar_respuesta(prompt)
+                # Generar la respuesta del modelo
+                respuesta_chatbot = generar_respuesta(prompt)
 
-            # Devolver la respuesta del chatbot
-            return {"respuesta_chatbot": respuesta_chatbot}
-
+                # Devolver la respuesta del chatbot
+                return {"respuesta_chatbot": respuesta_chatbot}
+    
+        else:
+            prompt = "Título: "
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
