@@ -377,7 +377,7 @@ def barras_apiladas_genero_orientacion_html(dataframe):
 
 def graficar_permiso_residencia_html(dataframe):
     """
-    Genera un gráfico de pastel (pie chart) sobre la distribución de permisos de residencia,
+    Genera un gráfico de pastel (pie chart) sobre la distribución de permisos de residencia (solo True),
     basado en un DataFrame dado, y lo devuelve como HTML.
 
     Args:
@@ -387,25 +387,26 @@ def graficar_permiso_residencia_html(dataframe):
         str: El contenido HTML del gráfico generado.
     """
     try:
-        # Contar las frecuencias de los valores en la columna 'permiso_residencia'
-        permiso_count = dataframe['permiso_residencia'].value_counts().reset_index()
+        # Filtrar solo los valores True en 'permiso_residencia'
+        permiso_count = dataframe[dataframe['permiso_residencia'] == True].value_counts().reset_index(name='Cantidad')
         permiso_count.columns = ['Permiso de Residencia', 'Cantidad']
 
-        permiso_count['Permiso de Residencia'] = permiso_count['Permiso de Residencia'].map({True: 'Con Permiso', False: 'Sin Permiso'})
+        # Mapear el valor True a un texto descriptivo
+        permiso_count['Permiso de Residencia'] = permiso_count['Permiso de Residencia'].map({True: 'Con Permiso'})
 
         # Crear gráfico de pastel (pie chart) con cantidades y porcentajes
         fig = px.pie(permiso_count,
                     names='Permiso de Residencia',
                     values='Cantidad',
-                    title='Distribución de Permisos de Residencia',
+                    title='Distribución de Permisos de Residencia (Con Permiso)',
                     labels={'Permiso de Residencia': 'Tipo de Permiso'},
                     color='Permiso de Residencia',
                     color_discrete_sequence=px.colors.qualitative.Pastel,
-                    hole=0.3) 
-        
+                    hole=0.3)
+
         fig.update_layout(
             title={
-                'text': "Distribución de Permisos de Residencia<br><span style='font-size:18px;color:gray;'>El gráfico muestra la proporción de usuarios con y sin permiso de residencia.</span>",
+                'text': "Distribución de Permisos de Residencia<br><span style='font-size:18px;color:gray;'>Solo usuarios con permiso de residencia.</span>",
                 'x': 0.5,  # Centrado horizontalmente
                 'xanchor': 'center'},
             plot_bgcolor='white',
@@ -416,7 +417,7 @@ def graficar_permiso_residencia_html(dataframe):
                 x=0.7,
                 y=0.9
             )
-            )
+        )
 
         # Exportar el gráfico como HTML
         return fig.to_html(full_html=False)
