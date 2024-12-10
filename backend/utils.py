@@ -240,28 +240,51 @@ def create_bar_chart_plotly_html(df):
 
 
 
+#EDITADO
+
 def barras_apiladas_genero_orientacion_html(dataframe):
 
     try:
         # Agrupar y contar las combinaciones de género y orientación
         datos_agrupados = dataframe.groupby(['identidad_genero', 'orientacion_sexual']).size().reset_index(name='Cantidad')
 
+        # Normalizar dentro de cada grupo de género
+        datos_agrupados['Proporcion'] = datos_agrupados.groupby('identidad_genero')['Cantidad'].transform(lambda x: x / x.sum())
+
         # Configurar el gráfico de barras apiladas
         fig = px.bar(
             datos_agrupados,
             x='identidad_genero',
-            y='Cantidad',
+            y='Proporcion',
             color='orientacion_sexual',
-            title='Distribución de Género y Orientación Sexual',
-            labels={'identidad_genero': 'Género', 'orientacion_sexual': 'Orientación Sexual'},
+            title='Distribución de identidades de género y orientaciones sexuales',
+            labels={'Proporcion': 'Proporción', 'identidad_genero': 'Identidad de Género', 'orientacion_sexual': 'Orientación Sexual'},
             barmode='stack',
             color_discrete_sequence=px.colors.qualitative.Pastel
         )
+
+        # Añadir subtítulo al gráfico
+        fig.update_layout(
+            title={
+                'text': "Distribución de identidades de género y orientaciones sexuales<br><span style='font-size:18px;color:gray;'>El gráfico muestra la proporción de orientaciones sexuales dentro de cada identidad de género.</span>",
+                'x': 0.5,  # Centrado horizontalmente
+                'xanchor': 'center'},
+            plot_bgcolor='white',
+            paper_bgcolor='white',
+            title_font=dict(size=22),
+            xaxis_title_font=dict(size=18),  
+            yaxis_title_font=dict(size=18),  
+            xaxis_tickfont=dict(size=16),  
+            yaxis_tickfont=dict(size=16),
+            legend_font=dict(size=14)
+            )
 
         # Exportar el gráfico como HTML
         return fig.to_html(full_html=False)
     except Exception as e:
         raise RuntimeError(f"Error al generar el gráfico: {e}")
+
+
 
 
 
