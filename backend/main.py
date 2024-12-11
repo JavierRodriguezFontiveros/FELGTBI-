@@ -947,8 +947,8 @@ async def personalizar_prompt_usuario_ss(data: dict):
 
         # Asignar los datos a los placeholders
         datos_ss = (
-            raw_data[0], raw_data[2], raw_data[4],)
-        )
+            raw_data[0], raw_data[2], raw_data[4])
+        
 
         # Aquí iría la ejecución en tu conexión a la base de datos
         cursor.execute(query, datos_ss)
