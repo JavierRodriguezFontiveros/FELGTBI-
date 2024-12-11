@@ -847,7 +847,7 @@ async def personalizar_prompt_usuario_no_ss(data: dict):
         # Generar respuesta del chatbot
         respuesta_chatbot = generar_respuesta(prompt)
         raw_data = data["data"]
-        # Query adaptada
+        # Query adaptada para guardar los registros del chatbot de no sanitarios
         query = """INSERT INTO respuestas_chatbot_nosanitarios
         (id_usuario, pregunta1, respuesta1, response_array)
         VALUES (%s, %s, %s, %s)"""
@@ -857,6 +857,63 @@ async def personalizar_prompt_usuario_no_ss(data: dict):
         )
         cursor.execute(query, datos_no_ss)
         connection.commit()
+
+    
+        # Insertar las respuestas del chatbot en la tabla correspondiente
+        id_usuario = raw_data[0]
+        respuesta1 = raw_data[2]
+        response_array = raw_data[3:]
+
+        # Mapear los valores del array 'response_array' en las columnas correspondientes
+
+        if "Creo que me he expuesto al virus" in respuesta1:
+            # Para la situación de "Creo que me he expuesto al virus"
+            situacion = respuesta1
+            tiempo_exposicion = next((response_array[i+1] for i in range(len(response_array)) if response_array[i] == "¿Cuándo ocurrió la posible infección?"), None)
+            acceso_personal_sanitario = next((response_array[i+1] for i in range(len(response_array)) if response_array[i] == "¿Tienes acceso a personal sanitario?"), None)
+            tipo_exposicion = next((response_array[i+1] for i in range(len(response_array)) if response_array[i] == "¿Qué tipo de exposición fue?"), None)
+            entorno_chemsex = next((response_array[i+1] for i in range(len(response_array)) if response_array[i] == "¿Ha sido en un entorno de 'chem-sex'?"), None)
+            info_pep = next((response_array[i+1] for i in range(len(response_array)) if response_array[i] == "¿Sabes qué es la PEP?"), None)
+            compartido_preocupacion = next((response_array[i+1] for i in range(len(response_array)) if response_array[i] == "¿Has compartido tu preocupación con alguien?"), None)
+
+            # Insertar en la tabla respuestas_chatbot_exposicion_vih
+            cursor.execute("""
+                INSERT INTO respuestas_chatbot_exposicion_vih (
+                    id_usuario, situacion, tiempo_exposicion, acceso_personal_sanitario, tipo_exposicion, 
+                    entorno_chemsex, info_pep, compartido_preocupacion
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """, (id_usuario, situacion, tiempo_exposicion, acceso_personal_sanitario, tipo_exposicion, entorno_chemsex, info_pep, compartido_preocupacion))
+            connection.commit()
+
+        elif "Quiero saber más sobre el vih/sida" in respuesta1:
+            # Para la situación de "Quiero saber más sobre el vih/sida"
+            situacion = respuesta1
+            recursos = next((response_array[i+1] for i in range(len(response_array)) if response_array[i] == "¿Necesitas recursos de referencia?"), None)
+
+            # Insertar en la tabla respuestas_chatbot_informacion_vih
+            cursor.execute("""
+                INSERT INTO respuestas_chatbot_informacion_vih (
+                    id_usuario, situacion, recursos
+                ) VALUES (%s, %s, %s)
+            """, (id_usuario, situacion, recursos))
+            connection.commit()
+
+        elif "Estoy apoyando a una persona seropositiva" in respuesta1:
+            # Para la situación de "Estoy apoyando a una persona seropositiva"
+            situacion = respuesta1
+            acceso_recursos = next((response_array[i+1] for i in range(len(response_array)) if response_array[i] == "¿Tiene acceso a recursos locales o grupos de apoyo?"), None)
+            compartido_preocupacion = next((response_array[i+1] for i in range(len(response_array)) if response_array[i] == "¿Has compartido tu preocupación sobre esta persona con alguien?"), None)
+            recursos_apoyo = next((response_array[i+1] for i in range(len(response_array)) if response_array[i] == "¿Qué apoyo necesitas?"), None)
+
+            # Insertar en la tabla respuestas_chatbot_apoyo_persona_seropositiva
+            cursor.execute("""
+                INSERT INTO respuestas_chatbot_apoyo_persona_seropositiva (
+                    id_usuario, situacion, acceso_recursos, compartido_preocupacion, recursos_apoyo
+                ) VALUES (%s, %s, %s, %s, %s)
+            """, (id_usuario, situacion, acceso_recursos, compartido_preocupacion, recursos_apoyo))
+            connection.commit()
+
+
         # Insertar respuesta en la base de datos
         query = '''
             INSERT INTO respuestas_modelo (id_usuario, respuesta_modelo)
