@@ -890,19 +890,14 @@ async def personalizar_prompt_usuario_ss(data: dict):
     try:
         # Extraer el array del JSON
         values = list(data.values())[0]  # Extrae el array contenido en el JSON
-
         if not isinstance(values, list) or len(values) < 5:
             return {"error": "Formato de datos no válido. El array debe contener al menos 5 elementos."}
-
         id_usuario, titulo, tipo_personal, pregunta, eleccion = values[:5]
-
         if not id_usuario or not isinstance(id_usuario, str) or not id_usuario.isalnum():
             return {"error": "ID de usuario no válido."}
-
         connection = connect_to_db()
         if connection is None:
             return {"error": "No se pudo conectar a la base de datos."}
-
         cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         try:
             query = """
@@ -912,58 +907,64 @@ async def personalizar_prompt_usuario_ss(data: dict):
             """
             cursor.execute(query, (id_usuario,))
             resultados = cursor.fetchone()
-
             if not resultados:
                 return {"error": "No se encontraron datos para el ID de usuario proporcionado."}
-
             provincia = resultados["provincia"]
             ambito_laboral = resultados["ambito_laboral"]
         except Exception as e:
             cursor.close()
             connection.close()
             return {"error": f"Error al procesar la solicitud: {str(e)}"}
-
+        ##################################EDITADO############
+        #Configuracion de la API google Places:
+        load_dotenv(dotenv_path="../credenciales.env")
+        google_places = os.getenv("GPLACES_API_KEY")
+        os.environ["GPLACES_API_KEY"] = google_places
+        # Crear instancia de GooglePlacesTool
+        places = GooglePlacesTool()
+        # Realizar la búsqueda
+        try:
+            prompt_maps_2 = "Centros vih en " + provincia
+            respuesta_google_maps_2 = places.run(prompt_maps_2)
+            print(provincia)
+            print(respuesta_google_maps_2)
+        except Exception as e:
+            print(f"Hubo un error al realizar la búsqueda: {e}")
+        #######################################################
         prompt = (
-            f"Mi pronombre es el neutro (elle). "
+            f"Trátame de usted y conjuga los adjetivos en neutro. (Ej: 'Informade, interesade'). No hace falta que me saludes."
             f"Vivo en {provincia}. Dame respuestas orientadas a ese lugar.\n"
             f"Soy personal sanitario y trabajo en este ámbito laboral: {ambito_laboral}.\n"
             f"Estoy trabajando actualmente con vih (úsalo siempre en minúscula). Necesito información profesional sobre {eleccion}."
         )
-
         respuesta_chatbot = generar_respuesta(prompt)
-
 ### GUARDAR CONSULTAS Y EL ARBOL DE CHAT
         raw_data = data["data"]
         respuesta_chatbot = generar_respuesta(prompt)
-        
         # Query adaptada
-        query = """INSERT INTO respuestas_chatbot_sanitarios 
-        (id_usuario, especialidad, recursos) 
+        query = """INSERT INTO respuestas_chatbot_sanitarios
+        (id_usuario, especialidad, recursos)
         VALUES (%s, %s, %s)"""
-
         # Asignar los datos a los placeholders
         datos_ss = (
             raw_data[0], raw_data[2], raw_data[4])
-        
-
         # Aquí iría la ejecución en tu conexión a la base de datos
         cursor.execute(query, datos_ss)
         connection.commit()
-
         query = ''' INSERT INTO respuestas_modelo (id_usuario, respuesta_modelo)
                         VALUES (%s, %s);'''
         valores = (id_usuario, respuesta_chatbot)
-
         cursor.execute(query, valores)
         connection.commit()
         cursor.close()
         connection.close()
         print("Datos insertados correctamente.")
-        return {"respuesta_chatbot": respuesta_chatbot}
-
+        ########LOQUE HE AÑADIDO########
+        respuesta_final_2 = respuesta_chatbot + respuesta_google_maps_2
+        ################################
+        return {"respuesta_chatbot": respuesta_final_2}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
     finally:
         try:
             if cursor:
