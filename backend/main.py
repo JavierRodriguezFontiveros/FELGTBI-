@@ -282,16 +282,14 @@ def generate_ambito_laboral_chart():
         connection.close()
 
         # Generar el gráfico de ámbito laboral
-        fig = ambito_laboral(df)
-
-        # Convertir el gráfico a HTML
-        html_content = fig.to_html(full_html=False)
+        html_content = ambito_laboral(df)
 
         # Devolver el HTML del gráfico
         return HTMLResponse(content=html_content, media_type="text/html")
     
     except Exception as e:
         return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
+
 
 
 

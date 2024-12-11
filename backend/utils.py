@@ -545,6 +545,10 @@ def graficar_top_5_ciudades(dataframe):
 ###EDITADA###
 def ambito_laboral(dataframe):
     try:
+        # Verificar si la columna 'ambito_laboral' existe en el dataframe
+        if 'ambito_laboral' not in dataframe.columns:
+            raise ValueError("La columna 'ambito_laboral' no existe en los datos.")
+        
         # Contar las frecuencias de los valores en la columna 'ambito_laboral'
         especialidad_count = dataframe['ambito_laboral'].value_counts().reset_index()
         especialidad_count.columns = ['Ambito Laboral', 'Cantidad']
@@ -573,7 +577,7 @@ def ambito_laboral(dataframe):
             names='Ambito Laboral',
             values='Cantidad',
             title='Distribución de Especialidades',
-            labels={'Ambito Laboral': 'Ambito Laboral'},
+            labels={'Ambito Laboral': 'Ámbito Laboral'},
             color='Ambito Laboral',
             color_discrete_sequence=px.colors.qualitative.Pastel,
             hole=0.3
