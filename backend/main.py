@@ -62,7 +62,7 @@ except Exception as e:
 origins = [
     "http://localhost:5173",  # React u otras apps locales
     "https://felgtbiqplus.netlify.app",
-    "https://chatbot-felgtbiq-front.onrender.com/"
+    "https://chatbot-felgtbiq-front.onrender.com"
     # Dominio de producción
 ]
 
