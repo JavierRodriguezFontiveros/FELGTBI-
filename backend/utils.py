@@ -592,8 +592,56 @@ def ambito_laboral(dataframe):
     except Exception as e:
         raise RuntimeError(f"Error al generar el gráfico: {e}")
 
+import google.generativeai as genai
+import concurrent.futures
 
 
+def generar_respuesta(prompt):
+    try:
+        def call_model():
+            model = genai.GenerativeModel("gemini-1.5-flash")
+            prompt_total = prompt_basico + prompt
+            # prompt_total = formateo(prompt_total)             ##########################################  METER AQUI EL FORMATEO!!! (PROTOCO)
+            return model.generate_content(prompt_total)
 
-if __name__ == '__main__':
-    connect_to_db()
+        # Usar un executor para manejar el tiempo límite
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(call_model)
+            response = future.result(timeout=30)  # Tiempo límite de 30 segundos
+
+        # Verificar si la respuesta es válida
+        if not response or not hasattr(response, 'text'):
+            raise ValueError("Respuesta vacía o no válida del modelo.")
+        return response.text
+    except concurrent.futures.TimeoutError:
+        print("El modelo tomó demasiado tiempo en responder.")
+        return "Error: El modelo tardó demasiado en responder."
+    except Exception as e:
+        print(f"Error en generar_respuesta: {e}")
+        return f"Error al generar respuesta para historia: {str(e)}"
+    
+def generar_respuesta_final(prompt_chat, memory):
+    try:
+        def call_model():
+            model = genai.GenerativeModel("gemini-1.5-flash")
+            return model.generate_content("Teniendo en cuenta lo que acabamos de hablar (" + str(memory) + "), resuélveme esta consulta:" + prompt_chat)
+
+        # Usar un executor para manejar el tiempo límite
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(call_model)
+            response = future.result(timeout=30)  # Tiempo límite de 30 segundos
+
+        # Verificar si la respuesta es válida
+        if not response or not hasattr(response, 'text'):
+            raise ValueError("Respuesta vacía o no válida del modelo.")
+        return response.text
+    except concurrent.futures.TimeoutError:
+        print("El modelo tomó demasiado tiempo en responder.")
+        return "Error: El modelo tardó demasiado en responder."
+    except Exception as e:
+        print(f"Error en generar_respuesta: {e}")
+        return f"Error al generar respuesta para historia: {str(e)}"
+
+
+# if __name__ == '__main__':
+#     connect_to_db()
