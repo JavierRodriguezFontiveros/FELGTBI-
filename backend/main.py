@@ -289,6 +289,9 @@ def generate_ambito_laboral_chart():
     
     except Exception as e:
         return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+###GRÁFICOS-CHATBOT###
 
 
 
