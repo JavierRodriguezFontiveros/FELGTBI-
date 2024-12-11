@@ -31,7 +31,7 @@ Esta seria la interfaz principal
 
 ## **Tecnologías Utilizadas**
 
-
+![sociosanitario](Imagenes/tablas.png)
 ### **Backend**
 - Fastapi
 - Modelo LLM de Gemini  
@@ -49,3 +49,8 @@ Esta seria la interfaz principal
 2. Clona este repositorio si quieres acceder al coódigo  
    ```bash
    git clone https://github.com/usuario/repo.git
+
+
+![sociosanitario](Imagenes/googlemaps.png)
+![sociosanitario](Imagenes/render.png)
+![sociosanitario](Imagenes/aws.png)
