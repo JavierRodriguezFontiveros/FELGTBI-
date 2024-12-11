@@ -938,7 +938,6 @@ async def personalizar_prompt_usuario_ss(data: dict):
 ### GUARDAR CONSULTAS Y EL ARBOL DE CHAT
         raw_data = data["data"]
         respuesta_chatbot = generar_respuesta(prompt)
-        raw_data = data["data"]
         
         # Query adaptada
         query = """INSERT INTO respuestas_chatbot_sanitarios 
