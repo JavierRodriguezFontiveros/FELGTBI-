@@ -29,6 +29,8 @@ import json
 
 from fastapi.middleware.cors import CORSMiddleware
 
+from langchain_community.tools import GooglePlacesTool
+
 #Warnings
 import warnings
 warnings.filterwarnings("ignore")
@@ -730,31 +732,23 @@ def generar_respuesta_final(prompt_chat, memory):
 @app.post("/personalizar_prompt_usuario_no_ss")
 async def personalizar_prompt_usuario_no_ss(data: dict):
     print(f"API Key en uso: {gemini_api_key}")
-
     try:
         # Validar que el JSON tiene la estructura esperada
         if "data" not in data or not isinstance(data["data"], list):
             return {"error": "Formato de datos no válido. Se requiere un JSON con la clave 'data' y un array de valores."}
-
         # Extraer el array del JSON
         values = data["data"]
-
         if len(values) < 2:
             return {"error": "El array debe contener al menos dos elementos."}
-
         # Extraer el ID del usuario y la situación
         id_usuario = values[0]
         situacion = values[2]  # Según el formato, la situación está en el tercer elemento
-
         if not id_usuario or not isinstance(id_usuario, str) or not id_usuario.isalnum():
             return {"error": "ID de usuario no válido."}
-
         connection = connect_to_db()
         if connection is None:
             return {"error": "No se pudo conectar a la base de datos."}
-
         cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-
         try:
             # Obtener los datos del usuario desde la base de datos
             query = """
@@ -764,26 +758,37 @@ async def personalizar_prompt_usuario_no_ss(data: dict):
             """
             cursor.execute(query, (id_usuario,))
             resultados = cursor.fetchone()
-
             if not resultados:
                 return {"error": "No se encontraron datos para el ID de usuario proporcionado."}
-
             provincia = resultados["provincia"]
             pronombres = []
-
             if resultados["pronombre_el"]:
                 pronombres.append("Él")
             if resultados["pronombre_ella"]:
                 pronombres.append("Ella")
             if resultados["pronombre_elle"]:
                 pronombres.append("Elle/Pronombre neutro")
-
             pronombres = ", ".join(pronombres)
         except Exception as e:
             cursor.close()
             connection.close()
             return {"error": f"Error al procesar la solicitud: {str(e)}"}
-
+##################################EDITADO############
+        #Configuracion de la API google Places:
+        load_dotenv(dotenv_path="../credenciales.env")
+        google_places = os.getenv("GPLACES_API_KEY")
+        os.environ["GPLACES_API_KEY"] = google_places
+        # Crear instancia de GooglePlacesTool
+        places = GooglePlacesTool()
+        # Realizar la búsqueda
+        try:
+            prompt_maps = "Centros vih en " + provincia
+            respuesta_google_maps = places.run(prompt_maps)
+            print(provincia)
+            print(respuesta_google_maps)
+        except Exception as e:
+            print(f"Hubo un error al realizar la búsqueda: {e}")
+#######################################################
         # Construcción del prompt basado en la situación
         prompt = ""
         if situacion == "Tengo VIH":
@@ -791,7 +796,6 @@ async def personalizar_prompt_usuario_no_ss(data: dict):
             en_tratamiento = values[6]
             acceso_medico = values[8]
             informacion_necesaria = values[10]
-
             prompt = (
                 f"Mis pronombres son: {pronombres}. \n"
                 f"Vivo en {provincia}. Dame respuestas orientadas a ese lugar.\n"
@@ -807,7 +811,6 @@ async def personalizar_prompt_usuario_no_ss(data: dict):
             chem_sex = values[10]
             conocimiento_pep = values[12]
             preocupacion = values[14]
-
             prompt = (
                 f"Mis pronombres son: {pronombres}. \n"
                 f"Vivo en {provincia}. Dame respuestas orientadas a ese lugar.\n"
@@ -820,7 +823,6 @@ async def personalizar_prompt_usuario_no_ss(data: dict):
             )
         elif situacion == "Quiero saber más sobre el vih/sida":
             tema_informacion = values[4]
-
             prompt = (
                 f"Mis pronombres son: {pronombres}. \n"
                 f"Vivo en {provincia}. Dame respuestas orientadas a ese lugar.\n"
@@ -830,7 +832,6 @@ async def personalizar_prompt_usuario_no_ss(data: dict):
             acceso_grupos = values[4]
             preocupacion = values[6]
             apoyo_necesario = values[8]
-
             prompt = (
                 f"Mis pronombres son: {pronombres}. \n"
                 f"Vivo en {provincia}. Dame respuestas orientadas a ese lugar.\n"
@@ -840,23 +841,19 @@ async def personalizar_prompt_usuario_no_ss(data: dict):
             )
         else:
             return {"error": f"Situación no soportada: '{situacion}'"}
-
         # Generar respuesta del chatbot
         respuesta_chatbot = generar_respuesta(prompt)
         raw_data = data["data"]
-
         # Query adaptada
-        query = """INSERT INTO respuestas_chatbot_nosanitarios 
-        (id_usuario, pregunta1, respuesta1, response_array) 
+        query = """INSERT INTO respuestas_chatbot_nosanitarios
+        (id_usuario, pregunta1, respuesta1, response_array)
         VALUES (%s, %s, %s, %s)"""
-
         # Asignar los datos a los placeholders
         datos_no_ss = (
             raw_data[0], raw_data[1], raw_data[2], json.dumps(raw_data[3:])
         )
         cursor.execute(query, datos_no_ss)
         connection.commit()
-
         # Insertar respuesta en la base de datos
         query = '''
             INSERT INTO respuestas_modelo (id_usuario, respuesta_modelo)
@@ -865,17 +862,17 @@ async def personalizar_prompt_usuario_no_ss(data: dict):
             SET respuesta_modelo = EXCLUDED.respuesta_modelo;
         '''
         valores = (id_usuario, respuesta_chatbot)
-
+########LOQUE HE AÑADIDO########
+        respuesta_final = respuesta_chatbot + respuesta_google_maps
+################################
         cursor.execute(query, valores)
         connection.commit()
         cursor.close()
         connection.close()
         print("Datos insertados correctamente.")
-        return {"respuesta_chatbot": respuesta_chatbot}
-
+        return {"respuesta_chatbot": respuesta_final}###################
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
     finally:
         try:
             if cursor:
