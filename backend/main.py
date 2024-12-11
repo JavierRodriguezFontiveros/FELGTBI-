@@ -685,6 +685,8 @@ class UserData(BaseModel):
 
 import concurrent.futures
 
+# from utils import generar_respuesta, generar_respuesta_final
+
 def generar_respuesta(prompt):
     try:
         def call_model():
@@ -731,6 +733,7 @@ def generar_respuesta_final(prompt_chat, memory):
         print(f"Error en generar_respuesta: {e}")
         return f"Error al generar respuesta para historia: {str(e)}"
 
+import re
 
 @app.post("/personalizar_prompt_usuario_no_ss")
 async def personalizar_prompt_usuario_no_ss(data: dict):
@@ -787,8 +790,23 @@ async def personalizar_prompt_usuario_no_ss(data: dict):
         try:
             prompt_maps = "Centros vih en " + provincia
             respuesta_google_maps = places.run(prompt_maps)
+            pattern = re.compile(r"(\d+)\.\s*(.*?)\nAddress:\s*(.*?)\nGoogle place ID:\s*(.*?)\nPhone:\s*(.*?)\nWebsite:\s*(.*?)\n",re.DOTALL)
+            matches = pattern.findall(respuesta_google_maps)
+            locations_str = ""
+            for match in matches:
+                location_info = (
+                    f"ID: {int(match[0])}\n"
+                    f"Name: {match[1].strip()}\n"
+                    f"Address: {match[2].strip()}\n"
+                    f"Phone: {match[4].strip() if match[4].strip() != 'Unknown' else 'N/A'}\n"
+                    f"Website: {match[5].strip() if match[5].strip() != 'Unknown' else 'N/A'}\n"
+                    f"{'-' * 40}\n"  # Separador entre cada ubicación
+                )
+                locations_str += location_info
+
+            print(locations_str)
             print(provincia)
-            print(respuesta_google_maps)
+
         except Exception as e:
             print(f"Hubo un error al realizar la búsqueda: {e}")
 #######################################################
@@ -923,7 +941,7 @@ async def personalizar_prompt_usuario_no_ss(data: dict):
         '''
         valores = (id_usuario, respuesta_chatbot)
 ########LOQUE HE AÑADIDO########
-        respuesta_final = respuesta_chatbot + respuesta_google_maps
+        respuesta_final = respuesta_chatbot + locations_str
 ################################
         cursor.execute(query, valores)
         connection.commit()
@@ -984,10 +1002,24 @@ async def personalizar_prompt_usuario_ss(data: dict):
         places = GooglePlacesTool()
         # Realizar la búsqueda
         try:
-            prompt_maps_2 = "Centros vih en " + provincia
-            respuesta_google_maps_2 = places.run(prompt_maps_2)
+            prompt_maps = "Centros vih en " + provincia
+            respuesta_google_maps_2 = places.run(prompt_maps)
+            pattern = re.compile(r"(\d+)\.\s*(.*?)\nAddress:\s*(.*?)\nGoogle place ID:\s*(.*?)\nPhone:\s*(.*?)\nWebsite:\s*(.*?)\n",re.DOTALL)
+            matches = pattern.findall(respuesta_google_maps_2)
+            locations_str = ""
+            for match in matches:
+                location_info = (
+                    f"ID: {int(match[0])}\n"
+                    f"Name: {match[1].strip()}\n"
+                    f"Address: {match[2].strip()}\n"
+                    f"Phone: {match[4].strip() if match[4].strip() != 'Unknown' else 'N/A'}\n"
+                    f"Website: {match[5].strip() if match[5].strip() != 'Unknown' else 'N/A'}\n"
+                    f"{'-' * 40}\n"  # Separador entre cada ubicación
+                )
+                locations_str += location_info
+
+            print(locations_str)
             print(provincia)
-            print(respuesta_google_maps_2)
         except Exception as e:
             print(f"Hubo un error al realizar la búsqueda: {e}")
         #######################################################
