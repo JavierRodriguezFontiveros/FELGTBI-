@@ -55,3 +55,10 @@ Esta seria la interfaz principal
 ![sociosanitario](Imagenes/render.png)
 ![sociosanitario](Imagenes/aws.png)
 ![sociosanitario](Imagenes/gemini.png)
+
+participantes:
+-Hugo
+-Ana
+-Nathan
+-Fran
+-Javier
