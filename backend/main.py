@@ -146,23 +146,19 @@ def generar_grafico_pie(viven_espana: bool = True):
 ###FUNCIONA_EDITADA###
 @app.get("/barras-apiladas/", response_class=HTMLResponse)
 def generar_barras_apiladas():
-
     try:
+        with connect_to_db() as connection:
+            query = "SELECT * FROM no_sociosanit_formulario"
+            df = pd.read_sql_query(query, connection)
 
-        connection = connect_to_db()
-        if connection is None:
-            return {"error": "No se pudo conectar a la base de datos."}
-
-
-        query = "SELECT * FROM no_sociosanit_formulario"  
-
-        df = pd.read_sql_query(query, connection)
-
-        connection.close()
+        if df.empty:
+            return {"error": "La consulta no devolvió resultados."}
 
         html_content = barras_apiladas_genero_orientacion_html(df)
 
         return HTMLResponse(content=html_content, media_type="text/html")
+    except ValueError as ve:
+        return {"error": f"Error de validación: {ve}"}
     except Exception as e:
         return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
     
@@ -237,7 +233,7 @@ def generate_bar_chart():
         # Conectar a la base de datos
         connection = connect_to_db()
         if connection is None:
-            return {"error": "No se pudo conectar a la base de datos."}
+            return HTMLResponse(content="Error: No se pudo conectar a la base de datos.", media_type="text/html")
 
         # Consulta SQL para obtener los datos
         query = "SELECT * FROM no_sociosanit_formulario"  # Asegúrate de usar el nombre correcto de la tabla
@@ -248,6 +244,10 @@ def generate_bar_chart():
         # Cerrar la conexión
         connection.close()
 
+        # Verificar el contenido del DataFrame
+        if df.empty:
+            return HTMLResponse(content="Error: No se encontraron datos en la tabla.", media_type="text/html")
+
         # Generar el gráfico de barras
         fig = graficar_top_5_ciudades(df)
 
@@ -256,9 +256,9 @@ def generate_bar_chart():
 
         # Devolver el HTML del gráfico
         return HTMLResponse(content=html_content, media_type="text/html")
-    
     except Exception as e:
-        return {"error": f"Ocurrió un error al procesar el gráfico: {e}"}
+        error_message = f"Error al procesar el gráfico: {e}"
+        return HTMLResponse(content=error_message, media_type="text/html")
     
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 @app.get("/grafico-ambito-laboral/", response_class=HTMLResponse)

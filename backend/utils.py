@@ -325,13 +325,21 @@ def create_bar_chart_plotly_html(df):
 ###EDITADA###
 
 def barras_apiladas_genero_orientacion_html(dataframe):
-
     try:
+        # Verificar que las columnas necesarias están presentes
+        if not {'identidad_genero', 'orientacion_sexual'}.issubset(dataframe.columns):
+            raise ValueError("Las columnas 'identidad_genero' y 'orientacion_sexual' deben estar presentes en los datos.")
+
+        # Eliminar filas con valores faltantes en las columnas relevantes
+        dataframe = dataframe.dropna(subset=['identidad_genero', 'orientacion_sexual'])
+
         # Agrupar y contar las combinaciones de género y orientación
         datos_agrupados = dataframe.groupby(['identidad_genero', 'orientacion_sexual']).size().reset_index(name='Cantidad')
 
         # Normalizar dentro de cada grupo de género
-        datos_agrupados['Proporcion'] = datos_agrupados.groupby('identidad_genero')['Cantidad'].transform(lambda x: x / x.sum())
+        datos_agrupados['Proporcion'] = datos_agrupados.groupby('identidad_genero')['Cantidad'].transform(
+            lambda x: x / x.sum() if x.sum() > 0 else 0
+        )
 
         # Configurar el gráfico de barras apiladas
         fig = px.bar(
@@ -345,23 +353,23 @@ def barras_apiladas_genero_orientacion_html(dataframe):
             color_discrete_sequence=px.colors.qualitative.Pastel
         )
 
-        # Añadir subtítulo al gráfico
+        # Configuración de diseño adicional
         fig.update_layout(
             title={
-                'text': "Distribución de identidades de género y orientaciones sexuales<br><span style='font-size:18px;color:gray;'>El gráfico muestra la proporción de orientaciones sexuales dentro de cada identidad de género.</span>",
-                'x': 0.5,  # Centrado horizontalmente
-                'xanchor': 'center'},
+                'text': "Distribución de identidades de género y orientaciones sexuales<br>"
+                        "<span style='font-size:18px;color:gray;'>El gráfico muestra la proporción de orientaciones sexuales dentro de cada identidad de género.</span>",
+                'x': 0.5,
+                'xanchor': 'center'
+            },
             plot_bgcolor='white',
             paper_bgcolor='white',
             title_font=dict(size=22),
-            xaxis_title_font=dict(size=18),  
-            yaxis_title_font=dict(size=18),  
-            xaxis_tickfont=dict(size=16),  
+            xaxis_title_font=dict(size=18),
+            yaxis_title_font=dict(size=18),
+            xaxis_tickfont=dict(size=16),
             yaxis_tickfont=dict(size=16),
             legend_font=dict(size=14),
-            bordercolor="Black",  # Borde de la leyenda
-            borderwidth=1  # Grosor del borde de la leyenda
-            )
+        )
 
         # Exportar el gráfico como HTML
         return fig.to_html(full_html=False)
@@ -477,48 +485,58 @@ def colectivos(dataframe):
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ###EDITADA###
 def obtener_top_5_ciudades(dataframe):
+    try:
+        # Verificar si la columna 'Provincia' existe
+        if 'provincia' not in dataframe.columns:
+            raise KeyError("La columna 'Provincia' no existe en los datos.")
 
-    ciudades_count = dataframe['provincia'].value_counts().reset_index()
-    ciudades_count.columns = ['Provincia', 'Cantidad']
-    top_5_ciudades = ciudades_count.head(5).to_dict(orient='records')
-    return top_5_ciudades
+        # Agrupar por la columna 'Provincia' y contar las ocurrencias
+        ciudades_frecuencia = dataframe['provincia'].value_counts().reset_index()
+        ciudades_frecuencia.columns = ['Provincia', 'Cantidad']
 
+        # Seleccionar las 5 ciudades más frecuentes
+        top_5_ciudades = ciudades_frecuencia.head(5).to_dict(orient='records')
+        return top_5_ciudades
+    except Exception as e:
+        raise RuntimeError(f"Error al obtener las 5 ciudades más frecuentes: {e}")
 
-
-# CHECK: error 500
 
 def graficar_top_5_ciudades(dataframe):
-    # Obtener las 5 ciudades más frecuentes
-    top_5_ciudades = obtener_top_5_ciudades(dataframe)
-    
-    # Ordenar las ciudades de mayor a menor según la cantidad
-    top_5_ciudades = sorted(top_5_ciudades, key=lambda x: x['Cantidad'], reverse=True)
+    try:
+        # Obtener las 5 ciudades más frecuentes
+        top_5_ciudades = obtener_top_5_ciudades(dataframe)
 
-    # Crear gráfico de barras con Plotly
-    fig = px.bar(top_5_ciudades, 
-                 x='Provincia', 
-                 y='Cantidad', 
-                 title="Top 5 Ciudades Más Frecuentes",
-                 labels={'Provincia': 'Ciudad', 'Cantidad': 'Frecuencia'},
-                 color='Provincia',
-                 color_discrete_sequence=px.colors.qualitative.Pastel)
-    
-    # Personalizar el gráfico
-    fig.update_layout(
-        title={'text': "Top 5 Ciudades Más Frecuentes<br><span style='font-size:14px;color:gray;'>Las cinco ciudades más frecuentes en los datos.</span>",
-               'x': 0.5, 
-               'xanchor': 'center'},
-        title_font=dict(size=22),
-        xaxis_title_font=dict(size=18),  
-        yaxis_title_font=dict(size=18),  
-        xaxis_tickfont=dict(size=16),  
-        yaxis_tickfont=dict(size=16),  
-        plot_bgcolor="white",  # Fondo blanco para el área del gráfico
-        paper_bgcolor="white",  # Fondo blanco para el gráfico completo
-        legend=False
-    )
-    
-    return fig
+        # Crear gráfico de barras con Plotly
+        fig = px.bar(
+            top_5_ciudades,
+            x='Provincia',
+            y='Cantidad',
+            title="Top 5 Ciudades Más Frecuentes",
+            labels={'Provincia': 'Ciudad', 'Cantidad': 'Frecuencia'},
+            color='Provincia',
+            color_discrete_sequence=px.colors.qualitative.Pastel
+        )
+
+        # Personalizar el gráfico
+        fig.update_layout(
+            title={
+                'text': "Top 5 Ciudades Más Frecuentes<br><span style='font-size:14px;color:gray;'>Las cinco ciudades más frecuentes en los datos.</span>",
+                'x': 0.5,
+                'xanchor': 'center'
+            },
+            title_font=dict(size=22),
+            xaxis_title_font=dict(size=18),
+            yaxis_title_font=dict(size=18),
+            xaxis_tickfont=dict(size=16),
+            yaxis_tickfont=dict(size=16),
+            plot_bgcolor="white",  # Fondo blanco para el área del gráfico
+            paper_bgcolor="white",  # Fondo blanco para el gráfico completo
+            showlegend=False
+        )
+
+        return fig
+    except Exception as e:
+        raise RuntimeError(f"Error al generar el gráfico: {e}")
 
 
 
