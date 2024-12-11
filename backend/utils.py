@@ -6,7 +6,8 @@ import pandas as pd
 
 from langchain_community.tools import GooglePlacesTool
 
-
+import warnings
+warnings.filterwarnings("ignore")
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 #Conexión GooglePlaces
