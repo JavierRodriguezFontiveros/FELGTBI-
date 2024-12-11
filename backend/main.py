@@ -688,7 +688,9 @@ def generar_respuesta(prompt):
     try:
         def call_model():
             model = genai.GenerativeModel("gemini-1.5-flash")
-            return model.generate_content(prompt + prompt_basico)
+            prompt_total = prompt_basico + prompt
+            # prompt_total = formateo(prompt_total)             ##########################################  METER AQUI EL FORMATEO!!! (PROTOCO)
+            return model.generate_content(prompt_total)
 
         # Usar un executor para manejar el tiempo límite
         with concurrent.futures.ThreadPoolExecutor() as executor:
