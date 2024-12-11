@@ -607,15 +607,46 @@ def ambito_laboral(dataframe):
 
 import google.generativeai as genai
 import concurrent.futures
+import google.generativeai as genai
+def formateo_incusivo(prompt):
+    
+    try:
+        prompt_inclusivo = f"""
+    Eres un experto en genero neutro y con el pronombres inclusivos como elle, investiga bien como funciona. Analiza el sigiente texto como si estuviese hablanco contigo y formateamelo: {prompt}
+
+    Si crees que debes modificar algo para introducir el pronombre elle y conjugar los adjetivos a neutro, hazlo. Sino devuelveme exactamente el mismo texto.
+    Palabras como medico en lugar de medice pon medique. Y en plural los mediques.
+    
+    No hables de nada, simplemente formatealo y sino lo devuelves como está. Y muy importante, VIH siempre ponlo en minuscula (vih).
+    Solo formatealo y que no se genere mucho mas texto.
+    """
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        response = model.generate_content(prompt_inclusivo)
+        if not response or not hasattr(response, 'text'):
+            raise ValueError("Respuesta vacía o no válida del modelo.")
+        return response.text
+    except Exception as e:
+        return f"Error al generar respuesta para historia: {str(e)}"
+
+
 
 
 def generar_respuesta(prompt):
     try:
         def call_model():
             model = genai.GenerativeModel("gemini-1.5-flash")
+            # print("*"*50)
+            # print("prompt_basico:",prompt_basico)
+            # print("*"*50)
+            # print("prompt:",prompt)
+            # print("*"*50)
             prompt_total = prompt_basico + prompt
-            # prompt_total = formateo(prompt_total)             ##########################################  METER AQUI EL FORMATEO!!! (PROTOCO)
-            return model.generate_content(prompt_total)
+            # print("*"*50)
+            # print("prompt_total:",prompt_total)
+            # print("*"*50)
+            respuesta_modelo = model.generate_content(prompt_total)
+            print(respuesta_modelo.text)
+            return respuesta_modelo
 
         # Usar un executor para manejar el tiempo límite
         with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -625,7 +656,14 @@ def generar_respuesta(prompt):
         # Verificar si la respuesta es válida
         if not response or not hasattr(response, 'text'):
             raise ValueError("Respuesta vacía o no válida del modelo.")
-        return response.text
+        
+        respuesta_final = formateo_incusivo(response.text) 
+        print("*"*50)
+        print("/"*50)
+        print(respuesta_final)
+        print("/"*50)
+        print("*"*50)
+        return respuesta_final
     except concurrent.futures.TimeoutError:
         print("El modelo tomó demasiado tiempo en responder.")
         return "Error: El modelo tardó demasiado en responder."
