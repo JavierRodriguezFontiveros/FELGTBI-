@@ -945,10 +945,15 @@ async def personalizar_prompt_usuario_ss(data: dict):
         places = GooglePlacesTool()
         # Realizar la búsqueda
         try:
-            prompt_maps = "Centros vih en " + provincia
+            prompt_maps = f"Centros vih " + provincia
             respuesta_google_maps_2 = places.run(prompt_maps)
-            pattern = re.compile(r"(\d+)\.\s*(.*?)\nAddress:\s*(.*?)\nGoogle place ID:\s*(.*?)\nPhone:\s*(.*?)\nWebsite:\s*(.*?)\n",re.DOTALL)
+            pattern = re.compile(r"(\d+)\.\s*(.*?)\nAddress:\s*(.*?)\nGoogle place ID:\s*(.*?)\nPhone:\s*(.*?)\nWebsite:\s*(.*?)\n", re.DOTALL)
             matches = pattern.findall(respuesta_google_maps_2)
+
+            matches = list({match[0]: match for match in matches}.values())
+
+            matches = matches[:3]  # Muestra solo los primeros 3 resultados
+
             locations_str = ""
             for match in matches:
                 location_info = (
@@ -961,6 +966,7 @@ async def personalizar_prompt_usuario_ss(data: dict):
                 )
                 locations_str += location_info
 
+            # Imprimir el resultado en consola
             print(locations_str)
             print(provincia)
         except Exception as e:

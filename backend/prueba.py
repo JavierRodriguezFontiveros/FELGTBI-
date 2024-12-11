@@ -1,20 +1,34 @@
 from dotenv import load_dotenv
 import os
-from langchain_community.tools import GooglePlacesTool
 import re
+from langchain_community.tools import GooglePlacesTool
 
-#Configuracion de la API google Places:
+#Warnings
+import warnings
+warnings.filterwarnings("ignore")
+
+
+# Cargar las variables de entorno desde el archivo .env
 load_dotenv(dotenv_path="../credenciales.env")
+
+# Configuración de la API de Google Places
 google_places = os.getenv("GPLACES_API_KEY")
 os.environ["GPLACES_API_KEY"] = google_places
+
 # Crear instancia de GooglePlacesTool
 places = GooglePlacesTool()
-# Realizar la búsqueda
+
+
 try:
-    prompt_maps = "Centros vih en Sevilla " 
+    prompt_maps = f"Centros vih " + provincia
     respuesta_google_maps = places.run(prompt_maps)
-    pattern = re.compile(r"(\d+)\.\s*(.*?)\nAddress:\s*(.*?)\nGoogle place ID:\s*(.*?)\nPhone:\s*(.*?)\nWebsite:\s*(.*?)\n",re.DOTALL)
+    pattern = re.compile(r"(\d+)\.\s*(.*?)\nAddress:\s*(.*?)\nGoogle place ID:\s*(.*?)\nPhone:\s*(.*?)\nWebsite:\s*(.*?)\n", re.DOTALL)
     matches = pattern.findall(respuesta_google_maps)
+
+    matches = list({match[0]: match for match in matches}.values())
+
+    matches = matches[:3]  # Muestra solo los primeros 3 resultados
+
     locations_str = ""
     for match in matches:
         location_info = (
@@ -27,6 +41,10 @@ try:
         )
         locations_str += location_info
 
+    # Imprimir el resultado en consola
     print(locations_str)
+    print(provincia)
+
+
 except Exception as e:
     print(f"Hubo un error al realizar la búsqueda: {e}")
