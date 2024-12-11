@@ -29,6 +29,10 @@ import json
 
 from fastapi.middleware.cors import CORSMiddleware
 
+
+import warnings
+warnings.filterwarnings("ignore")
+
 # Configurar renderer
 pio.renderers.default = "browser"
 
