@@ -3,6 +3,7 @@ from psycopg2.extras import DictCursor
 
 import os
 from dotenv import load_dotenv
+import re
 
 load_dotenv()
 
@@ -32,11 +33,11 @@ cur.execute("""CREATE TABLE IF NOT EXISTS admin_data(
 conn.commit()
 print("tabla admin creada")
 
-# Comando para crear tabla de preguntas
-cur.execute("""CREATE TABLE IF NOT EXISTS preguntas(
-            pregunta_id SERIAL PRIMARY KEY,
-            texto VARCHAR (200) NOT NULL);
-            """)
+# Comando para crear tabla de preguntas ------------------------ELIMINAAAAAAAAAAAAAAAAAAAAAAAAAARRRRRRRRRRRRRRR
+# cur.execute("""CREATE TABLE IF NOT EXISTS preguntas(
+#             pregunta_id SERIAL PRIMARY KEY,
+#             texto VARCHAR (200) NOT NULL);
+#             """)
 # Grabar los cambios en la bbdd
 conn.commit()
 print("tabla preguntas creada")
@@ -116,16 +117,16 @@ cur.execute(
 conn.commit()
 
 
-cur.execute(
-  """
-  CREATE TABLE IF NOT EXISTS opciones_chatbot (
-    id_opcion INTEGER PRIMARY KEY AUTOINCREMENT,
-    texto_opcion TEXT NOT NULL
-);
-  """
-)
-conn.commit()
-print("tablas chatbot creadas")
+# cur.execute(
+#   """
+#   CREATE TABLE IF NOT EXISTS opciones_chatbot (
+#     id_opcion INTEGER PRIMARY KEY AUTOINCREMENT,
+#     texto_opcion TEXT NOT NULL
+# );
+#   """
+# )
+# conn.commit()
+# print("tablas chatbot creadas")
 
 
 cur.execute(
@@ -155,15 +156,150 @@ print("tablas preguntas_opciones_chatbot creada")
 
 cur.execute(
   """CREATE TABLE IF NOT EXISTS respuestas_modelo (
-    user_id INT,
-    question_id INT,
-    selected_option TEXT,
-    PRIMARY KEY (user_id, question_id)
+    id_usuario VARCHAR(255) PRIMARY KEY NOT NULL,
+    respuesta_modelo TEXT
 );
 """
 )
+conn.commit()
 print('tabla respuestas_modelo creada')
 
-# Cerrar el cursor y la bbdd
+
+cur.execute(
+  """CREATE TABLE IF NOT EXISTS respuestas_personal_sanitario (
+    id_usuario VARCHAR(255) PRIMARY KEY NOT NULL,
+    especialidad VARCHAR(255),
+    recursos VARCHAR(255)
+);
+"""
+)
+print('tabla respuestas_personal_sanitario creada')
+conn.commit()
+
+cur.execute(
+  """CREATE TABLE IF NOT EXISTS respuestas_trabajador_social (
+    id_usuario VARCHAR(255) PRIMARY KEY NOT NULL,
+    especialidad VARCHAR(255),
+    recursos VARCHAR(255)
+);
+"""
+)
+print('tabla respuestas_trabajador_social creada')
+conn.commit()
+
+cur.execute(
+  """CREATE TABLE IF NOT EXISTS respuestas_psicólogo (
+    id_usuario VARCHAR(255) PRIMARY KEY NOT NULL,
+    especialidad VARCHAR(255),
+    recursos VARCHAR(255)
+);
+"""
+)
+print('tabla respuestas_psicólogo creada')
+conn.commit()
+
+cur.execute(
+  """CREATE TABLE IF NOT EXISTS respuestas_educador (
+    id_usuario VARCHAR(255) PRIMARY KEY NOT NULL,
+    especialidad VARCHAR(255),
+    recursos VARCHAR(255)
+);
+"""
+)
+print('tabla respuestas_educador creada')
+conn.commit()
+
+cur.execute(
+  """CREATE TABLE IF NOT EXISTS voluntario_y_cuidador (
+    id_usuario VARCHAR(255) PRIMARY KEY NOT NULL,
+    especialidad VARCHAR(255),
+    recursos VARCHAR(255)
+);
+"""
+)
+print('tabla respuestas_voluntario_y_cuidador creada')
+conn.commit()
+
+
+cur.execute("""CREATE TABLE IF NOT EXISTS respuestas_chatbot_nosanitarios (
+    id_usuario VARCHAR(255) PRIMARY KEY,
+    pregunta1 TEXT,
+    respuesta1 TEXT,
+    response_array JSONB
+);""")
+
+print('tabla respuestas_chatbot_nosanitarios creada')
+conn.commit()
+
+cur.execute("""CREATE TABLE IF NOT EXISTS respuestas_chatbot_sanitarios (
+    id_usuario VARCHAR(255) PRIMARY KEY,
+    especialidad VARCHAR(255),
+    recursos VARCHAR(255)
+);""")
+
+print('tabla respuestas_chatbot_sanitarios creada')
+conn.commit()
+
+# Obtener valores únicos de respuesta1 de no sanitarios
+cur.execute("SELECT DISTINCT respuesta1 FROM respuestas_chatbot_nosanitarios")
+unique_responses = cur.fetchall()  # Devuelve una lista de tuplas
+
+for response in unique_responses:
+    response_value = response[0]
+
+    # Generar un nombre válido para la tabla
+    table_name = re.sub(r'\W+', '_', response_value.lower())
+    table_name = f"respuestas_chatbot_{table_name}"
+
+    # Extraer valores únicos de response_array
+    cur.execute(f"""
+    SELECT DISTINCT jsonb_array_elements_text(response_array)
+    FROM respuestas_chatbot_nosanitarios
+    WHERE respuesta1 = %s
+    """, (response_value,))
+    unique_array_values = [row[0] for row in cur.fetchall()]  # Lista de valores únicos
+
+    # Crear columnas dinámicamente
+    dynamic_columns = ", ".join(
+        [f"columna{i+1} TEXT" for i in range(len(unique_array_values))]
+    )
+
+    # Crear la tabla con columnas dinámicas
+
+    cur.execute(f"""
+    CREATE TABLE IF NOT EXISTS {table_name} (
+        id_usuario VARCHAR,
+        pregunta1 TEXT,
+        respuesta1 TEXT,
+        {dynamic_columns}
+    );
+    """)
+    conn.commit()
+
+    # Poblar la tabla con los datos
+    cur.execute(f"SELECT id_usuario, pregunta1, respuesta1, response_array FROM respuestas_chatbot_nosanitarios WHERE respuesta1 = %s",
+                 (response_value,))
+    rows = cur.fetchall()
+
+    for row in rows:
+        id_usuario, pregunta1, respuesta1, response_array = row
+        
+        # Convertir el array en una lista de valores
+        response_values = [response_array[i] if i < len(response_array) else None for i in range(len(unique_array_values))]
+
+        # Crear las columnas dinámicas para este registro
+        column_names = ", ".join([f"columna{i+1}" for i in range(len(response_values))])
+        placeholders = ", ".join(["%s"] * len(response_values))
+        
+        insert_query = f"""
+        INSERT INTO {table_name} (id_usuario, pregunta1, respuesta1, {column_names})
+        VALUES (%s, %s, %s, {placeholders})
+        """
+        cur.execute(insert_query, (id_usuario, pregunta1, respuesta1, *response_values))
+
+# Confirmar cambios y cerrar conexión
+conn.commit()
+
+#Cerrar el cursor y la bbdd
 cur.close()
 conn.close() 
