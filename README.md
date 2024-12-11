@@ -50,7 +50,8 @@ Esta seria la interfaz principal
    ```bash
    git clone https://github.com/usuario/repo.git
 
-
+# Tecnologias
 ![sociosanitario](Imagenes/googlemaps.png)
 ![sociosanitario](Imagenes/render.png)
 ![sociosanitario](Imagenes/aws.png)
+![sociosanitario](Imagenes/gemini.png)
