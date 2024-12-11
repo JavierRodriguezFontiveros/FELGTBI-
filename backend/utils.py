@@ -233,10 +233,8 @@ def grafico_pie(dataframe, viven_espana=True):
         showlegend=True,  # Mostrar la leyenda
         legend_title="Orientación Sexual",  # Título de la leyenda
         legend=dict(
-            x=1,  # Mover la leyenda a la derecha del gráfico
-            xanchor='left',  # Alineación de la leyenda a la izquierda
-            y=0.5,  # Alineación vertical de la leyenda
-            yanchor='middle',  # Centrar la leyenda en el medio
+            x=0.8,  # Mover la leyenda a la derecha del gráfico
+            y=0.9,  # Alineación vertical de la leyenda
             traceorder='normal',  # Orden de las leyendas
             font=dict(size=14),  # Tamaño de la fuente en la leyenda
             bgcolor="white",  # Fondo blanco para la leyenda
@@ -360,7 +358,9 @@ def barras_apiladas_genero_orientacion_html(dataframe):
             yaxis_title_font=dict(size=18),  
             xaxis_tickfont=dict(size=16),  
             yaxis_tickfont=dict(size=16),
-            legend_font=dict(size=14)
+            legend_font=dict(size=14),
+            bordercolor="Black",  # Borde de la leyenda
+            borderwidth=1  # Grosor del borde de la leyenda
             )
 
         # Exportar el gráfico como HTML
@@ -399,6 +399,12 @@ def graficar_permiso_residencia_html(dataframe):
                      color='Permiso de Residencia',
                      color_discrete_sequence=px.colors.qualitative.Pastel,
                      hole=0.3)
+        
+        fig.update_traces(
+        textinfo='percent',  # Mostrar solo el porcentaje dentro del gráfico
+        textfont_size=16,  # Ajustar el tamaño del texto
+                    )
+        
         fig.update_layout(
             title={
                 'text': "Distribución de Permisos de Residencia<br><span style='font-size:18px;color:gray;'>El gráfico muestra la proporción de usuarios con y sin permiso de residencia.</span>",
@@ -408,10 +414,12 @@ def graficar_permiso_residencia_html(dataframe):
             paper_bgcolor='white',
             title_font=dict(size=22),
             legend=dict(
-                x=0.7,
-                y=0.7
+                x=0.8,
+                y=0.7,
+                bordercolor="Black",  # Borde de la leyenda
+                borderwidth=1  # Grosor del borde de la leyenda
             ),
-            legend_font=dict(size=14),
+            legend_font=dict(size=14)
         )
         # Exportar el gráfico como HTML
         return fig.to_html(full_html=False)
@@ -446,7 +454,7 @@ def colectivos(dataframe):
                  y='Cantidad', 
                  color='Condición',
                  title="Frecuencia de Condiciones por Variable (Solo True)",
-                 labels={'Cantidad': 'Número de Personas', 'Condición': 'Variable'},
+                 labels={'Cantidad': 'Número de Personas', 'Condición': 'Colectivos '},
                  color_discrete_sequence=px.colors.qualitative.Pastel)
 
     # Personalizar el gráfico
@@ -476,6 +484,9 @@ def obtener_top_5_ciudades(dataframe):
     return top_5_ciudades
 
 
+
+# CHECK: error 500
+
 def graficar_top_5_ciudades(dataframe):
     # Obtener las 5 ciudades más frecuentes
     top_5_ciudades = obtener_top_5_ciudades(dataframe)
@@ -504,12 +515,14 @@ def graficar_top_5_ciudades(dataframe):
         yaxis_tickfont=dict(size=16),  
         plot_bgcolor="white",  # Fondo blanco para el área del gráfico
         paper_bgcolor="white",  # Fondo blanco para el gráfico completo
+        legend=False
     )
     
     return fig
 
 
 
+#CHECK: error 500
 
 ###EDITADA###
 def ambito_laboral(dataframe):
@@ -559,3 +572,6 @@ def ambito_laboral(dataframe):
 
 
 
+
+if __name__ == '__main__':
+    connect_to_db()
