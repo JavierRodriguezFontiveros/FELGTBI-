@@ -15,7 +15,7 @@ load_dotenv(dotenv_path="../credenciales.env")
 google_places = os.getenv("GPLACES_API_KEY")
 
 # Imprimir la clave para verificar (debería mostrar la clave si está bien cargada)
-print("API Key:", google_places)
+# print("API Key:", google_places)
 
 # Configurar la clave de API como variable de entorno
 os.environ["GPLACES_API_KEY"] = google_places
