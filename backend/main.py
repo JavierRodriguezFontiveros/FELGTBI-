@@ -942,12 +942,12 @@ async def personalizar_prompt_usuario_ss(data: dict):
         
         # Query adaptada
         query = """INSERT INTO respuestas_chatbot_sanitarios 
-        (id_usuario, pregunta1, respuesta1, response_array) 
-        VALUES (%s, %s, %s, %s)"""
+        (id_usuario, especialidad, recursos) 
+        VALUES (%s, %s, %s)"""
 
         # Asignar los datos a los placeholders
         datos_ss = (
-            raw_data[0], raw_data[1], raw_data[2], json.dumps(raw_data[3:])
+            raw_data[0], raw_data[2], raw_data[4],)
         )
 
         # Aquí iría la ejecución en tu conexión a la base de datos
