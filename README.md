@@ -115,11 +115,11 @@ El enfoque asegura que ningún dato identificable sea almacenado, promoviendo co
 
 ---
 
-### participantes:
+### Participantes:
 
 - ***Hugo Menéndez Montes***
 - ***Ana I. Montero Martín***
-- ***Nathan Jones ***
+- ***Nathan Jones***
 - ***Fran M. Martínez Poyatos***
 - ***Javier Rodríguez Fontiveros***
 
@@ -159,16 +159,3 @@ El enfoque asegura que ningún dato identificable sea almacenado, promoviendo co
             
 
 
-
-### participantes:
-
-- Hugo Menéndez Montes
-- Ana I. Montero Martín
-- Nathan Jones 
-- Fran M. Martínez Poyatos
-- Javier Rodríguez Fontiveros
-
-
-
-## **Extructura del repositorio**
-![logo](Imagenes/logo.png)
