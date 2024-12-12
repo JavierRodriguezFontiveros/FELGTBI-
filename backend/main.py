@@ -773,7 +773,7 @@ async def personalizar_prompt_usuario_no_ss(data: dict):
 #######################################################
         # Construcción del prompt basado en la situación
         prompt = ""
-        if situacion == "Tengo VIH":
+        if situacion == "Tengo vih":
             tiempo_diagnostico = values[4]
             en_tratamiento = values[6]
             acceso_medico = values[8]
@@ -781,7 +781,7 @@ async def personalizar_prompt_usuario_no_ss(data: dict):
             prompt = (
                 f"Mis pronombres son: {pronombres}. \n"
                 f"Vivo en {provincia}. Dame respuestas orientadas a ese lugar.\n"
-                f"Tengo VIH diagnosticado desde {tiempo_diagnostico}. \n"
+                f"Tengo vih diagnosticado desde {tiempo_diagnostico}. \n"
                 f"¿Estoy en tratamiento TAR? {en_tratamiento}. \n"
                 f"Tengo acceso a un médico: {acceso_medico}. \n"
                 f"Necesito información sobre: {informacion_necesaria}."
@@ -845,7 +845,26 @@ async def personalizar_prompt_usuario_no_ss(data: dict):
 
         # Mapear los valores del array 'response_array' en las columnas correspondientes
 
-        if "Creo que me he expuesto al virus" in respuesta1:
+        if "Tengo vih" in respuesta1:
+            # Para la situación "Tengo vih"
+            situacion = respuesta1
+            tiempo_diagnostico = next((response_array[i+1] for i in range(len(response_array)) if response_array[i] == "¿Cuándo te diagnosticaron?"), None)
+            tratamiento_tar = next((response_array[i+1] for i in range(len(response_array)) if response_array[i] == "¿Estás en tratamiento TAR?"), None)
+            compartido_diagnostico = next((response_array[i+1] for i in range(len(response_array)) if response_array[i] == "¿Has compartido tu diagnóstico con alguien?"), None)
+            acceso_recursos = next((response_array[i+1] for i in range(len(response_array)) if response_array[i] == "¿Tienes acceso a recursos locales o grupos de apoyo?"), None)
+            acceso_personal_sanitario = next((response_array[i+1] for i in range(len(response_array)) if response_array[i] == "¿Tienes acceso a personal sanitario?"), None)
+            recursos_informacion = next((response_array[i+1] for i in range(len(response_array)) if response_array[i] == "¿Quieres más información sobre algún tema?"), None)
+
+            # Insertar en la tabla respuestas_chatbot_tengo_vih
+            cursor.execute("""
+                INSERT INTO respuestas_chatbot_tengo_vih (
+                    id_usuario, situacion, tiempo_diagnostico, tratamiento_tar, compartido_diagnostico, 
+                    acceso_recursos, acceso_personal_sanitario, recursos_informacion
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """, (id_usuario, situacion, tiempo_diagnostico, tratamiento_tar, compartido_diagnostico, acceso_recursos, acceso_personal_sanitario, recursos_informacion))
+            connection.commit()
+
+        elif "Creo que me he expuesto al virus" in respuesta1:
             # Para la situación de "Creo que me he expuesto al virus"
             situacion = respuesta1
             tiempo_exposicion = next((response_array[i+1] for i in range(len(response_array)) if response_array[i] == "¿Cuándo ocurrió la posible infección?"), None)
@@ -1249,7 +1268,7 @@ if __name__ == "__main__":
 #   "data": {
 #     "1.1": {
 #       "id_usuario" : "1234abcd",
-#       "titulo": "Tengo VIH",
+#       "titulo": "Tengo vih",
 #       "preguntas": {
 #         "¿Cuándo te diagnosticaron?": ["Hace menos de 6 meses"],
 #         "¿Estás en tratamiento TAR?": ["Sí"],
@@ -1264,7 +1283,7 @@ if __name__ == "__main__":
 # { "data" : [
 #     "1234abcd",
 #     "¿Cuál es tu situación?",
-#     "Tengo VIH",
+#     "Tengo vih",
 #     "¿Cuándo te diagnosticaron?",
 #     "Hace menos de 6 meses",
 #     "¿Estás en tratamiento TAR?",
@@ -1282,5 +1301,5 @@ if __name__ == "__main__":
 #     "Especialidad",
 #     "Personal sanitario",
 #     "¿Qué necesitas como personal sanitario?",
-#     "Manejo clínico de pacientes con VIH"
+#     "Manejo clínico de pacientes con vih"
 # ]}
