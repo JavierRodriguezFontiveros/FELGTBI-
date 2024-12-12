@@ -314,6 +314,7 @@ class SexualOrientation(str, Enum):
     bisexual = "Bisexual"
     pansexual = "Pansexual"
     asexual = "Asexual"
+    heterosexual = "Heterosexual"
     otro = "Otro"
 
 
