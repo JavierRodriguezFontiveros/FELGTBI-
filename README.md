@@ -115,6 +115,15 @@ El enfoque asegura que ningún dato identificable sea almacenado, promoviendo co
 
 ---
 
+### participantes:
+
+- ***Hugo Menéndez Montes***
+- ***Ana I. Montero Martín***
+- ***Nathan Jones ***
+- ***Fran M. Martínez Poyatos***
+- ***Javier Rodríguez Fontiveros***
+
+
 ## **Extructura del repositorio**
    ```bash
    FELGTBI_plus/
@@ -147,7 +156,7 @@ El enfoque asegura que ningún dato identificable sea almacenado, promoviendo co
    │   ├── presentacion.pdf
    │
    └── README.md
-              
+            
 
 
 
