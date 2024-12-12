@@ -1,7 +1,6 @@
 # Backend del chatbot vih360
- ## **Asistencia y orientación en materia de VIH y SIDA**
-![logo](Imagenes/logo.png)
-
+![web](Imagenes/interfaz_web.png)
+## **Asistencia y orientación en materia de vih y sida**
 ## **Descripción**
 
 ### **1. Datos y problemática**
@@ -17,6 +16,7 @@ El impacto del virus no se limita a su dimensión física; el **estigma social a
 
 Estos factores destacan la urgencia de ofrecer información personalizada y accesible que fomente la equidad en salud.
 
+![sociosanitario](Imagenes/diapositiva.png)
 ---
 
 ### **2. Planteamiento**
@@ -37,15 +37,31 @@ Desde una perspectiva alineada con la **FELGTBI+**, la salud debe abordarse de f
 
 ---
 
+### **3. Funcionamiento**
+![sociosanitario](Imagenes/no_sociosanitario.png)  
 
+La herramienta operará mediante un **árbol de decisión** interactivo:
+- **Preguntas predefinidas** que guían al usuario según su situación.
+- **Rutas personalizadas**:
+  - Información sobre **prevención**, **pruebas diagnósticas**, **manejo emocional**, y **recursos locales**.
+  - Ejemplo de rutas:
+    - Una persona que sospecha una exposición reciente al VIH.
+    - Un profesional sociosanitario que busca pautas de asesoramiento.
+- **Evitar cajas de texto libre**: Esto permite mantener una guía clara, estructurada y un acompañamiento cercano.
 
+![sociosanitario](Imagenes/chatbot_2.png)
 
+### **Adaptación de la información**
+La información será adaptada para ser:
+- Relevante y comprensible según el perfil del usuario.
+- Basada en evidencia científica y recomendaciones actualizadas.
+- Accediendo ala api de **Gemini**  
 
+![sociosanitario](Imagenes/gemini.png)  
 
+- Dando ubicaciones cercana de centros personalizados accediendo a la api de **googlemaps**.
 
-
-
-
+![sociosanitario](Imagenes/googlemaps.png)
 
 
 
@@ -66,9 +82,9 @@ La aplicación está dirigida a:
 - Comunidad general que desea información fiable y empática.
 
 Esta seria la interfaz principal 
-![web](Imagenes/interfaz_web.png)
 
-![sociosanitario](Imagenes/diapositva.png)
+
+
 
 ---
 
@@ -103,18 +119,20 @@ Esta seria la interfaz principal
    ```bash
    git clone https://github.com/usuario/repo.git
 
-# Tecnologias
-![sociosanitario](Imagenes/googlemaps.png)
-![sociosanitario](Imagenes/render.png)
-![sociosanitario](Imagenes/aws.png)
-![sociosanitario](Imagenes/gemini.png)
 
-participantes:
+
+### participantes:
 -Hugo
 -Ana
 -Nathan
 -Fran
 -Javier
+### Tecnologias
+
+![sociosanitario](Imagenes/googlemaps.png)
+![sociosanitario](Imagenes/render.png)
+![sociosanitario](Imagenes/aws.png)
+![sociosanitario](Imagenes/gemini.png)
 
 import requirements:
 fastapi==0.115.5
@@ -135,3 +153,6 @@ python-multipart==0.0.19
 
 ![sociosanitario](Imagenes/grafico_barchart.png)
 ![sociosanitario](Imagenes/barras_apiladas.png)
+
+## **Extructura del repositorio**
+![logo](Imagenes/logo.png)
