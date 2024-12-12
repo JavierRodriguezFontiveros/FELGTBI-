@@ -115,7 +115,7 @@ El enfoque asegura que ningún dato identificable sea almacenado, promoviendo co
 
 ---
 
-### participantes:
+### Participantes:
 
 - ***Hugo Menéndez Montes***
 - ***Ana I. Montero Martín***
