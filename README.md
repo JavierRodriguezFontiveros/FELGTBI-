@@ -1,6 +1,58 @@
-
- # **Asistencia y orientación en materia de VIH y SIDA**
+# Backend del chatbot vih360
+ ## **Asistencia y orientación en materia de VIH y SIDA**
 ![logo](Imagenes/logo.png)
+
+## **Descripción**
+
+### **1. Datos y problemática**
+
+El VIH continúa siendo un desafío global de salud pública, con implicaciones que trascienden lo médico. Según ONUSIDA:
+- **1,5 millones de nuevos casos** fueron reportados recientemente.
+- **38 millones de personas** viven actualmente con VIH.
+
+El impacto del virus no se limita a su dimensión física; el **estigma social asociado** puede ser incluso más devastador. Las comunidades vulnerables, como la población LGTBIQ+, enfrentan barreras significativas:
+- **Prejuicios sociales** que dificultan el acceso a información y servicios libres de discriminación.
+- **Falta de enfoque específico**: Las necesidades de hombres trans, mujeres lesbianas y migrantes, entre otros, suelen pasar desapercibidas.
+- **Carencia de personal capacitado**: Los trabajadores sociosanitarios requieren orientación y actualizaciones regulares para garantizar una atención inclusiva y eficaz.
+
+Estos factores destacan la urgencia de ofrecer información personalizada y accesible que fomente la equidad en salud.
+
+---
+
+### **2. Planteamiento**
+
+Desde una perspectiva alineada con la **FELGTBI+**, la salud debe abordarse de forma integral:
+- Dimensiones **físicas**, **emocionales** y **sociales** como pilares esenciales.
+- Proveer una **herramienta segura y confiable**, que:
+  - Incluya información actualizada sobre prevención y apoyo emocional.
+  - Sea accesible y amigable para usuarios con diversas necesidades.
+
+### **Principios rectores**
+1. **Lenguaje inclusivo**: Adaptado a todas las identidades y realidades.  
+2. **Accesibilidad**: Información clara, fácil de usar para diferentes niveles educativos.  
+3. **Interseccionalidad**: Reconocer las múltiples formas de discriminación que pueden superponerse.  
+4. **Amabilidad y empatía**: Fomentar la confianza en el usuario.  
+5. **Diversidad de escenarios**: Incluir la mayor cantidad de casuísticas posibles.  
+6. **Recopilación de estadísticas**: Para mejorar continuamente y adaptarse a las necesidades emergentes.
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ## **Descripción**
@@ -16,6 +68,7 @@ La aplicación está dirigida a:
 Esta seria la interfaz principal 
 ![web](Imagenes/interfaz_web.png)
 
+![sociosanitario](Imagenes/diapositva.png)
 
 ---
 
