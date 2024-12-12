@@ -16,7 +16,8 @@ El impacto del virus no se limita a su dimensión física; el **estigma social a
 
 Estos factores destacan la urgencia de ofrecer información personalizada y accesible que fomente la equidad en salud.
 
-![sociosanitario](Imagenes/diapositiva.png)
+<img src="Imagenes/diapositiva.png" alt="sociosanitario" width="70%">   
+
 ---
 
 ### **2. Planteamiento**
@@ -38,7 +39,7 @@ Desde una perspectiva alineada con la **FELGTBI+**, la salud debe abordarse de f
 ---
 
 ### **3. Funcionamiento**
-![sociosanitario](Imagenes/no_sociosanitario.png)  
+<img src="Imagenes/no_sociosanitario.png" alt="sociosanitario" width="50%">
 
 La herramienta operará mediante un **árbol de decisión** interactivo:
 - **Preguntas predefinidas** que guían al usuario según su situación.
@@ -47,7 +48,7 @@ La herramienta operará mediante un **árbol de decisión** interactivo:
   - Ejemplo de rutas:
     - Una persona que sospecha una exposición reciente al VIH.
     - Un profesional sociosanitario que busca pautas de asesoramiento.
-- **Evitar cajas de texto libre**: Esto permite mantener una guía clara, estructurada y un acompañamiento cercano.
+- **Evitar cajas de texto libre**: Esto permite mantener una guía clara, estructurada y un acompañamiento cercano. 
 
 ![sociosanitario](Imagenes/chatbot_2.png)
 
@@ -55,13 +56,12 @@ La herramienta operará mediante un **árbol de decisión** interactivo:
 La información será adaptada para ser:
 - Relevante y comprensible según el perfil del usuario.
 - Basada en evidencia científica y recomendaciones actualizadas.
-- Accediendo ala api de **Gemini** para la respuesta personalizada.
+- Accediendo ala api de **Gemini** para la respuesta personalizada.   
+<img src="Imagenes/gemini.png" alt="sociosanitario" width="9.5%">
 
-![sociosanitario](Imagenes/gemini.png)  
+- Dando ubicaciones cercana de centros específicos de vih accediendo a la api de **googlemaps**.   
+<img src="Imagenes/googlemaps.png" alt="sociosanitario" width="9.5%">
 
-- Dando ubicaciones cercana de centros específicos de vih accediendo a la api de **googlemaps**.
-
-![sociosanitario](Imagenes/googlemaps.png)
 
 ---
 
@@ -75,8 +75,11 @@ El sistema garantizará el **anonimato y la confidencialidad total** mediante:
   - Mejorar la calidad del contenido.
   - Actualizar periódicamente las rutas del árbol de decisión.
 
-![sociosanitario](Imagenes/grafico_barchart.png)
-![sociosanitario](Imagenes/barras_apiladas.png)
+
+<img src="Imagenes/grafico_barchart.png" alt="sociosanitario" width="80%">
+
+<img src="Imagenes/barras_apiladas.png" alt="sociosanitario" width="80%">
+
 
 ### **Enfoque de privacidad**
 El enfoque asegura que ningún dato identificable sea almacenado, promoviendo confianza entre los usuarios.
@@ -84,19 +87,13 @@ El enfoque asegura que ningún dato identificable sea almacenado, promoviendo co
 ---
 ### **Tecnologias Utilizadas**
 - Estructura de base de datos alojada en **AWS** en irlanda del tipo **PostgreSQL**   
-
-![sociosanitario](Imagenes/aws.png)
+<img src="Imagenes/aws.png" alt="sociosanitario" width="9.5%">
 
 - Para mayor cordinación con el grupo de **frontend** desplegamos la aplicacion en **Render**   
-
-![sociosanitario](Imagenes/render.png)
+<img src="Imagenes/render.png" alt="sociosanitario" width="10%">
 
 
 ---
-
-
-
-
 
 # **Instalación y Configuración**
 
@@ -110,10 +107,47 @@ El enfoque asegura que ningún dato identificable sea almacenado, promoviendo co
 3. Para tu entorno virtual:
    ```bash
    pip install requirements
+
+4. Tambien puedes probarla scaneando el **códigoQR**   
+<img src="Imagenes/codigo.png" alt="sociosanitario" width="10%">
+
+
+
 ---
 
 ## **Extructura del repositorio**
-
+   ```bash
+   FELGTBI_plus/
+   ├── backend/
+   │   ├── main.py
+   │   ├── utils.py
+   │   ├── requirements.txt
+   │
+   ├── Basedatos/
+   │   ├── pruebas/
+   │   │   ├── prueba_1.ipynb
+   │   │   ├── prueba_2.ipynb
+   │
+   ├── Imagenes/
+   │   ├── interfaz_web.png
+   │   ├── diapositiva.png
+   │   ├── no_sociosanitario.png
+   │   ├── chatbot_2.png
+   │   ├── gemini.png
+   │   ├── googlemaps.png
+   │   ├── grafico_barchart.png
+   │   ├── barras_apiladas.png
+   │
+   ├── Modelos/
+   │   ├── pruebas/
+   │   │   ├── modelo_prueba_1.ipynb
+   │   │   ├── modelo_prueba_2.ipynb
+   │
+   ├── presentacion_ppt/
+   │   ├── presentacion.pdf
+   │
+   └── README.md
+              
 
 
 
