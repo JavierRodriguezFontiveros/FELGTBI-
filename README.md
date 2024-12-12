@@ -55,62 +55,50 @@ La herramienta operará mediante un **árbol de decisión** interactivo:
 La información será adaptada para ser:
 - Relevante y comprensible según el perfil del usuario.
 - Basada en evidencia científica y recomendaciones actualizadas.
-- Accediendo ala api de **Gemini**  
+- Accediendo ala api de **Gemini** para la respuesta personalizada.
 
 ![sociosanitario](Imagenes/gemini.png)  
 
-- Dando ubicaciones cercana de centros personalizados accediendo a la api de **googlemaps**.
+- Dando ubicaciones cercana de centros específicos de vih accediendo a la api de **googlemaps**.
 
 ![sociosanitario](Imagenes/googlemaps.png)
 
+---
 
+## **4. Tratamiento de datos (no Identitario, solo Estadístico)**
 
+El sistema garantizará el **anonimato y la confidencialidad total** mediante:
+- **Registro solo de datos agregados**, como:
+  - Rutas más consultadas.
+  - Picos de uso para identificar demandas recurrentes.
+- Utilización de estos datos para:
+  - Mejorar la calidad del contenido.
+  - Actualizar periódicamente las rutas del árbol de decisión.
 
+![sociosanitario](Imagenes/grafico_barchart.png)
+![sociosanitario](Imagenes/barras_apiladas.png)
 
+### **Enfoque de privacidad**
+El enfoque asegura que ningún dato identificable sea almacenado, promoviendo confianza entre los usuarios.
 
+---
+### **Tecnologias Utilizadas**
+- Estructura de base de datos alojada en **AWS** en irlanda del tipo **PostgreSQL**   
 
+![sociosanitario](Imagenes/aws.png)
 
+- Para mayor cordinación con el grupo de **frontend** desplegamos la aplicacion en **Render**   
 
-## **Descripción**
-
-Plataforma web diseñada para brindar información, recursos y asistencia a personas que necesitan apoyo en temas relacionados con el VIH y SIDA. Nuestra misión es derribar barreras de acceso a información confiable, ofrecer herramientas de autoevaluación y conectar a las personas con servicios de apoyo y orientación.
-
-La aplicación está dirigida a:  
-- Personas diagnosticadas con VIH.  
-- Personas interesadas en aprender sobre prevención, tratamiento y cuidados.  
-- Profesionales de la salud que buscan recursos adicionales.  
-- Comunidad general que desea información fiable y empática.
-
-Esta seria la interfaz principal 
-
-
+![sociosanitario](Imagenes/render.png)
 
 
 ---
 
-## **Características Principales**
 
-- **Recursos informativos:** Artículos detallados sobre prevención, tratamiento, mitos y realidades.  
-- **Asistencia personalizada:** Acceso a orientación profesional a través de un sistema de chat o foros anónimos.  
-- **Autoevaluación:** Herramientas interactivas para evaluar riesgos y obtener recomendaciones.  
-- **Mapa de servicios:** Localización de clínicas, centros de prueba y organizaciones de apoyo cercanas.  
-- **Noticias y actualizaciones:** Información actualizada sobre avances en el tratamiento y leyes relacionadas con el VIH/SIDA.
-![no_sociosanitario](Imagenes/no_sociosanitario.png)
----
 
-## **Tecnologías Utilizadas**
 
-![sociosanitario](Imagenes/tablas.png)
-### **Backend**
-- Fastapi
-- Modelo LLM de Gemini  
-- Base de datos alojada en AWS(irlanda) 
 
-![sociosanitario](Imagenes/sociosanitario.png)
-### **Frontend** 
-- Tiene
-
-## **Instalación y Configuración**
+# **Instalación y Configuración**
 
 1. Pincha en el link para probarlo directamente.
 
@@ -119,40 +107,25 @@ Esta seria la interfaz principal
    ```bash
    git clone https://github.com/usuario/repo.git
 
+3. Para tu entorno virtual:
+   ```bash
+   pip install requirements
+---
+
+## **Extructura del repositorio**
+
+
 
 
 ### participantes:
--Hugo
--Ana
--Nathan
--Fran
--Javier
-### Tecnologias
 
-![sociosanitario](Imagenes/googlemaps.png)
-![sociosanitario](Imagenes/render.png)
-![sociosanitario](Imagenes/aws.png)
-![sociosanitario](Imagenes/gemini.png)
-
-import requirements:
-fastapi==0.115.5
-uvicorn==0.32.1
-pandas==2.2.2
-matplotlib==3.8.4
-psycopg2==2.9.10
-python-dotenv==0.21.0
-plotly==5.22.0
-google-generativeai==0.8.3
-kaleido==0.2.1
-ipython==8.12.3
-nbformat>=4.2.0
-googlemaps==4.10.0
-langchain_community==0.3.8
-python-multipart==0.0.19
+- Hugo Menéndez Montes
+- Ana I. Montero Martín
+- Nathan Jones 
+- Fran M. Martínez Poyatos
+- Javier Rodríguez Fontiveros
 
 
-![sociosanitario](Imagenes/grafico_barchart.png)
-![sociosanitario](Imagenes/barras_apiladas.png)
 
 ## **Extructura del repositorio**
 ![logo](Imagenes/logo.png)
