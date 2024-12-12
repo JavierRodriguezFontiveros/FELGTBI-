@@ -123,6 +123,44 @@ def modify_table_records(table_name:str, column:str, new_value:str, id:int) -> N
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+# Esto es para crear contraseñas hasheadas
+# import bcrypt    ##### HABRIA QUE HACER PIP INSTALL bcrypt
+import bcrypt
+
+def add_admin(email: str, plain_password: str):
+    conn = connect_to_db() 
+    cur = None  # Inicializamos el cursor como None
+    try:
+        # Hashea la contraseña
+        hashed_password = bcrypt.hashpw(plain_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        
+        # Crea un cursor
+        cur = conn.cursor()
+        
+        # Inserta el email y la contraseña hasheada en la base de datos
+        query = "INSERT INTO admin_data (email, password) VALUES (%s, %s);"
+        cur.execute(query, (email, hashed_password))
+        
+        # Confirma los cambios en la base de datos
+        conn.commit()
+        print("Admin añadido con éxito.")
+    except Exception as e:
+        print(f"Error al añadir admin: {e}")
+    finally:
+        # Cierra el cursor si fue creado
+        if cur:
+            cur.close()
+        # Cierra la conexión
+        conn.close()
+
+
+# # Ejemplo de uso
+# add_admin("2oadmin@gmail.com", "hansJuapo")
+        
+
+
+
+
 def check_admin_details(email: str, password: str) -> bool:
     conn = connect_to_db()  
     if not conn:
@@ -130,18 +168,28 @@ def check_admin_details(email: str, password: str) -> bool:
     
     try:
         with conn.cursor() as cur:
-            query = "SELECT * FROM admin_data WHERE email = %s AND password = %s;"
-            cur.execute(query, (email, password))
+            # Consulta para obtener el hash almacenado para el email
+            query = "SELECT password FROM admin_data WHERE email = %s;"
+            cur.execute(query, (email,))
             result = cur.fetchone()
+            
             if result:
-                return True  # Valid credentials
+                # Obtén el hash almacenado
+                stored_hash = result[0]
+                
+                # Compara la contraseña ingresada con el hash almacenado
+                if bcrypt.checkpw(password.encode('utf-8'), stored_hash.encode('utf-8')):
+                    return True  # Credenciales válidas
+                else:
+                    return False  # Credenciales inválidas
             else:
-                return False  # Invalid credentials
+                return False  # Email no encontrado
         
     except Exception as e:
         raise RuntimeError(f"Error fetching data: {e}")
     finally:
         conn.close()
+
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -618,7 +666,7 @@ def formateo_incusivo(prompt):
     Palabras como medico en lugar de medice pon medique. Y en plural los mediques.
     
     No hables de nada, simplemente formatealo y sino lo devuelves como está. Y muy importante, VIH siempre ponlo en minuscula (vih).
-    Solo formatealo y que no se genere mucho mas texto.
+    Solo formatealo y que no se genere mucho mas texto del que está.
     """
         model = genai.GenerativeModel("gemini-1.5-flash")
         response = model.generate_content(prompt_inclusivo)
