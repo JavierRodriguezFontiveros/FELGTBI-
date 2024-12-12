@@ -4,6 +4,7 @@ import random
 import os
 from dotenv import load_dotenv
 import numpy as np
+import string
 
 load_dotenv()
 
@@ -40,12 +41,12 @@ cur = conn.cursor()
 # print("Valor añadido")
 
 # Listas de valores que pueden tomar las columnas en la tabla de users_data para rellenar aleatoriamente las filas    
-edad = np.arange(15,80)
+edad = np.arange(10,70)
 pronombre_el = [True, False]
 pronombre_ella = [True, False]
 pronombre_elle = [True, False]
-genero = ["hombre_cis", "hombre_trans", "mujer_cis", "mujer_trans", "no_binarie", "otro"]
-orientacion = ["gay", "lesbiana", "bisexual", "heterosexual", "pansexual", "asexual", "otro"]
+genero = ["Hombre cis", "Hombre trans", "Mujer cis", "Mujer trans", "No binarie", "Otro"]
+orientacion = ["Gay", "Lesbiana", "Bisexual", "Heterosexual", "Pansexual", "Asexual", "Otro"]
 vives_espana = [True, False]
 nacionalidad = ["Afganistán", "Albania", "Alemania", "Andorra", "Angola", "Antigua y Barbuda", "Argentina", "Armenia", "Australia", 
         "Austria", "Azerbaiyán", "Bahamas", "Bangladés", "Barbados", "Bielorrusia", "Bélgica", "Belice", "Benín", "Bolivia", "Bosnia y Herzegovina", 
@@ -60,7 +61,7 @@ nacionalidad = ["Afganistán", "Albania", "Alemania", "Andorra", "Angola", "Anti
         "Santo Tomé y Príncipe", "Senegal", "Serbia", "Seychelles", "Sierra Leona", "Singapur", "Siria", "Somalia", "Sri Lanka", "Sudáfrica", "Sudán", "Surinam", "Suecia", "Suiza", 
         "Sudán del Sur", "Esuatini", "Tailandia", "Tanzania", "Togo", "Tonga", "Trinidad y Tobago", "Túnez", "Turquía", "Turkmenistán", "Tuvalu", "Ucrania", "Uganda", "Uruguay", 
         "Uzbekistán", "Vanuatu", "Venezuela", "Vietnam", "Yemen", "Yugoslavia", "Zambia", "Zimbabue"]
-permiso_residencia = ["Con permiso de residencia", "De vacaciones", "Permiso de residencia en trámite", "Otros"]
+permiso_residencia = [True, False]
 persona_racializada = [True, False]
 discapacitade = [True, False]
 sin_hogar = [True, False]
@@ -71,9 +72,18 @@ provincia = ["Álava", "Albacete", "Alicante", "Almería", "Ávila", "Badajoz", 
               "Huesca", "Jaén", "La Rioja", "Las Palmas", "León", "Lugo", "Madrid", "Málaga", "Melilla", "Murcia", "Navarra", "Ourense", 
               "Palencia", "Pontevedra", "Salamanca", "Segovia", "Sevilla", "Soria", "Tarragona", "Teruel", "Toledo", "Valencia", "Valladolid", 
               "Vizcaya", "Zamora", "Zaragoza", "Fuera de España"]
+estudios = ["Primarios", "Secundarios","Técnicos", "Universitarios","Postgrado","Otro"]
+situacion_afectiva = ["Soltere","En pareja","Casade","Divorciade","Viude","Otro"]
+
+def generar_valor_aleatorio(longitud=14):
+    caracteres = string.digits + string.ascii_lowercase  # Números y letras minúsculas
+    valor = ''.join(random.choice(caracteres) for _ in range(longitud))
+    return valor
+
+
 
 # Generar 100 filas con datos aleatorios
-for _ in range(100):
+for _ in range(200):
     edad_random = int(random.choice(edad))
     pronombre_el_random = random.choice(pronombre_el)
     pronombre_ella_random = random.choice(pronombre_ella)
@@ -89,6 +99,9 @@ for _ in range(100):
     migrante_random = random.choice(migrante)
     intersexual_random = random.choice(intersexual)
     provincia_random = random.choice(provincia)
+    estudios_random = random.choice(estudios)
+    situacion_afectiva_random = random.choice(situacion_afectiva)
+    id_usuario_random = generar_valor_aleatorio()
 
     # Insertar los datos en la tabla
     cur.execute("""
@@ -96,36 +109,55 @@ for _ in range(100):
                                                 orientacion_sexual, vives_en_espana, nacionalidad, permiso_residencia,
                                                 persona_racializada, persona_discapacitada, persona_sin_hogar,
                                                 persona_migrante, persona_intersexual, nivel_estudios, situacion_afectiva,
-                                                provincia)
-           VALUES (%(edad)s, %(pronombre_el)s, %(pronombre_ella)s, %(pronombre_elle)s, %(identidad_genero)s,
-                   %(orientacion_sexual)s, %(vives_en_espana)s, %(nacionalidad)s, %(permiso_residencia)s,
-                   %(persona_racializada)s, %(persona_discapacitada)s, %(persona_sin_hogar)s, %(persona_migrante)s,
-                   %(persona_intersexual)s, %(nivel_estudios)s, %(situacion_afectiva)s, %(provincia)s)
+                                                provincia, id_usuario)
+        VALUES (%(edad)s, %(pronombre_el)s, %(pronombre_ella)s, %(pronombre_elle)s, %(identidad_genero)s,
+                %(orientacion_sexual)s, %(vives_en_espana)s, %(nacionalidad)s, %(permiso_residencia)s,
+                %(persona_racializada)s, %(persona_discapacitada)s, %(persona_sin_hogar)s, %(persona_migrante)s,
+                %(persona_intersexual)s, %(nivel_estudios)s, %(situacion_afectiva)s, %(provincia)s, %(id_usuario)s)
     """, 
-    (edad_random, pronombre_el_random, pronombre_ella_random, pronombre_elle_random, genero_random, orientacion_random, vives_espana_random, nacionalidad_random, permiso_residencia_random, persona_racializada_random, discapacitade_random, sin_hogar_random, migrante_random, intersexual_random))
+    {
+    'edad': edad_random,
+    'pronombre_el': pronombre_el_random,
+    'pronombre_ella': pronombre_ella_random,
+    'pronombre_elle': pronombre_elle_random,
+    'identidad_genero': genero_random,
+    'orientacion_sexual': orientacion_random,
+    'vives_en_espana': vives_espana_random,
+    'nacionalidad': nacionalidad_random,
+    'permiso_residencia': permiso_residencia_random,
+    'persona_racializada': persona_racializada_random,
+    'persona_discapacitada': discapacitade_random,
+    'persona_sin_hogar': sin_hogar_random,
+    'persona_migrante': migrante_random,
+    'persona_intersexual': intersexual_random,
+    'nivel_estudios': estudios_random,
+    'situacion_afectiva': situacion_afectiva_random,
+    'provincia': provincia_random,
+    'id_usuario': id_usuario_random
+})
 
 
 # Confirmar los cambios
 conn.commit()
 
 # Listas de valores que pueden tomar las columnas en la tabla de sociosanitarios_data para rellenar aleatoriamente las filas
-ambito_laboral = ["Hospitalario", "Centro de salud", "Asociación", "Centro comunitario"]
-#especialidad = ["Trabajador social", "Especialista en ETS", "Voluntarios y cuidadores", "Personal sanitario", "Educador"]
+# ambito_laboral = ["Hospitalario", "Centro de salud", "Asociación", "Centro comunitario"]
+# #especialidad = ["Trabajador social", "Especialista en ETS", "Voluntarios y cuidadores", "Personal sanitario", "Educador"]
 
-# Generar 100 filas con datos aleatorios
-for _ in range(100):
-    provincia_random = random.choice(provincia)
-    ambito = random.choice(ambito_laboral)
-    #especialidad_seleccionada = random.choice(especialidad)
+# # Generar 100 filas con datos aleatorios
+# for _ in range(100):
+#     provincia_random = random.choice(provincia)
+#     ambito = random.choice(ambito_laboral)
+#     #especialidad_seleccionada = random.choice(especialidad)
     
-    # Insertar los datos en la tabla
-    cur.execute("""
-        INSERT INTO sociosanitarios_data (provincia, ambito_laboral, especialidad)
-        VALUES (%s, %s, %s)
-    """, (provincia_random, ambito, especialidad_seleccionada))
+#     # Insertar los datos en la tabla
+#     cur.execute("""
+#         INSERT INTO sociosanitarios_data (provincia, ambito_laboral, especialidad)
+#         VALUES (%s, %s, %s)
+#     """, (provincia_random, ambito, especialidad_seleccionada))
 
-# Confirmar los cambios
-conn.commit()
+# # Confirmar los cambios
+# conn.commit()
 
 # cur.execute("""
 #     INSERT INTO preguntas_front (id_categoria, titulo_categoria, texto_pregunta, texto_opcion) VALUES
